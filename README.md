@@ -2,7 +2,7 @@
 
 This repo contains scripts for setting up a kubernetes cluster for [ipfs testground](https://testground.ipfs.team)
 
-Using the kubernetes cluster runner on IPFS testground enables you to test p2p workloads at high scaleu. Testing at high volume is a pivotal component of developing rock solid distributed software. Using the kuberentes runner, testground can test workloads with 10k+ instances. While this is magnitudes smaller than the interplanetary-scale IPFS network, testing at this level has enabled us to find issues that would have been undetectable on smaller tests.
+Using the kubernetes cluster runner on IPFS testground enables you to test p2p workloads at high scale. Testing at high volume is a pivotal component of developing rock solid distributed software. Using the kuberentes runner, testground can test workloads with 10k+ instances. While this is magnitudes smaller than the interplanetary-scale IPFS network, testing at this level has enabled us to find issues that would have been undetectable on smaller tests.
 
 
 Our work is never finished. If you see anything we can do better, file an issue or open a PR!
