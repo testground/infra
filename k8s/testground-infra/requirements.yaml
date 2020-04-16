@@ -1,0 +1,9 @@
+---
+dependencies:
+
+  - name: redis
+    repository: https://charts.bitnami.com/bitnami
+    version: "*"
+
+  - name: testground-dashboards
+    version: "0.0.*"
