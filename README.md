@@ -10,11 +10,36 @@ The [IPFS](https://ipfs.io/) and [libp2p](https://libp2p.io/) projects have used
 
 ## Quick start
 
-<@coryschwartz>
+We are using kops to create a cluster rather than a hosted kubernetes service. Doing it this way enables us to tune kernel parameters and make customizations that have proven to be important.
+
+There are a couple of dependencies required to make the `cluster:k8s` runner work.
+
+### required software
+  * an AWS account with API access
+  * helm v3+ [link](https://helm.sh/)
+  * kops v1.17.0+ [link](https://github.com/kubernetes/kops/releases)
+  * terraform v0.12+ [link](https://www.terraform.io/)
+
+### environment variables
+Set up environment variables before starting the cluster
+  * AWS_PROFILE      (if you have multiple AWS accounts)
+  * NAME             (cluster name)
+  * PUBKEY           (SSH key for testground workers)
+  * ZONE             (availability zone i.e. us-west-2a)
+  * AWS_REGION       (where is your cluster. i.e. us-west-2)
+  * KOPS_STATE_STORE (s3 bucket for kops)
+  * WORKER_NODES     (size of your kubernetes cluster)
+
+### Create the cluster
+This will take about 15 minutes to complete.
+Once you run this, take some time to walk the dog, clean up around the office, or go get yourself some coffee! When you return, your shiny new kubernetes cluster will be ready to run testground plans.
+
+```
+k8s/install.sh k8s/cluster.yaml
+```
 
 ## Documentation
-
-<@coryschwartz: point to the relevant sections in GitBook>
+Additional information about this runner and more can be found on [testground gitbook](https://app.gitbook.com/@protocol-labs/s/testground/)
 
 ## Contribute
 
