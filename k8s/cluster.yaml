@@ -118,6 +118,8 @@ spec:
       net.ipv4.tcp_mem = 262144 524288 1572864
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 8192
       EOT
   image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
   machineType: c5.2xlarge
@@ -157,6 +159,8 @@ spec:
       net.ipv4.tcp_mem = 262144 524288 1572864
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 8192
       EOT
   cloudLabels:
     testground.nodetype: plan
@@ -199,6 +203,8 @@ spec:
       net.ipv4.tcp_mem = 262144 524288 1572864
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 8192
       EOT
   cloudLabels:
     testground.nodetype: infra
