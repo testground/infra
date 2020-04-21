@@ -1,6 +1,6 @@
 # Testground infrastructure
 
-# Background
+## Background
 
 This repo contains scripts for setting up a Kubernetes cluster for [Testground](http://testground.ipfs.team).
 
@@ -42,7 +42,7 @@ More information on the Testground Networking requirements can be found [here](h
     * [Configure the aws-cli tool with your credentials](https://docs.aws.amazon.com/cli/).
     * Create a `.env.toml` file (copying over the [`env-example.toml`](https://github.com/ipfs/testground/blob/master/env-example.toml) at the root of this repo as a template), and add your region to the `[aws]` section.
 
-2. Download shared key for `kops`. We use a shared key, so that everyone on the team can log into any cluster and have full access.
+2. For the Testground team: Download shared key for `kops`. The Testground team uses a shared key, so that everyone on the team can log into any ephemeral cluster and have full access.
 
 ```sh
 $ aws s3 cp s3://kops-shared-key-bucket/testground_rsa ~/.ssh/
@@ -83,7 +83,7 @@ Where:
 You might want to add them to your `rc` file (`.zshrc`, `.bashrc`, etc.), or to an `.env.sh` file that you source.
 
 In addition to the initial cluster setup, these variables should be accessible to the daemon. If these variables are
-manually set or you source them manually, you should make sure to do so before starting the testground daemon.
+manually set or you source them manually, you should make sure to do so before starting the Testground daemon.
 
 ```sh
 # `NAME` needs to be a subdomain of an existing Route53 domain name.
@@ -109,7 +109,7 @@ $ helm repo update
 
 ## Create the Kubernetes cluster
 
-This will take about 15 minutes to complete.
+This will take about 10-15 minutes to complete.
 
 Once you run this command, take some time to walk the dog, clean up around the office, or go get yourself some coffee! When you return, your shiny new kubernetes cluster will be ready to run testground plans.
 
@@ -207,8 +207,8 @@ If you want to let other people on your team connect to your Kubernetes cluster,
 $ kops export kubecfg --state $KOPS_STATE_STORE --name=$NAME
 ```
 
-# Documentation
-Additional information about this runner and more can be found on [testground gitbook](https://app.gitbook.com/@protocol-labs/s/testground/)
+## Documentation
+Additional information about this runner and more can be found on the [Testground gitbook](https://app.gitbook.com/@protocol-labs/s/testground/)
 
 ## Contribute
 
