@@ -1,0 +1,2 @@
+{"id":2,"orgId":1,"name":"InfluxDB","type":"influxdb","access":"proxy","url":"http://influxdb:8086/","password":"","user":"","database":"metrics","basicAuth":false,"isDefault":true,"jsonData":{},"secureJsonData":null}
+
