@@ -178,6 +178,8 @@ items:
               command:
                 - /home/weave/launch.sh
               env:
+                - name: WEAVE_MTU
+                  value: "8912"
                 - name: CONN_LIMIT
                   value: "250"
                 - name: EXTRA_ARGS
