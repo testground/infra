@@ -212,7 +212,7 @@ Additional information about this runner and more can be found on the [Testgroun
 
 ## Contribute
 
-Our work is never finished. If you see anything we can do better, file an issue or open a PR!
+Our work is never finished. If you see anything we can do better, file an issue on [github.com/testground/testground](https://github.com/testground/testground) repo or open a PR!
 
 ## License
 
