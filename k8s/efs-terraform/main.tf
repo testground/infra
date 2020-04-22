@@ -10,6 +10,13 @@ resource "aws_efs_file_system" "default" {
 resource "aws_efs_mount_target" "default" {
   count           = 1
   file_system_id  = join("", aws_efs_file_system.default.*.id)
-  subnet_id       = var.fs_subnet_id
+  subnet_id       = var.fs_subnet_id_zone_a
+  security_groups = [var.fs_sg_id]
+}
+
+resource "aws_efs_mount_target" "default" {
+  count           = 1
+  file_system_id  = join("", aws_efs_file_system.default.*.id)
+  subnet_id       = var.fs_subnet_id_zone_b
   security_groups = [var.fs_sg_id]
 }
