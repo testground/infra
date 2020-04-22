@@ -2,6 +2,7 @@
 
 set -o errexit
 set -o pipefail
+set -x
 
 set -e
 
@@ -29,15 +30,8 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetIds=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }'`
-
-if [[ -z ${subnetId} ]]; then
-  echo "Couldn't detect AWS Subnets created by `kops`"
-  exit 1
-fi
-
-subnetIdZoneA=`echo $subnetIds | sort | head -1`
-subnetIdZoneB=`echo $subnetIds | sort | tail -1`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | head -1`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | tail -1`
 
 echo "Detected Subnet: $subnetIdZoneA"
 echo "Detected Subnet: $subnetIdZoneB"
