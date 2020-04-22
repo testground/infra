@@ -83,7 +83,7 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetId=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }'`
+subnetId=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | head -n 1`
 
 if [[ -z ${subnetId} ]]; then
   echo "Couldn't detect AWS Subnet created by `kops`"
