@@ -81,9 +81,13 @@ spec:
   - 0.0.0.0/0
   subnets:
   - cidr: 172.20.32.0/19
-    name: ${ZONE}
+    name: ${ZONE_A}
     type: Public
-    zone: ${ZONE}
+    zone: ${ZONE_A}
+  - cidr: 172.20.64.0/19
+    name: ${ZONE_B}
+    type: Public
+    zone: ${ZONE_B}
   topology:
     dns:
       type: Public
@@ -126,10 +130,10 @@ spec:
   maxSize: 1
   minSize: 1
   nodeLabels:
-    kops.k8s.io/instancegroup: master-${ZONE}
+    kops.k8s.io/instancegroup: master-${ZONE_A}
   role: Master
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
 
 ---
 
@@ -173,7 +177,8 @@ spec:
     testground.nodetype: plan
   role: Node
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
+  - ${ZONE_B}
 
 ---
 
@@ -217,4 +222,5 @@ spec:
     testground.nodetype: infra
   role: Node
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
+  - ${ZONE_B}

@@ -73,7 +73,8 @@ Where:
 
 - a cluster name,
 - set AWS region
-- set AWS availability zone (not region; this is something like `us-west-2a` [availability zone], not `us-west-2` \[region])
+- set AWS availability zone A (not region; for example `us-west-2a` [availability zone]) - used for master node and worker nodes
+- set AWS availability zone B (not region; for example `us-west-2b` [availability zone]) - used for more worker nodes
 - set `kops` state store bucket
 - set number of worker nodes
 - set location for cluster spec to be generated
@@ -92,7 +93,8 @@ manually set or you source them manually, you should make sure to do so before s
 export NAME=<desired kubernetes cluster name (cluster name must be a fully-qualified DNS name (e.g. mycluster.k8s.local or mycluster.testground.ipfs.team)>
 export KOPS_STATE_STORE=s3://<kops state s3 bucket>
 export AWS_REGION=<aws region, for example eu-central-1>
-export ZONE=<aws availability zone, for example eu-central-1a>
+export ZONE_A=<aws availability zone, for example eu-central-1a>
+export ZONE_B=<aws availability zone, for example eu-central-1b>
 export WORKER_NODES=4
 export PUBKEY=$HOME/.ssh/testground_rsa.pub
 ```
