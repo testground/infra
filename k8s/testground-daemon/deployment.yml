@@ -26,6 +26,9 @@ spec:
         volumeMounts:
           - name: dockersock
             mountPath: "/var/run/docker.sock"
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
         resources:
           requests:
             memory: 2000Mi
@@ -37,3 +40,6 @@ spec:
       - name: dockersock
         hostPath:
           path: /var/run/docker.sock
+      - name: envtoml
+        configMap:
+          name: env-toml-cfg
