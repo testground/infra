@@ -39,7 +39,7 @@ spec:
             memory: 512Mi
             cpu: 500m
       - name: testground-daemon
-        image: nonsens3/testground:daemon
+        image: iptestground/platform:edge
         imagePullPolicy: Always
         securityContext:
           privileged: true
