@@ -15,12 +15,16 @@ spec:
         app: testground-daemon
     spec:
       serviceAccountName: testground-daemon
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: goproxy
         image: goproxy/goproxy:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081
+          hostPort: 8081
         volumeMounts:
           - name: envtoml
             mountPath: /root/testground/.env.toml
@@ -35,12 +39,13 @@ spec:
             memory: 512Mi
             cpu: 500m
       - name: testground-daemon
-        image: nonsens3/testground:latest
+        image: nonsens3/testground:daemon
         imagePullPolicy: Always
         securityContext:
           privileged: true
         ports:
         - containerPort: 8042
+          hostPort: 8042
         volumeMounts:
           - name: dockersock
             mountPath: "/var/run/docker.sock"
