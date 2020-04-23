@@ -16,8 +16,26 @@ spec:
     spec:
       serviceAccountName: testground-daemon
       containers:
+      - name: goproxy
+        image: goproxy/goproxy:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+        volumeMounts:
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
+          - name: goproxymnt-pvc
+            mountPath: "/go"
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m
+          limits:
+            memory: 512Mi
+            cpu: 500m
       - name: testground-daemon
-        image: iptestground/platform:edge
+        image: nonsens3/testground:latest
         imagePullPolicy: Always
         securityContext:
           privileged: true
@@ -37,9 +55,12 @@ spec:
             memory: 2000Mi
             cpu: 2000m
       volumes:
-      - name: dockersock
-        hostPath:
-          path: /var/run/docker.sock
-      - name: envtoml
-        configMap:
-          name: env-toml-cfg
+        - name: goproxymnt-pvc
+          persistentVolumeClaim:
+            claimName: efs
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: envtoml
+          configMap:
+            name: env-toml-cfg
