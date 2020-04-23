@@ -83,14 +83,11 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetId=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }'`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | head -1`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | tail -1`
 
-if [[ -z ${subnetId} ]]; then
-  echo "Couldn't detect AWS Subnet created by `kops`"
-  exit 1
-fi
-
-echo "Detected Subnet ID: $subnetId"
+echo "Detected Subnet: $subnetIdZoneA"
+echo "Detected Subnet: $subnetIdZoneB"
 
 pushd efs-terraform
 
@@ -101,7 +98,7 @@ terraform init -backend-config=bucket=$S3_BUCKET \
                -backend-config=key=tf-efs-$NAME \
                -backend-config=region=$AWS_REGION
 
-terraform apply -var aws_region=$AWS_REGION -var fs_subnet_id=$subnetId -var fs_sg_id=$securityGroupId -auto-approve
+terraform apply -var aws_region=$AWS_REGION -var fs_subnet_id_zone_a=$subnetIdZoneA -var fs_subnet_id_zone_b=$subnetIdZoneB -var fs_sg_id=$securityGroupId -auto-approve
 
 export EFS_DNSNAME=`terraform output dns_name`
 
