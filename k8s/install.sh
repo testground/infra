@@ -29,6 +29,8 @@ then
 	export ULIMIT_NOFILE="1048576:1048576"
 fi
 
+export TEAM=${TEAM:=default-team}
+export PROJECT=${PROJECT:=default-project}
 CLUSTER_SPEC=$(mktemp)
 envsubst <$CLUSTER_SPEC_TEMPLATE >$CLUSTER_SPEC
 cat $CLUSTER_SPEC

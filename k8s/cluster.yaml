@@ -4,6 +4,9 @@ metadata:
   creationTimestamp: null
   name: ${NAME}
 spec:
+  cloudLabels:
+    Team: ${TEAM}
+    Project: ${PROJECT}
   api:
     loadBalancer:
       type: Public
