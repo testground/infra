@@ -97,6 +97,8 @@ export ZONE_A=<aws availability zone, for example eu-central-1a>
 export ZONE_B=<aws availability zone, for example eu-central-1b>
 export WORKER_NODES=4
 export PUBKEY=$HOME/.ssh/testground_rsa.pub
+export TEAM=<optional - your team name ; used for cost allocation purposes>
+export PROJECT=<optional - your project name ; used for cost allocation purposes>
 ```
 
 5. Set up Helm and add the `stable` Helm Charts repository
