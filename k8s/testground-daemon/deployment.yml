@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testground-daemon
+  labels:
+    app: testground-daemon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testground-daemon
+  template:
+    metadata:
+      labels:
+        app: testground-daemon
+    spec:
+      serviceAccountName: testground-daemon
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: goproxy
+        image: goproxy/goproxy:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+          hostPort: 8081
+        volumeMounts:
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
+          - name: goproxymnt-pvc
+            mountPath: "/go"
+        resources:
+          requests:
+            memory: 512Mi
+            cpu: 500m
+          limits:
+            memory: 512Mi
+            cpu: 500m
+      - name: testground-daemon
+        image: iptestground/testground:edge
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 8042
+          hostPort: 8042
+        volumeMounts:
+          - name: dockersock
+            mountPath: "/var/run/docker.sock"
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
+        resources:
+          requests:
+            memory: 2000Mi
+            cpu: 2000m
+          limits:
+            memory: 2000Mi
+            cpu: 2000m
+      volumes:
+        - name: goproxymnt-pvc
+          persistentVolumeClaim:
+            claimName: efs
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: envtoml
+          configMap:
+            name: env-toml-cfg
