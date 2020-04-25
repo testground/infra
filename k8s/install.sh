@@ -142,6 +142,13 @@ echo
 kubectl apply -f ./kops-weave/weave-metrics-service.yml \
               -f ./kops-weave/weave-service-monitor.yml
 
+echo "Install Testground daemon..."
+echo
+kubectl apply -f ./testground-daemon/config-map-env-toml.yml
+kubectl apply -f ./testground-daemon/service-account.yml
+kubectl apply -f ./testground-daemon/role-binding.yml
+kubectl apply -f ./testground-daemon/deployment.yml -f ./testground-daemon/service.yml
+
 echo "Wait for Sidecar to be Ready..."
 echo
 RUNNING_SIDECARS=0
