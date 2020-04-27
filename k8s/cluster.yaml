@@ -4,6 +4,9 @@ metadata:
   creationTimestamp: null
   name: ${NAME}
 spec:
+  cloudLabels:
+    Team: ${TEAM}
+    Project: ${PROJECT}
   api:
     loadBalancer:
       type: Public
@@ -81,9 +84,13 @@ spec:
   - 0.0.0.0/0
   subnets:
   - cidr: 172.20.32.0/19
-    name: ${ZONE}
+    name: ${ZONE_A}
     type: Public
-    zone: ${ZONE}
+    zone: ${ZONE_A}
+  - cidr: 172.20.64.0/19
+    name: ${ZONE_B}
+    type: Public
+    zone: ${ZONE_B}
   topology:
     dns:
       type: Public
@@ -119,17 +126,17 @@ spec:
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
       net.ipv4.neigh.default.gc_thresh2 = 4096
-      net.ipv4.neigh.default.gc_thresh3 = 8192
+      net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
   image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
   machineType: c5.2xlarge
   maxSize: 1
   minSize: 1
   nodeLabels:
-    kops.k8s.io/instancegroup: master-${ZONE}
+    kops.k8s.io/instancegroup: master-${ZONE_A}
   role: Master
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
 
 ---
 
@@ -160,7 +167,7 @@ spec:
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
       net.ipv4.neigh.default.gc_thresh2 = 4096
-      net.ipv4.neigh.default.gc_thresh3 = 8192
+      net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
   cloudLabels:
     testground.nodetype: plan
@@ -173,7 +180,8 @@ spec:
     testground.nodetype: plan
   role: Node
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
+  - ${ZONE_B}
 
 ---
 
@@ -204,7 +212,7 @@ spec:
       net.ipv4.tcp_rmem = 16384 131072 4194304
       net.ipv4.tcp_wmem = 16384 131072 4194304
       net.ipv4.neigh.default.gc_thresh2 = 4096
-      net.ipv4.neigh.default.gc_thresh3 = 8192
+      net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
   cloudLabels:
     testground.nodetype: infra
@@ -217,4 +225,5 @@ spec:
     testground.nodetype: infra
   role: Node
   subnets:
-  - ${ZONE}
+  - ${ZONE_A}
+  - ${ZONE_B}

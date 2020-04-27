@@ -1,0 +1,21 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: env-toml-cfg
+  namespace: default
+data:
+  .env.toml: |
+    ["aws"]
+    region = "eu-west-2"
+
+    [runners."cluster:k8s"]
+    pod_resource_cpu      = "100m"
+    pod_resource_memory   = "100Mi"
+
+    [daemon]
+    listen = "0.0.0.0:8042"
+
+    [client]
+    endpoint = "localhost:8080"
+---
+

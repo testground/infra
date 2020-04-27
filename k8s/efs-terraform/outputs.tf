@@ -7,17 +7,17 @@ output "dns_name" {
 }
 
 output "mount_target_dns_names" {
-  value       = coalescelist(aws_efs_mount_target.default.*.dns_name, [""])
+  value       = coalescelist(aws_efs_mount_target.target_subnet_zone_a.*.dns_name, [""])
 }
 
 output "mount_target_ids" {
-  value       = coalescelist(aws_efs_mount_target.default.*.id, [""])
+  value       = coalescelist(aws_efs_mount_target.target_subnet_zone_a.*.id, [""])
 }
 
 output "mount_target_ips" {
-  value       = coalescelist(aws_efs_mount_target.default.*.ip_address, [""])
+  value       = coalescelist(aws_efs_mount_target.target_subnet_zone_a.*.ip_address, [""])
 }
 
 output "network_interface_ids" {
-  value       = coalescelist(aws_efs_mount_target.default.*.network_interface_id, [""])
+  value       = coalescelist(aws_efs_mount_target.target_subnet_zone_a.*.network_interface_id, [""])
 }

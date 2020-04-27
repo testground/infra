@@ -29,6 +29,8 @@ then
 	export ULIMIT_NOFILE="1048576:1048576"
 fi
 
+export TEAM=${TEAM:=default-team}
+export PROJECT=${PROJECT:=default-project}
 CLUSTER_SPEC=$(mktemp)
 envsubst <$CLUSTER_SPEC_TEMPLATE >$CLUSTER_SPEC
 cat $CLUSTER_SPEC
@@ -83,14 +85,11 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetId=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }'`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | head -1`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | tail -1`
 
-if [[ -z ${subnetId} ]]; then
-  echo "Couldn't detect AWS Subnet created by `kops`"
-  exit 1
-fi
-
-echo "Detected Subnet ID: $subnetId"
+echo "Detected Subnet: $subnetIdZoneA"
+echo "Detected Subnet: $subnetIdZoneB"
 
 pushd efs-terraform
 
@@ -101,7 +100,7 @@ terraform init -backend-config=bucket=$S3_BUCKET \
                -backend-config=key=tf-efs-$NAME \
                -backend-config=region=$AWS_REGION
 
-terraform apply -var aws_region=$AWS_REGION -var fs_subnet_id=$subnetId -var fs_sg_id=$securityGroupId -auto-approve
+terraform apply -var aws_region=$AWS_REGION -var fs_subnet_id_zone_a=$subnetIdZoneA -var fs_subnet_id_zone_b=$subnetIdZoneB -var fs_sg_id=$securityGroupId -auto-approve
 
 export EFS_DNSNAME=`terraform output dns_name`
 
@@ -149,6 +148,13 @@ echo
 
 kubectl apply -f ./kops-weave/weave-metrics-service.yml \
               -f ./kops-weave/weave-service-monitor.yml
+
+echo "Install Testground daemon..."
+echo
+kubectl apply -f ./testground-daemon/config-map-env-toml.yml
+kubectl apply -f ./testground-daemon/service-account.yml
+kubectl apply -f ./testground-daemon/role-binding.yml
+kubectl apply -f ./testground-daemon/deployment.yml -f ./testground-daemon/service.yml
 
 echo "Wait for Sidecar to be Ready..."
 echo

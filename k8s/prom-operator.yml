@@ -121,9 +121,7 @@ prometheus-node-exporter:
     cni: flannel
 prometheus:
   prometheusSpec:
-    spec:
-      serviceMonitorNamespaceSelector:
-        any: true
+    serviceMonitorSelectorNilUsesHelmValues: false
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
