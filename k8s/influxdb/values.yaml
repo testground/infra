@@ -155,10 +155,10 @@ resources: {}
 resources:
   limits:
     cpu: 1000m
-    memory: 3096Mi
+    memory: 2096Mi
   requests:
     cpu: 1000m
-    memory: 3096Mi
+    memory: 2096Mi
 
 # Annotations to be added to InfluxDB pods
 podAnnotations: {}
