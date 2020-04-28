@@ -49,6 +49,8 @@ spec:
         env:
         - name: REDIS_HOST
           value: "testground-infra-redis-headless"
+        - name: INFLUXDB_HOST
+          value: "influxdb"
         ports:
         - name: pprof
           containerPort: 6060
@@ -71,6 +73,3 @@ spec:
       - name: cnibin
         hostPath:
           path: /opt/cni/bin
-      nodeSelector:
-        testground.nodetype: plan
-

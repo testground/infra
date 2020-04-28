@@ -18,6 +18,8 @@ spec:
       hostPID: true
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        testground.nodetype: infra
       containers:
       - name: goproxy
         image: goproxy/goproxy:latest
