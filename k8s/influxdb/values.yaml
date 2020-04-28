@@ -145,20 +145,13 @@ setDefaultUser:
 
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
-resources: {}
-#  requests:
-#    memory: 256Mi
-#    cpu: 0.1
-#  limits:
-#    memory: 16Gi
-#    cpu: 8
 resources:
   limits:
     cpu: 1000m
-    memory: 2096Mi
+    memory: 2048Mi
   requests:
     cpu: 1000m
-    memory: 2096Mi
+    memory: 2048Mi
 
 # Annotations to be added to InfluxDB pods
 podAnnotations: {}
@@ -181,7 +174,7 @@ ingress:
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
 nodeSelector:
-  testground.nodetype: tginfra
+  testground.nodetype: infra
 
 ## Affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity
