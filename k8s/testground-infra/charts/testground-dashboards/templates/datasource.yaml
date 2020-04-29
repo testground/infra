@@ -3,6 +3,6 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}-datasources
   labels:
-    grafana_datasource: "1"
+    grafana_datasource: "2"
 data:
 {{ (.Files.Glob "dashboards/datasources/*").AsConfig | indent 2 }}

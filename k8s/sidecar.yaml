@@ -41,7 +41,7 @@ spec:
         image: iptestground/sidecar:edge
         imagePullPolicy: Always
         command: ["testground"]
-        args: ["--vv", "sidecar", "--runner", "k8s", "--pprof"]
+        args: ["sidecar", "--runner", "k8s", "--pprof"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
@@ -73,3 +73,5 @@ spec:
       - name: cnibin
         hostPath:
           path: /opt/cni/bin
+      nodeSelector:
+        testground.nodetype: plan
