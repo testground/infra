@@ -143,6 +143,9 @@ prometheus:
           topologyKey: "kubernetes.io/hostname"
     nodeSelector:
       testground.nodetype: infra
+    podMonitorSelector:
+      matchExpressions:
+        - { key: testground.purpose, operator: NotIn, values: [ plan ] }
     resources:
       requests:
         memory: 8000Mi
