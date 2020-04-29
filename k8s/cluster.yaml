@@ -117,7 +117,7 @@ spec:
       net.netfilter.nf_conntrack_max = 1048576
       net.ipv4.tcp_max_syn_backlog = 131072
       net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 1024 65535
+      net.ipv4.ip_local_port_range = 10000 65535
       net.ipv4.tcp_tw_recycle = 1
       net.ipv4.tcp_tw_reuse = 1
       net.core.rmem_max = 4194304
@@ -158,7 +158,7 @@ spec:
       net.netfilter.nf_conntrack_max = 1048576
       net.ipv4.tcp_max_syn_backlog = 131072
       net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 1024 65535
+      net.ipv4.ip_local_port_range = 10000 65535
       net.ipv4.tcp_tw_recycle = 1
       net.ipv4.tcp_tw_reuse = 1
       net.core.rmem_max = 4194304
@@ -203,7 +203,7 @@ spec:
       net.netfilter.nf_conntrack_max = 1048576
       net.ipv4.tcp_max_syn_backlog = 131072
       net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 1024 65535
+      net.ipv4.ip_local_port_range = 10000 65535
       net.ipv4.tcp_tw_recycle = 1
       net.ipv4.tcp_tw_reuse = 1
       net.core.rmem_max = 4194304
