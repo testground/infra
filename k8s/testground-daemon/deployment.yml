@@ -20,7 +20,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         testground.nodetype: infra
-      containers:
+      initContainers:
       - name: iproute-add
         image: busybox
         securityContext:
@@ -34,6 +34,7 @@ spec:
           ip route &&
           ip route add 100.64.0.0/16 via $GW &&
           ip route || true;
+      containers:
       - name: goproxy
         image: goproxy/goproxy:latest
         imagePullPolicy: Always
