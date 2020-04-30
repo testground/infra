@@ -195,7 +195,7 @@ tolerations: []
 ## Ref: https://hub.docker.com/_/influxdb/
 env:
   - name: INFLUXDB_DB
-    value: "metrics"
+    value: "testground"
 
 ## InfluxDB configuration
 ## ref: https://docs.influxdata.com/influxdb/v1.7/administration/config
