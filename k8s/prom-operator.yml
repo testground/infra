@@ -18,15 +18,10 @@
 #   See the following for a description of this option:
 #   https://github.com/helm/charts/blob/master/stable/prometheus-operator/
 #   for an explanation of this option.
-# * podAnnotations is set to flannel to force it to be ont he control network.
 prometheusOperator:
   createCustomResource: false
   admissionWebooks:
     patch:
-      podAnnotations:
-        cni: flannel
-  podAnnotations:
-    cni: flannel
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -76,14 +71,6 @@ grafana:
       enabled: true
     datasources:
       enabled: true
-  podAnnotations:
-    cni: flannel
-    #kube-state-metrics:
-    #  prometheus:
-    #    monitor:
-    #      enabled: true
-  podAnnotations:
-    cni: flannel
   affinity:
     podAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -117,9 +104,9 @@ prometheus-node-exporter:
   prometheus:
     monitor:
       enables: true
-  podAnnotations:
-    cni: flannel
 prometheus:
+  denyNamespaces:
+    - default
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
     affinity:
@@ -150,5 +137,4 @@ prometheus:
       limits:
         memory: 8000Mi
         cpu: 4000m
-
 
