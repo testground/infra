@@ -202,8 +202,10 @@ items:
                   port: 6784
                 timeoutSeconds: 5
               resources:
-                limits:
+                requests:
                   cpu: 1000m
+                  memory: 1024Mi
+                limits:
                   memory: 1024Mi
               securityContext:
                 privileged: true
