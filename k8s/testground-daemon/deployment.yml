@@ -20,7 +20,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         testground.nodetype: infra
-      containers:
+      initContainers:
       - name: iproute-add
         image: busybox
         securityContext:
