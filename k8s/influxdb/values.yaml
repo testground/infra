@@ -147,7 +147,6 @@ setDefaultUser:
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
   limits:
-    cpu: 1000m
     memory: 2048Mi
   requests:
     cpu: 1000m
