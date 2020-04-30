@@ -20,7 +20,6 @@ redis:
         cpu: 200m
       limits:
         memory: 256Mi
-        cpu: 200m
   cluster:
     enabled: false
   usePassword: false
@@ -45,4 +44,3 @@ redis:
         cpu: 4000m
       limits:
         memory: 12000Mi
-        cpu: 4000m

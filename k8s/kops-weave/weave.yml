@@ -203,11 +203,10 @@ items:
                 timeoutSeconds: 5
               resources:
                 requests:
-                  cpu: 2000m
-                  memory: 2000Mi
+                  cpu: 1000m
+                  memory: 1024Mi
                 limits:
-                  cpu: 2000m
-                  memory: 2000Mi
+                  memory: 1024Mi
               securityContext:
                 privileged: true
               volumeMounts:
