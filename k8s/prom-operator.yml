@@ -43,6 +43,7 @@ prometheusOperator:
 alertmanager:
   enabled: false
 grafana:
+  defaultDashboardsEnabled: false
   grafana.ini:
     users:
       viewers_can_edit: false
@@ -124,7 +125,6 @@ kubeStateMetrics:
   enabled: false
 prometheus-node-exporter:
   prometheus:
-    monitor:
       enables: true
 prometheus:
   prometheusSpec:
