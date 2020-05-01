@@ -130,12 +130,15 @@ kubectl apply -f ./kops-weave/weave.yml \
               -f ./sidecar.yaml
 
 echo "Installing Prometheus"
-helm install prometheus-operator stable/prometheus-operator -f prom-operator.yml
+pushd prometheus
 
-echo "Installing Redis and Grafana dashboards"
-pushd testground-infra
-helm dep build
-helm install testground-infra .
+kubectl create namespace monitoring
+
+popd
+
+echo "Installing Redis"
+pushd redis
+helm install testground-redis bitnami/redis --values ./values.yaml
 popd
 
 echo "Install Weave service monitor..."
