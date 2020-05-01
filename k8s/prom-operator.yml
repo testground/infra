@@ -123,9 +123,6 @@ kubeEtcd:
     https: false
 kubeStateMetrics:
   enabled: false
-prometheus-node-exporter:
-  prometheus:
-      enables: true
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
