@@ -129,7 +129,7 @@ spec:
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
   image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
-  machineType: c5.2xlarge
+  machineType: c5.4xlarge
   maxSize: 1
   minSize: 1
   nodeLabels:

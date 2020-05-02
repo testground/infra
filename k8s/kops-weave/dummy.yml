@@ -11,8 +11,6 @@ spec:
       name: dummy
   template:
     metadata:
-      annotations:
-        cni: "flannel"
       labels:
         name: dummy
     spec:

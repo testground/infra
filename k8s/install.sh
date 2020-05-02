@@ -130,7 +130,14 @@ kubectl apply -f ./kops-weave/weave.yml \
               -f ./sidecar.yaml
 
 echo "Installing Prometheus"
-helm install prometheus-operator stable/prometheus-operator -f prom-operator.yml
+pushd prometheus-operator
+helm install prometheus-operator stable/prometheus-operator -f values.yaml
+popd
+
+echo "Installing InfluxDB"
+pushd influxdb
+helm install influxdb influxdata/influxdb -f ./values.yaml
+popd
 
 echo "Installing Redis and Grafana dashboards"
 pushd testground-infra

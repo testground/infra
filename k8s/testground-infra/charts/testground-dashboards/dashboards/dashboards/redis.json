@@ -1,12 +1,11 @@
 {
     "id": 23,
     "uid": "2LtOhWXZk",
-    "slug": "testground-redis-dashboard",
-    "title": "testground redis dashboard",
+    "slug": "redis",
+    "title": "Redis",
     "originalTitle": "",
     "tags": [
-        "testground",
-        "testground_infra"
+        "testground"
     ],
     "style": "dark",
     "timezone": "browser",
