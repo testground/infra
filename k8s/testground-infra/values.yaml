@@ -36,8 +36,6 @@ redis:
       - "--maxclients 131072"
     nodeSelector:
       testground.nodetype: infra
-    podAnnotations:
-      cni: flannel
     resources:
       requests:
         memory: 10000Mi

@@ -2,16 +2,12 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: testground-sidecar
-  annotations:
-    cni: "flannel"
 spec:
   selector:
     matchLabels:
       name: testground-sidecar
   template:
     metadata:
-      annotations:
-        cni: "flannel"
       labels:
         name: testground-sidecar
     spec:

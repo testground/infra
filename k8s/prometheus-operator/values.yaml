@@ -18,15 +18,10 @@
 #   See the following for a description of this option:
 #   https://github.com/helm/charts/blob/master/stable/prometheus-operator/
 #   for an explanation of this option.
-# * podAnnotations is set to flannel to force it to be ont he control network.
 prometheusOperator:
   createCustomResource: false
   admissionWebooks:
     patch:
-      podAnnotations:
-        cni: flannel
-  podAnnotations:
-    cni: flannel
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -48,7 +43,17 @@ prometheusOperator:
 alertmanager:
   enabled: false
 grafana:
-  adminPassword: testground
+  defaultDashboardsEnabled: false
+  grafana.ini:
+    users:
+      viewers_can_edit: false
+    auth:
+      disable_login_form: false
+      disable_signout_menu: false
+    auth.anonymous:
+      enabled: true
+      org_role: Viewer
+  adminPassword: admin
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -75,14 +80,18 @@ grafana:
       enabled: true
     datasources:
       enabled: true
-  podAnnotations:
-    cni: flannel
-    #kube-state-metrics:
-    #  prometheus:
-    #    monitor:
-    #      enabled: true
-  podAnnotations:
-    cni: flannel
+  additionalDataSources:
+  - name: influxdb
+    access: proxy
+    database: "testground"
+    basicAuth: false
+    editable: true
+    jsonData:
+        tlsSkipVerify: true
+    orgId: 1
+    type: influxdb
+    url: http://influxdb:8086
+    version: 1
   affinity:
     podAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -112,12 +121,8 @@ kubeEtcd:
   serviceMonitor:
     insecureSkipVerify: true
     https: false
-prometheus-node-exporter:
-  prometheus:
-    monitor:
-      enables: true
-  podAnnotations:
-    cni: flannel
+kubeStateMetrics:
+  enabled: false
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
@@ -144,9 +149,7 @@ prometheus:
       testground.nodetype: infra
     resources:
       requests:
-        memory: 8000Mi
-        cpu: 2000m
+        memory: 6000Mi
+        cpu: 1000m
       limits:
-        memory: 8000Mi
-
-
+        memory: 6000Mi
