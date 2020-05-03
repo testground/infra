@@ -1,5 +1,11 @@
 # Testground infrastructure
 
+
+
+
+## Issues
+Please report any issues you may want to submit in the testground/testground repo.
+
 ## Background
 
 This repo contains scripts for setting up a Kubernetes cluster for [Testground](http://testground.ipfs.team).
