@@ -101,13 +101,14 @@ export TEAM=<optional - your team name ; used for cost allocation purposes>
 export PROJECT=<optional - your project name ; used for cost allocation purposes>
 ```
 
-5. Set up Helm and add the `stable` Helm Charts repository
+5. Set up Helm and add the required chart repositories
 
 If you haven't, [install helm now](https://helm.sh/docs/intro/install/).
 
 ```sh
 $ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
+$ helm repo add influxdata https://helm.influxdata.com/
 $ helm repo update
 ```
 
