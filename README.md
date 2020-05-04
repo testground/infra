@@ -108,7 +108,7 @@ If you haven't, [install helm now](https://helm.sh/docs/intro/install/).
 ```sh
 $ helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 $ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm repo add influxdata https://influxdata.github.io/helm-charts
+$ helm repo add influxdata https://helm.influxdata.com/
 $ helm repo update
 ```
 
