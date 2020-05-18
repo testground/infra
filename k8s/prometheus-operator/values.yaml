@@ -22,16 +22,6 @@ prometheusOperator:
   createCustomResource: false
   admissionWebooks:
     patch:
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - redis
-        topologyKey: "kubernetes.io/hostname"
   nodeSelector:
     testground.nodetype: infra
   resources:
@@ -54,25 +44,6 @@ grafana:
       enabled: true
       org_role: Viewer
   adminPassword: admin
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - redis
-        topologyKey: "kubernetes.io/hostname"
-    podAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - prometheus-operator-operator
-        topologyKey: "kubernetes.io/hostname"
   nodeSelector:
     testground.nodetype: infra
   sidecar:
@@ -92,16 +63,6 @@ grafana:
     type: influxdb
     url: http://influxdb:8086
     version: 1
-  affinity:
-    podAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - prometheus-operator-operator
-        topologyKey: "kubernetes.io/hostname"
 kubeProxy:
   serviceMonitor:
     https: false
@@ -126,25 +87,6 @@ kubeStateMetrics:
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
-    affinity:
-      podAntiAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - redis
-          topologyKey: "kubernetes.io/hostname"
-      podAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - prometheus-operator-operator
-          topologyKey: "kubernetes.io/hostname"
     nodeSelector:
       testground.nodetype: infra
     resources:
