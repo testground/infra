@@ -9,8 +9,13 @@ data:
     region = "eu-west-2"
 
     [runners."cluster:k8s"]
-    pod_resource_cpu      = "100m"
-    pod_resource_memory   = "100Mi"
+    testplan_pod_cpu            = "100m"
+    testplan_pod_memory         = "100Mi"
+    collect_outputs_pod_cpu     = "1000m"
+    collect_outputs_pod_memory  = "1000Mi"
+    sysctls = [
+      "net.core.somaxconn=10000",
+    ]
 
     [daemon]
     listen = "0.0.0.0:8042"
