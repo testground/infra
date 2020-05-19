@@ -14,7 +14,7 @@ spec:
       terminationGracePeriodSeconds: 10
       hostPID: true
       hostNetwork: true
-      dnsPolicy: ClusterFirstWithHostNet
+      #dnsPolicy: ClusterFirstWithHostNet
       initContainers:
       - name: iproute-add
         image: busybox
@@ -27,17 +27,16 @@ spec:
           while [ "$GW" = "" ]; do export GW=$(ip route | grep cni0 | awk '{print $7}'); echo "Got GW: $GW"; sleep 5; done;
           echo $GW &&
           ip route &&
-          ip route add 100.64.0.0/16 via $GW &&
+          ip route add 10.96.0.0/11 via $GW || true &&
           ip route || true;
-          nslookup testground-infra-redis-headless;
-          while [ $? -ne 0 ]; do echo "redis-headless doesn't resolve."; sleep 5; nslookup testground-infra-redis-headless; done;
+          #nslookup testground-infra-redis-headless;
+          #while [ $? -ne 0 ]; do echo "redis-headless doesn't resolve."; sleep 5; nslookup testground-infra-redis-headless; done;
           echo "redis-headless resolved."
       containers:
       - name: testground-sidecar
-        image: iptestground/sidecar:edge
-        imagePullPolicy: Always
+        image: nonsens3/testground:sdcar
         command: ["testground"]
-        args: ["sidecar", "--runner", "k8s", "--pprof"]
+        args: ["sidecar", "--runner", "k8s-containerd", "--pprof"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
@@ -59,15 +58,13 @@ spec:
             memory: 256Mi
         volumeMounts:
           - name: dockersock
-            mountPath: "/var/run/docker.sock"
+            mountPath: "/run/containerd/containerd.sock"
           - name: cnibin
             mountPath: "/host/opt/cni/bin"
       volumes:
       - name: dockersock
         hostPath:
-          path: /var/run/docker.sock
+          path: /run/containerd/containerd.sock
       - name: cnibin
         hostPath:
           path: /opt/cni/bin
-      nodeSelector:
-        testground.nodetype: plan

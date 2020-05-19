@@ -50,7 +50,7 @@ service:
 ## Persist data to a persistent volume
 ##
 persistence:
-  enabled: true
+  enabled: false
   storageClass: "gp2"
   annotations:
   accessMode: ReadWriteOnce
@@ -135,11 +135,9 @@ setDefaultUser:
 ## Configure resource requests and limits
 ## ref: http://kubernetes.io/docs/user-guide/compute-resources/
 resources:
-  limits:
-    memory: 2048Mi
   requests:
-    cpu: 1000m
-    memory: 2048Mi
+    cpu: 10m
+    memory: 20Mi
 
 # Annotations to be added to InfluxDB pods
 podAnnotations: {}
@@ -162,7 +160,7 @@ ingress:
 ## Ref: https://kubernetes.io/docs/user-guide/node-selection/
 ##
 nodeSelector:
-  testground.nodetype: infra
+  testground.nodetype: plan
 
 ## Affinity for pod assignment
 ## Ref: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity

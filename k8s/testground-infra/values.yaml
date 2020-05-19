@@ -10,9 +10,9 @@
 # * podAnnotations is set to flannel to force it to be on the control network.
 redis:
   metrics:
-    enabled: true
+    enabled: false
     serviceMonitor:
-      enabled: true
+      enabled: false
       namespace: default
     resources:
       requests:
@@ -23,22 +23,12 @@ redis:
   cluster:
     enabled: false
   usePassword: false
-  securityContext:
-    sysctls:
-      - name: net.core.somaxconn
-        value: "131072"
-      - name: net.netfilter.nf_conntrack_max
-        value: "1048576"
   master:
     persistence:
       enabled: false
     extraFlags:
       - "--maxclients 131072"
-    nodeSelector:
-      testground.nodetype: infra
     resources:
       requests:
-        memory: 10000Mi
-        cpu: 4000m
-      limits:
-        memory: 10000Mi
+        memory: 10Mi
+        cpu: 40m
