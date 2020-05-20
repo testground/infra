@@ -43,10 +43,10 @@ prometheusOperator:
 alertmanager:
   enabled: false
 grafana:
-  defaultDashboardsEnabled: false
+  defaultDashboardsEnabled: true
   grafana.ini:
     users:
-      viewers_can_edit: false
+      viewers_can_edit: true
     auth:
       disable_login_form: false
       disable_signout_menu: false
@@ -122,7 +122,14 @@ kubeEtcd:
     insecureSkipVerify: true
     https: false
 kubeStateMetrics:
-  enabled: false
+  enabled: true
+kube-state-metrics:
+#  autosharding:
+#    enabled: true
+#  replicas: 5
+  #  collectors:
+  #  pods: false
+
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
@@ -147,9 +154,14 @@ prometheus:
           topologyKey: "kubernetes.io/hostname"
     nodeSelector:
       testground.nodetype: infra
+    disableCompaction: true
+    query:
+      maxSamples: 187500000
+      maxConcurrency: 2
+      lookbackDelta: 1h
     resources:
       requests:
-        memory: 6000Mi
-        cpu: 1000m
+         memory: 6000Mi
+         cpu: 1000m
       limits:
         memory: 6000Mi
