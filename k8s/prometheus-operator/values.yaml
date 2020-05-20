@@ -25,13 +25,13 @@ prometheusOperator:
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - redis
-        topologyKey: "kubernetes.io/hostname"
+        - topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - redis
   nodeSelector:
     testground.nodetype: infra
   resources:
@@ -57,22 +57,22 @@ grafana:
   affinity:
     podAntiAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - redis
-        topologyKey: "kubernetes.io/hostname"
+        - topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - redis
     podAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - prometheus-operator-operator
-        topologyKey: "kubernetes.io/hostname"
+        - topologyKey: "kubernetes.io/hostname"
+          labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values:
+                  - prometheus-operator-operator
   nodeSelector:
     testground.nodetype: infra
   sidecar:
@@ -81,27 +81,18 @@ grafana:
     datasources:
       enabled: true
   additionalDataSources:
-  - name: influxdb
-    access: proxy
-    database: "testground"
-    basicAuth: false
-    editable: true
-    jsonData:
+    - name: influxdb
+      access: proxy
+      database: "testground"
+      basicAuth: false
+      editable: true
+      jsonData:
         tlsSkipVerify: true
-    orgId: 1
-    type: influxdb
-    url: http://influxdb:8086
-    version: 1
-  affinity:
-    podAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-      - labelSelector:
-          matchExpressions:
-          - key: app
-            operator: In
-            values:
-            - prometheus-operator-operator
-        topologyKey: "kubernetes.io/hostname"
+      orgId: 1
+      type: influxdb
+      url: http://influxdb:8086
+      version: 1
+
 kubeProxy:
   serviceMonitor:
     https: false
@@ -124,11 +115,6 @@ kubeEtcd:
 kubeStateMetrics:
   enabled: true
 kube-state-metrics:
-#  autosharding:
-#    enabled: true
-#  replicas: 5
-  #  collectors:
-  #  pods: false
 
 prometheus:
   prometheusSpec:
@@ -136,22 +122,22 @@ prometheus:
     affinity:
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - redis
-          topologyKey: "kubernetes.io/hostname"
+          - topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - redis
       podAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-            - key: app
-              operator: In
-              values:
-              - prometheus-operator-operator
-          topologyKey: "kubernetes.io/hostname"
+          - topologyKey: "kubernetes.io/hostname"
+            labelSelector:
+              matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                    - prometheus-operator-operator
     nodeSelector:
       testground.nodetype: infra
     disableCompaction: true
@@ -161,7 +147,7 @@ prometheus:
       lookbackDelta: 1h
     resources:
       requests:
-         memory: 6000Mi
-         cpu: 1000m
+        memory: 6000Mi
+        cpu: 1000m
       limits:
         memory: 6000Mi
