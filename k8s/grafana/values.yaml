@@ -385,6 +385,15 @@ dashboardsConfigMaps: {}
 ## ref: http://docs.grafana.org/installation/configuration/
 ##
 grafana.ini:
+  users:
+    viewers_can_edit: false
+  auth:
+    disable_login_form: false
+    disable_signout_menu: false
+  auth.anonymous:
+    enabled: true
+    org_role: Viewer
+  #adminPassword: admin
   paths:
     data: /var/lib/grafana/data
     logs: /var/log/grafana

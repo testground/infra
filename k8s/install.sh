@@ -26,7 +26,7 @@ echo
 # Set default options (can be over-ridden by setting environment vars)
 if [ -z "$ULIMIT_NOFILE" ]
 then
-	export ULIMIT_NOFILE="1048576:1048576"
+  export ULIMIT_NOFILE="1048576:1048576"
 fi
 
 export TEAM=${TEAM:=default-team}
@@ -134,15 +134,14 @@ kubectl create namespace monitoring
 
 echo "Installing Prometheus"
 pushd prometheus
-helm install grafana stable/prometheus -f values.yaml --namespace monitoring
+helm install prometheus stable/prometheus -f values.yaml --namespace monitoring
 popd
 
 echo "Installing Grafana"
 pushd grafana
-kubectl apply -f configmap.yaml --namespace monitoring
+kubectl apply -f configmap.yaml
 helm install grafana stable/grafana -f values.yaml --namespace monitoring
 popd
-
 
 echo "Installing InfluxDB"
 pushd influxdb
@@ -150,15 +149,10 @@ helm install influxdb influxdata/influxdb -f ./values.yaml
 popd
 
 echo "Installing Redis"
-pushd redis
-helm install testground-redis bitnami/redis --values ./values.yaml
+pushd testground-infra
+helm dep build
+helm install testground-infra .
 popd
-
-echo "Install Weave service monitor..."
-echo
-
-kubectl apply -f ./kops-weave/weave-metrics-service.yml \
-              -f ./kops-weave/weave-service-monitor.yml
 
 echo "Install Testground daemon..."
 echo
