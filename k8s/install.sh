@@ -129,10 +129,21 @@ kubectl apply -f ./kops-weave/weave.yml \
               -f ./kops-weave/dummy.yml \
               -f ./sidecar.yaml
 
+echo "Create monitoring namespace"
+kubectl create namespace monitoring
+
 echo "Installing Prometheus"
 pushd prometheus
 
-kubectl create namespace monitoring
+helm install grafana stable/prometheus -f values.yaml --namespace monitoring
+
+popd
+
+echo "Installing Grafana"
+pushd grafana
+
+kubectl apply -f configmap.yaml --namespace monitoring
+helm install grafana stable/grafana -f values.yaml --namespace monitoring
 
 popd
 
