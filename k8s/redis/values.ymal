@@ -12,7 +12,7 @@ redis:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: false
+      enabled: true
       namespace: default
     resources:
       requests:
@@ -36,9 +36,11 @@ redis:
       - "--maxclients 131072"
     nodeSelector:
       testground.nodetype: infra
+    podAnnotations:
+      cni: flannel
     resources:
       requests:
-        memory: 10000Mi
+        memory: 12000Mi
         cpu: 4000m
       limits:
-        memory: 10000Mi
+        memory: 12000Mi
