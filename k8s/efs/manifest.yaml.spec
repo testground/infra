@@ -8,8 +8,6 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: efs-provisioner
-  annotations:
-    cni: "flannel"
 spec:
   replicas: 1
   selector:
@@ -19,8 +17,6 @@ spec:
     type: Recreate
   template:
     metadata:
-      annotations:
-        cni: "flannel"
       labels:
         app: efs-provisioner
     spec:

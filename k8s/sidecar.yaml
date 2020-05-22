@@ -2,16 +2,12 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: testground-sidecar
-  annotations:
-    cni: "flannel"
 spec:
   selector:
     matchLabels:
       name: testground-sidecar
   template:
     metadata:
-      annotations:
-        cni: "flannel"
       labels:
         name: testground-sidecar
     spec:
@@ -41,7 +37,7 @@ spec:
         image: iptestground/sidecar:edge
         imagePullPolicy: Always
         command: ["testground"]
-        args: ["--vv", "sidecar", "--runner", "k8s", "--pprof"]
+        args: ["sidecar", "--runner", "k8s", "--pprof"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
@@ -49,6 +45,8 @@ spec:
         env:
         - name: REDIS_HOST
           value: "testground-infra-redis-headless"
+        - name: INFLUXDB_HOST
+          value: "influxdb"
         ports:
         - name: pprof
           containerPort: 6060
@@ -73,4 +71,3 @@ spec:
           path: /opt/cni/bin
       nodeSelector:
         testground.nodetype: plan
-

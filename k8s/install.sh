@@ -134,17 +134,19 @@ kubectl create namespace monitoring
 
 echo "Installing Prometheus"
 pushd prometheus
-
 helm install grafana stable/prometheus -f values.yaml --namespace monitoring
-
 popd
 
 echo "Installing Grafana"
 pushd grafana
-
 kubectl apply -f configmap.yaml --namespace monitoring
 helm install grafana stable/grafana -f values.yaml --namespace monitoring
+popd
 
+
+echo "Installing InfluxDB"
+pushd influxdb
+helm install influxdb influxdata/influxdb -f ./values.yaml
 popd
 
 echo "Installing Redis"
