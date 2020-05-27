@@ -19,7 +19,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
-        testground.nodetype: infra
+        testground.node.role.infra: true
       initContainers:
       - name: iproute-add
         image: busybox
