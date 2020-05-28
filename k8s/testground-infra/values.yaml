@@ -35,7 +35,7 @@ redis:
     extraFlags:
       - "--maxclients 131072"
     nodeSelector:
-      testground.node.role.infra: true
+      testground.node.role.infra: "true"
     resources:
       requests:
         memory: 10000Mi

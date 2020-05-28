@@ -70,4 +70,4 @@ spec:
         hostPath:
           path: /opt/cni/bin
       nodeSelector:
-        testground.node.role.plan: true
+        testground.node.role.plan: "true"
