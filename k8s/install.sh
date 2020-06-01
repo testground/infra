@@ -158,6 +158,14 @@ kubectl apply -f ./testground-daemon/service-account.yml
 kubectl apply -f ./testground-daemon/role-binding.yml
 kubectl apply -f ./testground-daemon/deployment.yml -f ./testground-daemon/service.yml
 
+echo "Install Kubernetes Autoscaler..."
+echo
+pushd cluster-autoscaler
+AUTOSCALER_SPEC=$(mktemp)
+envsubst <cluster-autoscaler-autodiscover.yaml >$AUTOSCALER_SPEC
+kubectl apply -f $AUTOSCALER_SPEC
+popd
+
 echo "Wait for Sidecar to be Ready..."
 echo
 RUNNING_SIDECARS=0

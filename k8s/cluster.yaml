@@ -17,8 +17,17 @@ spec:
       [
         {
           "Effect": "Allow",
-          "Action": ["ecr:*"],
-          "Resource": ["*"]
+          "Action": [
+              "ecr:*",
+              "autoscaling:DescribeAutoScalingGroups",
+              "autoscaling:DescribeAutoScalingInstances",
+              "autoscaling:DescribeLaunchConfigurations",
+              "ec2:DescribeLaunchTemplateVersions",
+              "autoscaling:DescribeTags",
+              "autoscaling:SetDesiredCapacity",
+              "autoscaling:TerminateInstanceInAutoScalingGroup"
+          ],
+          "Resource": "*"
         }
       ]
   authorization:
@@ -173,9 +182,11 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/${NAME}: ""
   image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
   machineType: ${WORKER_NODE_TYPE}
-  maxSize: ${WORKER_NODES}
+  maxSize: 100
   minSize: ${WORKER_NODES}
   nodeLabels:
     kops.k8s.io/instancegroup: nodes
