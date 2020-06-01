@@ -10,6 +10,8 @@ spec:
   api:
     loadBalancer:
       type: Public
+  kubeDNS:
+    provider: CoreDNS
   additionalPolicies:
     node: |
       [
