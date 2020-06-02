@@ -13,7 +13,7 @@ spec:
   kubeDNS:
     provider: CoreDNS
   additionalPolicies:
-    node: |
+    master: |
       [
         {
           "Effect": "Allow",
@@ -26,6 +26,16 @@ spec:
               "autoscaling:DescribeTags",
               "autoscaling:SetDesiredCapacity",
               "autoscaling:TerminateInstanceInAutoScalingGroup"
+          ],
+          "Resource": "*"
+        }
+      ]
+    node: |
+      [
+        {
+          "Effect": "Allow",
+          "Action": [
+              "ecr:*"
           ],
           "Resource": "*"
         }
