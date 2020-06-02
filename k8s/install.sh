@@ -11,6 +11,11 @@ err_report() {
 
 trap 'err_report $LINENO' ERR
 
+# Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
 START_TIME=`date +%s`
 
 echo "Creating cluster for Testground..."
@@ -18,27 +23,38 @@ echo
 
 CLUSTER_SPEC_TEMPLATE=$1
 
-echo "Name: $NAME"
-echo "Public key: $PUBKEY"
-echo "Worker nodes: $WORKER_NODES"
-echo
+my_dir="$(dirname "$0")"
+source "$my_dir/install-playbook/validation.sh"
 
-# Set default options (can be over-ridden by setting environment vars)
-if [ -z "$ULIMIT_NOFILE" ]
+echo "Required arguments"
+echo "------------------"
+echo "Name (NAME): $NAME"
+echo "Kops state store (KOPS_STATE_STORE): $KOPS_STATE_STORE"
+echo "AWS availability zone A (ZONE_A): $ZONE_A"
+echo "AWS availability zone B (ZONE_B): $ZONE_B"
+echo "AWS region (AWS_REGION): $AWS_REGION"
+echo "AWS worker node type (WORKER_NODE_TYPE): $WORKER_NODE_TYPE"
+echo "AWS master node type (MASTER_NODE_TYPE): $MASTER_NODE_TYPE"
+echo "Min worker nodes (MIN_WORKER_NODES): $MIN_WORKER_NODES"
+echo "Max worker nodes (MAX_WORKER_NODES): $MAX_WORKER_NODES"
+echo "Public key (PUBKEY): $PUBKEY"
+echo ""
+echo "Optional arguments"
+echo "------------------"
+if [ "$AUTOSCALER_ENABLED" = true ]
 then
-	export ULIMIT_NOFILE="1048576:1048576"
+  echo -e "Cluster autoscaler (AUTOSCALER_ENABLED): ${GREEN}enabled${NC}."
+else
+  echo -e "Cluster autoscaler (AUTOSCALER_ENABLED): ${RED}disabled${NC}."
 fi
 
-export TEAM=${TEAM:=default-team}
-export PROJECT=${PROJECT:=default-project}
 CLUSTER_SPEC=$(mktemp)
 envsubst <$CLUSTER_SPEC_TEMPLATE >$CLUSTER_SPEC
-cat $CLUSTER_SPEC
 
 # Verify with the user before continuing.
 echo
-echo "The output above is the cluster I will create for you."
-echo -n "Does this look about right to you? [y/n]: "
+echo "The cluster will be built based on the params above."
+echo -n "Do they look right to you? [y/n]: "
 read response
 
 if [ "$response" != "y" ]
