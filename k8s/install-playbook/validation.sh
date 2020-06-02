@@ -64,6 +64,16 @@ then
   echo -e "Environment variable PUBKEY must be set."
   exit 2
 fi
+if [ -z "$TEAM" ]
+then
+  echo -e "Environment variable TEAM must be set (used for cost-allocation purposes)."
+  exit 2
+fi
+if [ -z "$PROJECT" ]
+then
+  echo -e "Environment variable PROJECT must be set (used for cost-allocation purposes)."
+  exit 2
+fi
 
 # Default values for Optional params
 AUTOSCALER_ENABLED=${AUTOSCALER_ENABLED:false}
