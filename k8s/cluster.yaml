@@ -186,8 +186,8 @@ spec:
     k8s.io/cluster-autoscaler/${NAME}: ""
   image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
   machineType: ${WORKER_NODE_TYPE}
-  maxSize: 100
-  minSize: ${WORKER_NODES}
+  maxSize: ${MAX_WORKER_NODES}
+  minSize: ${MIN_WORKER_NODES}
   nodeLabels:
     kops.k8s.io/instancegroup: nodes
     testground.node.role.plan: "true"
