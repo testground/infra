@@ -122,7 +122,11 @@ kubeEtcd:
     insecureSkipVerify: true
     https: false
 kubeStateMetrics:
-  enabled: false
+  enabled: true
+kube-state-metrics:
+  replicas: 3
+  autosharding:
+    enabled: true
 prometheus:
   prometheusSpec:
     serviceMonitorSelectorNilUsesHelmValues: false
