@@ -204,9 +204,9 @@ items:
               resources:
                 requests:
                   cpu: 1000m
-                  memory: 1024Mi
+                  memory: 1536Mi
                 limits:
-                  memory: 1024Mi
+                  memory: 1536Mi
               securityContext:
                 privileged: true
               volumeMounts:
