@@ -168,6 +168,7 @@ spec:
       - operator: Exists
         effect: NoSchedule
       serviceAccountName: flannel
+      priorityClassName: high-priority
       initContainers:
       - name: install-cni
         image: quay.io/coreos/flannel:v0.11.0-amd64

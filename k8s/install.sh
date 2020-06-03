@@ -80,6 +80,11 @@ echo
 
 kubectl apply -f ./limit-range/limit-range.yaml
 
+echo "Install priority class"
+echo
+
+kubectl apply -f ./priority-class/priority-class.yaml
+
 
 echo "Install EFS..."
 

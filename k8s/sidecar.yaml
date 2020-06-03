@@ -15,6 +15,7 @@ spec:
       hostPID: true
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      priorityClassName: high-priority
       initContainers:
       - name: iproute-add
         image: busybox
