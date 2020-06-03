@@ -37,7 +37,7 @@ spec:
         image: iptestground/sidecar:edge
         imagePullPolicy: Always
         command: ["testground"]
-        args: ["sidecar", "--runner", "k8s", "--pprof"]
+        args: ["sidecar", "--runner", "k8s"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
@@ -48,7 +48,7 @@ spec:
         - name: INFLUXDB_HOST
           value: "influxdb"
         ports:
-        - name: pprof
+        - name: sidecarhttp
           containerPort: 6060
         resources:
           limits:
