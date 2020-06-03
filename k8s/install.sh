@@ -188,7 +188,7 @@ fi
 echo "Wait for Sidecar to be Ready..."
 echo
 RUNNING_SIDECARS=0
-while [ "$RUNNING_SIDECARS" -ne "$WORKER_NODES" ]; do RUNNING_SIDECARS=$(kubectl get pods | grep testground-sidecar | grep Running | wc -l || true); echo "Got $RUNNING_SIDECARS running sidecar pods"; sleep 5; done;
+while [ "$RUNNING_SIDECARS" -ne "$MIN_WORKER_NODES" ]; do RUNNING_SIDECARS=$(kubectl get pods | grep testground-sidecar | grep Running | wc -l || true); echo "Got $RUNNING_SIDECARS running sidecar pods"; sleep 5; done;
 
 echo "Wait for EFS provisioner to be Running..."
 echo
