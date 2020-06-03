@@ -37,7 +37,7 @@ spec:
         image: iptestground/sidecar:v0.5.1
         imagePullPolicy: Always
         command: ["testground"]
-        args: ["sidecar", "--runner", "k8s"]
+        args: ["sidecar", "--runner", "k8s", "--pprof"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
