@@ -91,9 +91,16 @@ spec:
       - net.ipv4.tcp_max_orphans
       - net.ipv4.tcp_abort_on_overflow
     streamingConnectionIdleTimeout: 60m
+    registryPullQPS: 10
+    registryBurst: 20
+  kubeControllerManager:
+    eventRecordQPS: 20
+    eventBurst: 40
+    kubeAPIQPS: 20
+    kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: 1.17.3
+  kubernetesVersion: 1.18.3
   masterInternalName: api.internal.${NAME}
   masterPublicName: api.${NAME}
   networkCIDR: 172.20.0.0/16
