@@ -204,7 +204,7 @@ items:
                 timeoutSeconds: 5
               resources:
                 requests:
-                  cpu: 1000m
+                  cpu: 100m
                   memory: 1536Mi
                 limits:
                   memory: 1536Mi

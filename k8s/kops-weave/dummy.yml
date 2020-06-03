@@ -24,6 +24,6 @@ spec:
         command: ["/bin/sleep", "3650d"]
         image: governmentpaas/curl-ssl
         resources:
-          limits:
-            cpu: 10m
+          requests:
+            cpu: 100m
             memory: 10Mi
