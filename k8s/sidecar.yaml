@@ -34,10 +34,10 @@ spec:
           echo "redis-headless resolved."
       containers:
       - name: testground-sidecar
-        image: iptestground/sidecar:v0.5.1
+        image: iptestground/sidecar:edge
         imagePullPolicy: Always
         command: ["testground"]
-        args: ["sidecar", "--runner", "k8s", "--pprof"]
+        args: ["sidecar", "--runner", "k8s"]
         securityContext:
           capabilities:
             add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"]
