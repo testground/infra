@@ -130,8 +130,8 @@ kubectl apply -f ./kops-weave/weave.yml \
               -f ./sidecar.yaml
 
 echo "Installing Prometheus"
-pushd prometheus-operator
-helm install prometheus-operator stable/prometheus-operator -f values.yaml
+pushd prometheus
+helm install prometheus stable/prometheus -f values.yaml
 popd
 
 echo "Installing InfluxDB"
