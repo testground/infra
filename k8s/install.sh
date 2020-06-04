@@ -149,7 +149,6 @@ echo "Install Weave service monitor..."
 echo
 
 kubectl apply -f ./kops-weave/weave-metrics-service.yml \
-              -f ./kops-weave/weave-service-monitor.yml
 
 echo "Install Testground daemon..."
 echo
