@@ -5,6 +5,8 @@ metadata:
   namespace: default
   labels:
     k8s-app: dummy
+  annotations:
+    cni: "flannel"
 spec:
   selector:
     matchLabels:
@@ -13,8 +15,10 @@ spec:
     metadata:
       labels:
         name: dummy
+      annotations:
+        cni: "flannel"
     spec:
-      priorityClassName: high-priority
+      priorityClassName: system-node-critical
       volumes:
       - name: host-sys
         hostPath:

@@ -91,8 +91,8 @@ spec:
       - net.ipv4.tcp_max_orphans
       - net.ipv4.tcp_abort_on_overflow
     streamingConnectionIdleTimeout: 60m
-    registryPullQPS: 10
-    registryBurst: 20
+    registryPullQPS: 3
+    registryBurst: 6
   kubeControllerManager:
     eventRecordQPS: 20
     eventBurst: 40

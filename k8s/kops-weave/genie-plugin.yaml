@@ -128,7 +128,7 @@ spec:
       hostNetwork: true
       hostPID: true
       serviceAccountName: genie-plugin
-      priorityClassName: high-priority
+      priorityClassName: system-node-critical
       containers:
         # Create a container with install.sh that
         # Installs required 00-genie.conf and genie binary

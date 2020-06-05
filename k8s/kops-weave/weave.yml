@@ -163,7 +163,7 @@ items:
           labels:
             name: weave-net
         spec:
-          priorityClassName: high-priority
+          priorityClassName: system-node-critical
           initContainers:
           - name: wait-for-flannel
             image: busybox
