@@ -2,7 +2,6 @@
 sudo docker pull governmentpaas/curl-ssl:latest
 sudo docker pull grafana/grafana:7.0.3
 sudo docker pull busybox:latest
-sudo docker pull protokube:1.18.0-beta.1
 sudo docker pull kope/kops-controller:1.18.0-beta.1
 sudo docker pull kope/dns-controller:1.18.0-beta.1
 sudo docker pull kope/kube-apiserver-healthcheck:1.18.0-beta.1
@@ -25,3 +24,9 @@ sudo docker pull quay.io/coreos/flannel:v0.11.0-amd64
 sudo docker pull k8s.gcr.io/cluster-proportional-autoscaler-amd64:1.4.0
 sudo docker pull kopeio/etcd-manager:3.0.20200531
 sudo docker pull k8s.gcr.io/pause-amd64:3.2
+
+TEMPDIR=`mktemp -d`
+pushd $TEMPDIR
+wget https://kubeupv2.s3.amazonaws.com/kops/1.8.1/images/protokube.tar.gz
+sudo docker load < protokube.tar.gz
+popd
