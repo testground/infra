@@ -18,27 +18,29 @@ echo
 
 CLUSTER_SPEC_TEMPLATE=$1
 
-echo "Name: $NAME"
-echo "Public key: $PUBKEY"
-echo "Worker nodes: $WORKER_NODES"
+my_dir="$(dirname "$0")"
+source "$my_dir/install-playbook/validation.sh"
+
+echo "Required arguments"
+echo "------------------"
+echo "Name (NAME): $NAME"
+echo "Kops state store (KOPS_STATE_STORE): $KOPS_STATE_STORE"
+echo "AWS availability zone A (ZONE_A): $ZONE_A"
+echo "AWS availability zone B (ZONE_B): $ZONE_B"
+echo "AWS region (AWS_REGION): $AWS_REGION"
+echo "AWS worker node type (WORKER_NODE_TYPE): $WORKER_NODE_TYPE"
+echo "AWS master node type (MASTER_NODE_TYPE): $MASTER_NODE_TYPE"
+echo "Worker nodes (WORKER_NODES): $WORKER_NODES"
+echo "Public key (PUBKEY): $PUBKEY"
 echo
 
-# Set default options (can be over-ridden by setting environment vars)
-if [ -z "$ULIMIT_NOFILE" ]
-then
-	export ULIMIT_NOFILE="1048576:1048576"
-fi
-
-export TEAM=${TEAM:=default-team}
-export PROJECT=${PROJECT:=default-project}
 CLUSTER_SPEC=$(mktemp)
 envsubst <$CLUSTER_SPEC_TEMPLATE >$CLUSTER_SPEC
-cat $CLUSTER_SPEC
 
 # Verify with the user before continuing.
 echo
-echo "The output above is the cluster I will create for you."
-echo -n "Does this look about right to you? [y/n]: "
+echo "The cluster will be built based on the params above."
+echo -n "Do they look right to you? [y/n]: "
 read response
 
 if [ "$response" != "y" ]
@@ -63,7 +65,6 @@ echo "Install default container limits"
 echo
 
 kubectl apply -f ./limit-range/limit-range.yaml
-
 
 echo "Install EFS..."
 

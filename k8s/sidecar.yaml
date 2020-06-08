@@ -15,6 +15,7 @@ spec:
       hostPID: true
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
+      priorityClassName: system-node-critical
       initContainers:
       - name: iproute-add
         image: busybox
@@ -52,7 +53,6 @@ spec:
           containerPort: 6060
         resources:
           limits:
-            cpu: 200m
             memory: 256Mi
           requests:
             cpu: 200m
