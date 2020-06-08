@@ -11,7 +11,7 @@
     "source_ami": "ami-05516775460f4eb85",
     "instance_type": "m4.xlarge",
     "ssh_username": "admin",
-    "ami_name": "testground_ami_{{isotime \"2006-01-02\"}}_{{timestamp}}"
+    "ami_name": "testground_{{isotime \"2006-01-02\"}}"
   }],
   "provisioners": [
   {
