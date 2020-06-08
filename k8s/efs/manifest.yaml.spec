@@ -21,6 +21,8 @@ spec:
         app: efs-provisioner
     spec:
       serviceAccountName: efs-provisioner
+      nodeSelector:
+        testground.node.role.infra: "true"
       containers:
         - name: efs-provisioner
           image: quay.io/external_storage/efs-provisioner:latest
