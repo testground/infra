@@ -18,7 +18,7 @@ spec:
       priorityClassName: system-node-critical
       initContainers:
       - name: iproute-add
-        image: busybox
+        image: busybox:downloaded
         securityContext:
           privileged: true
         command:

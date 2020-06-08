@@ -22,7 +22,7 @@ spec:
         testground.node.role.infra: "true"
       initContainers:
       - name: iproute-add
-        image: busybox
+        image: busybox:downloaded
         securityContext:
           privileged: true
         command:

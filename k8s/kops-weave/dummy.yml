@@ -22,7 +22,7 @@ spec:
       containers:
       - name: dummy
         command: ["/bin/sleep", "3650d"]
-        image: governmentpaas/curl-ssl
+        image: governmentpaas/curl-ssl:downloaded
         resources:
           requests:
             cpu: 100m

@@ -23,7 +23,7 @@ spec:
       serviceAccountName: efs-provisioner
       containers:
         - name: efs-provisioner
-          image: quay.io/external_storage/efs-provisioner:latest
+          image: quay.io/external_storage/efs-provisioner:downloaded
           env:
             - name: FILE_SYSTEM_ID
               valueFrom:
