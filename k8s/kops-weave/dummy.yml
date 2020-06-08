@@ -22,7 +22,8 @@ spec:
       containers:
       - name: dummy
         command: ["/bin/sleep", "3650d"]
-        image: governmentpaas/curl-ssl:downloaded
+        image: governmentpaas/curl-ssl:latest
+        imagePullPolicy: IfNotPresent
         resources:
           requests:
             cpu: 100m

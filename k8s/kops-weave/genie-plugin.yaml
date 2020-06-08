@@ -131,7 +131,8 @@ spec:
       priorityClassName: system-node-critical
       initContainers:
       - name: wait-for-flannel
-        image: busybox:downloaded
+        image: busybox:latest
+        imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
         command:
@@ -144,7 +145,8 @@ spec:
         # Installs required 00-genie.conf and genie binary
         # on slave node.
         - name: install-cni
-          image: quay.io/huawei-cni-genie/genie-plugin:downloaded
+          image: quay.io/huawei-cni-genie/genie-plugin:latest
+          imagePullPolicy: IfNotPresent
           command: ["/launch.sh"]
           env:
             - name: CNI_NETWORK_CONFIG
@@ -211,7 +213,8 @@ spec:
       serviceAccountName: genie-plugin
       containers:
         - name: genie-network-admission-controller
-          image: quay.io/huawei-cni-genie/genie-admission-controller:downloaded
+          image: quay.io/huawei-cni-genie/genie-admission-controller:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
 ---
