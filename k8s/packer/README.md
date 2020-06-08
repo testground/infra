@@ -1,8 +1,8 @@
 ## Background
 
-Testground AMI image is currently based on `ami-05516775460f4eb85` (k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17)
+Testground AMI image is currently based on `k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17`
 
-You can review `kops` images with:
+You can get a specific AMI for a given region with:
 
 ```
 aws ec2 describe-images --region eu-west-2  --output table \
