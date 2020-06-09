@@ -30,3 +30,6 @@ pushd $TEMPDIR
 wget https://kubeupv2.s3.amazonaws.com/kops/1.8.1/images/protokube.tar.gz
 sudo docker load < protokube.tar.gz
 popd
+
+wget -O /tmp/kickstart-static64.sh https://my-netdata.io/kickstart-static64.sh
+sh /tmp/kickstart-static64.sh --dont-wait --no-updates
