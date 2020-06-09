@@ -22,7 +22,7 @@ spec:
         testground.node.role.infra: "true"
       initContainers:
       - name: iproute-add
-        image: busybox
+        image: busybox:1.31.1
         securityContext:
           privileged: true
         command:
@@ -36,8 +36,7 @@ spec:
           ip route || true;
       containers:
       - name: goproxy
-        image: goproxy/goproxy:latest
-        imagePullPolicy: Always
+        image: iptestground/goproxy:2.0.2
         ports:
         - containerPort: 8081
           hostPort: 8081

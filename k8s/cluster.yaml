@@ -139,7 +139,7 @@ spec:
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  image: testground_2020-06-09
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 1
   minSize: 1
@@ -182,7 +182,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  image: testground_2020-06-09
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
   minSize: ${WORKER_NODES}
@@ -227,7 +227,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-  image: kope.io/k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17
+  image: testground_2020-06-09
   machineType: c5.2xlarge
   maxSize: 2
   minSize: 2

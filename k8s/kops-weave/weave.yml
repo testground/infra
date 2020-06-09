@@ -166,7 +166,7 @@ items:
           priorityClassName: system-node-critical
           initContainers:
           - name: wait-for-flannel
-            image: busybox
+            image: busybox:1.31.1
             securityContext:
               privileged: true
             command:
@@ -195,7 +195,7 @@ items:
                       apiVersion: v1
                       fieldPath: spec.nodeName
               #image: 'docker.io/weaveworks/weave-kube:2.6.0'
-              image: 'nonsens3/weave-kube'
+              image: 'iptestground/weave-kube:0.0.1'
               readinessProbe:
                 httpGet:
                   host: 127.0.0.1
