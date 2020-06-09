@@ -23,8 +23,7 @@ spec:
       serviceAccountName: efs-provisioner
       containers:
         - name: efs-provisioner
-          image: quay.io/external_storage/efs-provisioner:latest
-          imagePullPolicy: IfNotPresent
+          image: quay.io/external_storage/efs-provisioner:v2.4.0
           env:
             - name: FILE_SYSTEM_ID
               valueFrom:
