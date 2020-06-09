@@ -16,3 +16,5 @@ aws ec2 describe-images --region eu-west-2  --output table \
 ## Upgrade strategy
 
 Every time a new `kops` image is available, we should re-create a cluster using it, instead of the Testground AMI, and review which Docker images have been upgraded and modify our `docker-pull-images.sh` script.
+
+Once we build a new image with `make build-ami-image`, we should then distribute that image to all regions with `distribute-image.sh`.
