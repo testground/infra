@@ -54,7 +54,7 @@ spec:
             memory: 512Mi
             cpu: 500m
       - name: testground-daemon
-        image: iptestground/testground:edge
+        image: iptestground/testground:v0.5.2
         imagePullPolicy: Always
         securityContext:
           privileged: true
