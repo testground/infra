@@ -14,3 +14,4 @@ jupyter_contrib_nbextensions
 durations
 seaborn
 ipywidgets
+panel
