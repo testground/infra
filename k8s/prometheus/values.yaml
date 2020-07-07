@@ -1,0 +1,25 @@
+serviceAccounts:
+  alertmanager:
+    create: false
+  pushgateway:
+    create: false
+alertmanager:
+  enabled: false
+server:
+  extraArgs:
+    query.max-samples: 10
+    query.max-concurrency: 2
+  extraFlags:
+    - storage.tsdb.wal-compression
+    - web.enable-admin-api
+  replicaCount: 3
+  persistentVolume:
+    enabled: false
+  resources:
+    requests:
+      memory: 6000Mi
+      cpu: 1000m
+    limits:
+      memory: 6000Mi
+pushgateway:
+  enabled: false

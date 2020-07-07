@@ -12,8 +12,7 @@ redis:
   metrics:
     enabled: true
     serviceMonitor:
-      enabled: true
-      namespace: default
+      enabled: false
     resources:
       requests:
         memory: 256Mi
