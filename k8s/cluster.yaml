@@ -73,7 +73,7 @@ spec:
       - net.ipv4.tcp_wmem
       - net.ipv4.tcp_max_orphans
       - net.ipv4.tcp_abort_on_overflow
-    streamingConnectionIdleTimeout: 60m
+    streamingConnectionIdleTimeout: 30m
     registryPullQPS: 3
     registryBurst: 6
   kubeControllerManager:
