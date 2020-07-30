@@ -1,5 +1,0 @@
-1. helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-
-2. helm install tg ingress-nginx/ingress-nginx
-
-3. manually add CNAME records for ingress points
