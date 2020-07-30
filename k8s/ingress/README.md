@@ -13,6 +13,11 @@ kubectl apply --validate=false -f https://github.com/jetstack/cert-manager/relea
 helm install --values nginx-ingress.yaml tg stable/nginx-ingress
 ```
 
+3.1. Apply nginx configmap
+```
+kubectl apply -f configmap.yaml
+```
+
 4. Manually add CNAME records for Ingress points to Route53
 ```
 kubectl get service
@@ -27,3 +32,5 @@ kubectl apply -f cluster-issuer-prod.yaml
 ```
 kubectl apply -f testground-daemon.yml -f grafana.yml
 ```
+
+7. N.B. Update LB idle connection timeout - by default it is 60sec.

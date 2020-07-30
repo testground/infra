@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tg-nginx-ingress-controller
+data:
+  proxy-read-timeout: "1200"
+  proxy-send-timeout: "1200"
+  proxy-connect-timeout: "10"
+  upstream-keepalive-timeout: "1200"
+  ssl-session-timeout: "1200"
+  client-body-timeout: "1200"
+  client-header-timeout: "1200"
+  post-body-size: "100m"
+  keep-alive: "1200"
