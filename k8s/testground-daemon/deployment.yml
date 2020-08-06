@@ -53,7 +53,7 @@ spec:
           limits:
             memory: 512Mi
       - name: testground-daemon
-        image: iptestground/testground:edge
+        image: iptestground/testground:v0.5.3
         imagePullPolicy: Always
         securityContext:
           privileged: true
