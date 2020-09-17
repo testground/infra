@@ -9,6 +9,7 @@ data:
     region = "eu-west-2"
 
     [runners."cluster:k8s"]
+    run_timeout_min             = 15
     testplan_pod_cpu            = "100m"
     testplan_pod_memory         = "100Mi"
     collect_outputs_pod_cpu     = "1000m"
@@ -20,6 +21,13 @@ data:
 
     [daemon]
     listen = "0.0.0.0:8042"
+    slack_webhook_url = ""
+    github_repo_status_token = ""
+
+    [daemon.scheduler]
+    workers = 2
+    task_timeout_min  = 20
+    task_repo_type    = "disk"
 
     [client]
     endpoint = "localhost:8080"

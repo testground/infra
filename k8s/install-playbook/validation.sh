@@ -14,9 +14,14 @@ if [ ! -f "$CLUSTER_SPEC_TEMPLATE" ]; then
     echo "Provided cluster spec file \"$1\" doesn't exist"
     exit 2
 fi
-if [ -z "$NAME" ]
+if [ -z "$CLUSTER_NAME" ]
 then
-  echo -e "Environment variable NAME must be set."
+  echo -e "Environment variable CLUSTER_NAME must be set."
+  exit 2
+fi
+if [ -z "$DEPLOYMENT_NAME" ]
+then
+  echo -e "Environment variable DEPLOYMENT_NAME must be set."
   exit 2
 fi
 if [ -z "$KOPS_STATE_STORE" ]
