@@ -86,8 +86,8 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | head -1`
-subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $12 }' | sort | tail -1`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | head -1`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | tail -1`
 
 echo "Detected Subnet: $subnetIdZoneA"
 echo "Detected Subnet: $subnetIdZoneB"
