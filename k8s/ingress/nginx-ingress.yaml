@@ -3,5 +3,11 @@ controller:
     limits:
       memory: 512Mi
     requests:
-      cpu: 100m
+      cpu: 500m
       memory: 512Mi
+  nodeSelector:
+    testground.node.role.infra: "true"
+
+defaultBackend:
+  nodeSelector:
+    testground.node.role.infra: "true"
