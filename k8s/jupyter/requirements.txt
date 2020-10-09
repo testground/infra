@@ -4,6 +4,7 @@ ndjson
 pandas
 numpy
 matplotlib
+python-highcharts
 jupyter
 ipywidgets
 bunch
