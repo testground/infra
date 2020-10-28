@@ -3,6 +3,7 @@ provider "aws" {
   version = "~> 2.50"
 }
 
+# EFS for Testground outputs
 resource "aws_efs_file_system" "default" {
   count           = 1
 }

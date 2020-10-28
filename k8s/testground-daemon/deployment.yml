@@ -44,7 +44,7 @@ spec:
           - name: envtoml
             mountPath: /root/testground/.env.toml
             subPath: .env.toml
-          - name: goproxymnt-pvc
+          - name: efs-pvc
             mountPath: "/go"
         resources:
           requests:
@@ -55,12 +55,19 @@ spec:
       - name: testground-daemon
         image: iptestground/testground:edge
         imagePullPolicy: Always
+        env:
+        - name: REDIS_HOST
+          value: "testground-infra-redis-headless"
         securityContext:
           privileged: true
         ports:
         - containerPort: 8042
           hostPort: 8042
         volumeMounts:
+          - name: daemon-datadir
+            mountPath: "/root/testground/"
+          - name: efs-pvc
+            mountPath: "/efs"
           - name: dockersock
             mountPath: "/var/run/docker.sock"
           - name: envtoml
@@ -68,14 +75,17 @@ spec:
             subPath: .env.toml
         resources:
           requests:
-            memory: 2000Mi
+            memory: 2048Mi
             cpu: 2000m
           limits:
-            memory: 2000Mi
+            memory: 2048Mi
       volumes:
-        - name: goproxymnt-pvc
+        - name: efs-pvc
           persistentVolumeClaim:
             claimName: efs
+        - name: daemon-datadir
+          persistentVolumeClaim:
+            claimName: testground-daemon-datadir-pvc
         - name: dockersock
           hostPath:
             path: /var/run/docker.sock

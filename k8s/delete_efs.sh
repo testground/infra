@@ -3,7 +3,6 @@
 set -o errexit
 set -o pipefail
 set -x
-
 set -e
 
 err_report() {
@@ -48,5 +47,3 @@ terraform init -backend-config=bucket=$S3_BUCKET \
 terraform destroy -var aws_region=$AWS_REGION -var fs_subnet_id_zone_a=$subnetIdZoneA -var fs_subnet_id_zone_b=$subnetIdZoneB -var fs_sg_id=$securityGroupId -auto-approve
 
 popd
-
-kops delete cluster $NAME --yes
