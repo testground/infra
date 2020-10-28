@@ -194,8 +194,8 @@ items:
                     fieldRef:
                       apiVersion: v1
                       fieldPath: spec.nodeName
-              #image: 'docker.io/weaveworks/weave-kube:2.6.0'
-              image: 'iptestground/weave-kube:0.0.1'
+              image: 'docker.io/weaveworks/weave-kube:2.7.0'
+              #image: 'iptestground/weave-kube:0.0.1'
               readinessProbe:
                 httpGet:
                   host: 127.0.0.1

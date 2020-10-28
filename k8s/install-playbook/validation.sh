@@ -7,7 +7,7 @@ set -e
 # Validate required arguments
 if [ -z "$CLUSTER_SPEC_TEMPLATE" ]
 then
-  echo -e "Please provider cluster spec template file as argument. For example: \`./install.sh cluster.yaml\`"
+  echo -e "Please provider cluster spec template file as argument. For example: \`./01_install.sh cluster.yaml\`"
   exit 2
 fi
 if [ ! -f "$CLUSTER_SPEC_TEMPLATE" ]; then

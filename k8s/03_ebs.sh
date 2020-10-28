@@ -12,6 +12,8 @@ trap 'err_report $LINENO' ERR
 
 START_TIME=`date +%s`
 
+CLUSTER_SPEC_TEMPLATE=$1
+
 my_dir="$(dirname "$0")"
 source "$my_dir/install-playbook/validation.sh"
 
