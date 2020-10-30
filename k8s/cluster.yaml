@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: ${CLUSTER_NAME}
 spec:
+  docker:
+    skipInstall: true
   cloudLabels:
     Team: ${TEAM}
     Project: ${PROJECT}

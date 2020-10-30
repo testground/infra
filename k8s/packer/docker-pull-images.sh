@@ -1,4 +1,8 @@
 #!/bin/bash
+
+sudo apt update
+sudo apt install -y docker.io
+
 sudo docker pull bitnami/redis:5.0.8-debian-10-r39
 sudo docker pull busybox:1.31.1
 sudo docker pull busybox:1.31.1-glibc
