@@ -26,10 +26,10 @@ then
   exit 2
 fi
 
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region eu-west-1
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region eu-west-2
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region us-east-1
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region us-east-2
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region us-west-1
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region us-west-2
-aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-central-1 --region ap-southeast-1
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region eu-west-1
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region eu-central-1
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region us-east-1
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region us-east-2
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region us-west-1
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region us-west-2
+aws ec2 copy-image --name $NAME --source-image-id $SOURCE_IMAGE_ID  --source-region eu-west-2 --region ap-southeast-1
