@@ -4,6 +4,7 @@ sudo apt update
 sudo apt install -y docker.io
 
 sudo docker pull bitnami/redis:5.0.8-debian-10-r39
+sudo docker pull bitnami/redis-exporter:1.5.2-debian-10-r27
 sudo docker pull busybox:1.31.1
 sudo docker pull busybox:1.31.1-glibc
 sudo docker pull grafana/grafana:7.0.3

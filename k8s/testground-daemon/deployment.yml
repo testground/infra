@@ -53,7 +53,7 @@ spec:
           limits:
             memory: 512Mi
       - name: testground-daemon
-        image: nonsens3/daemon:supervisor
+        image: iptestground/testground:edge
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
