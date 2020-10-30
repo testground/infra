@@ -139,7 +139,7 @@ spec:
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20201014
+  image: 909427826938/testground_2020-10-30
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 1
   minSize: 1
@@ -182,7 +182,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20201014
+  image: 909427826938/testground_2020-10-30
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
   minSize: ${WORKER_NODES}
@@ -227,7 +227,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20201014
+  image: 909427826938/testground_2020-10-30
   machineType: c5.2xlarge
   maxSize: 2
   minSize: 2
