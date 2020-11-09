@@ -2,8 +2,10 @@ apiVersion: kops.k8s.io/v1alpha2
 kind: Cluster
 metadata:
   creationTimestamp: null
-  name: ${NAME}
+  name: ${CLUSTER_NAME}
 spec:
+  docker:
+    skipInstall: true
   cloudLabels:
     Team: ${TEAM}
     Project: ${PROJECT}
@@ -27,7 +29,7 @@ spec:
     rbac: {}
   channel: stable
   cloudProvider: aws
-  configBase: ${KOPS_STATE_STORE}/${NAME}
+  configBase: ${KOPS_STATE_STORE}/${CLUSTER_NAME}
   docker:
     defaultUlimit:
     - "nofile=${ULIMIT_NOFILE}"
@@ -83,9 +85,9 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: 1.18.3
-  masterInternalName: api.internal.${NAME}
-  masterPublicName: api.${NAME}
+  kubernetesVersion: 1.18.10
+  masterInternalName: api.internal.${CLUSTER_NAME}
+  masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 172.20.0.0/16
   networking:
     flannel:
@@ -115,7 +117,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: ${NAME}
+    kops.k8s.io/cluster: ${CLUSTER_NAME}
   name: master-${ZONE}
 spec:
   additionalUserData:
@@ -139,7 +141,7 @@ spec:
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  image: 909427826938/testground_2020-06-09
+  image: 909427826938/testground_2020-10-30
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 1
   minSize: 1
@@ -156,7 +158,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: ${NAME}
+    kops.k8s.io/cluster: ${CLUSTER_NAME}
   name: nodes
 spec:
   additionalUserData:
@@ -182,7 +184,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-  image: 909427826938/testground_2020-06-09
+  image: 909427826938/testground_2020-10-30
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
   minSize: ${WORKER_NODES}
@@ -201,7 +203,7 @@ kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
-    kops.k8s.io/cluster: ${NAME}
+    kops.k8s.io/cluster: ${CLUSTER_NAME}
   name: tginfra
 spec:
   additionalUserData:
@@ -227,7 +229,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-  image: 909427826938/testground_2020-06-09
+  image: 909427826938/testground_2020-10-30
   machineType: c5.2xlarge
   maxSize: 2
   minSize: 2

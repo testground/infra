@@ -11,4 +11,4 @@ err_report() {
 
 trap 'err_report $LINENO' ERR
 
-kops delete cluster $NAME --yes
+kops delete cluster $CLUSTER_NAME --yes

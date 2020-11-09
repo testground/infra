@@ -1,15 +1,6 @@
 ## Background
 
-Testground AMI image is currently based on `k8s-1.17-debian-stretch-amd64-hvm-ebs-2020-01-17`
-
-You can get a specific AMI for a given region with:
-
-```
-aws ec2 describe-images --region eu-west-2  --output table \
-  --owners 383156758163 \
-  --query "sort_by(Images, &CreationDate)[*].[CreationDate,Name,ImageId]" \
-  --filters "Name=name,Values=*-debian-stretch-*"
-```
+Testground AMI image is currently based on `099720109477/ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-20201014` (since this is what kops v1.18.2 is using)
 
 ---
 

@@ -12,12 +12,14 @@ trap 'err_report $LINENO' ERR
 
 START_TIME=`date +%s`
 
+CLUSTER_SPEC_TEMPLATE=$1
+
 my_dir="$(dirname "$0")"
 source "$my_dir/install-playbook/validation.sh"
 
 echo "Installing EFS..."
 
-vpcId=`aws ec2 describe-vpcs --region=$AWS_REGION --filters Name=tag:Name,Values=$NAME --output text | awk '/VPCS/ { print $8 }'`
+vpcId=`aws ec2 describe-vpcs --region=$AWS_REGION --filters Name=tag:Name,Values=$CLUSTER_NAME --output text | awk '/VPCS/ { print $8 }'`
 
 if [[ -z ${vpcId} ]]; then
   echo "Couldn't detect AWS VPC created by `kops`"
@@ -26,7 +28,7 @@ fi
 
 echo "Detected VPC: $vpcId"
 
-securityGroupId=`aws ec2 describe-security-groups --region=$AWS_REGION --output text | awk '/nodes.'$NAME'/ && /SECURITYGROUPS/ { print $6 };'`
+securityGroupId=`aws ec2 describe-security-groups --region=$AWS_REGION --output text | awk '/nodes.'$CLUSTER_NAME'/ && /SECURITYGROUPS/ { print $6 };'`
 
 if [[ -z ${securityGroupId} ]]; then
   echo "Couldn't detect AWS Security Group created by `kops`"

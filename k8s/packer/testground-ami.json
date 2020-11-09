@@ -12,7 +12,7 @@
     "region": "{{user `aws_region`}}",
     "source_ami": "{{user `source_ami`}}",
     "instance_type": "m4.xlarge",
-    "ssh_username": "admin",
+    "ssh_username": "ubuntu",
     "ami_name": "testground_{{isotime \"2006-01-02\"}}"
   }],
   "provisioners": [

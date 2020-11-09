@@ -81,8 +81,9 @@ popd
 
 echo "Installing InfluxDB"
 pushd influxdb
-helm install influxdb influxdata/influxdb -f ./values.yaml
+helm install influxdb bitnami/influxdb -f ./values.yaml
 popd
+
 
 echo "Installing Redis and Grafana dashboards"
 pushd testground-infra
