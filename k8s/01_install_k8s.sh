@@ -53,7 +53,7 @@ fi
 
 kops create -f $CLUSTER_SPEC
 kops create secret --name $CLUSTER_NAME sshpublickey admin -i $PUBKEY
-kops update cluster $CLUSTER_NAME --yes
+kops update cluster $CLUSTER_NAME --yes --admin
 
 # Wait for worker nodes and master to be ready
 kops validate cluster --wait 20m
