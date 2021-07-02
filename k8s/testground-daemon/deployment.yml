@@ -56,6 +56,8 @@ spec:
         image: iptestground/testground:sync-service
         imagePullPolicy: Always
         env:
+        - name: REDIS_HOST # kept for compatibility with old SDKs
+          value: "testground-infra-redis-headless"
         - name: SYNC_SERVICE_HOST
           value: "testground-sync-service-headless"
         securityContext:
@@ -84,11 +86,8 @@ spec:
           persistentVolumeClaim:
             claimName: efs
         - name: daemon-datadir
-          hostPath:
-            path: /root/testground
-        # - name: daemon-datadir
-        #   persistentVolumeClaim:
-        #     claimName: testground-daemon-datadir-pvc
+          persistentVolumeClaim:
+            claimName: testground-daemon-datadir-pvc
         - name: dockersock
           hostPath:
             path: /var/run/docker.sock
