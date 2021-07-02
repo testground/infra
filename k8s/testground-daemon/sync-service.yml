@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testground-sync-service
+  labels:
+    app: testground-sync-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testground-sync-service
+  template:
+    metadata:
+      labels:
+        app: testground-sync-service
+    spec:
+      nodeSelector:
+        testground.node.role.infra: "true"
+      containers:
+        - name: testground-sync-service
+          image: iptestground/sync-service:no-redis
+          command: ["/service"]
+          env:
+            - name: DEBUG
+              value: "true"
+          ports:
+          - containerPort: 5050
+          resources:
+            requests:
+              cpu: 10m
+              memory: 12Mi
