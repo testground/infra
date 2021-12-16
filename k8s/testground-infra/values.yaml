@@ -11,18 +11,23 @@
 redis:
   metrics:
     enabled: true
-    serviceMonitor:
-      enabled: true
-      namespace: default
+    # This doesn work: Error: INSTALLATION FAILED: unable to build kubernetes objects from release manifest: unable to recognize "": no matches for kind "ServiceMonitor"
+    # This needs to be installed with: helm install testground-infra .
+    # serviceMonitor:
+    #   enabled: true
+    #   namespace: default
     resources:
       requests:
         memory: 256Mi
         cpu: 200m
       limits:
         memory: 256Mi
+  architecture: standalone
   cluster:
     enabled: false
   usePassword: false
+  auth:
+    enabled: false
   securityContext:
     sysctls:
       - name: net.core.somaxconn

@@ -1,0 +1,4 @@
+.envrc
+.env.toml
+.terraform.lock.*
+.terraform
