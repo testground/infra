@@ -31,7 +31,7 @@ terraform init -backend-config=bucket=$S3_BUCKET \
 
 terraform apply -var aws_region=$AWS_REGION -var aws_availability_zone=${AWS_REGION}a -auto-approve
 
-export TG_EBS_DATADIR_VOLUME_ID="aws://`terraform output availability_zone`/`terraform output volume_id`"
+export TG_EBS_DATADIR_VOLUME_ID="aws://`terraform output --raw availability_zone`/`terraform output --raw volume_id`"
 
 popd
 
