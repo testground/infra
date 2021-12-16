@@ -3,7 +3,7 @@ variable "aws_region" {}
 variable "aws_availability_zone" {}
 
 variable "default_tags" {
-  type = "map"
+  type = map
 
   default = {
     Name              = "taas-daemon-datadir-volume"
