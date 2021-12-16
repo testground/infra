@@ -6,7 +6,7 @@ metadata:
 data:
   .env.toml: |
     ["aws"]
-    region = "eu-west-2"
+    region = "us-east-1"
 
     [runners."cluster:k8s"]
     run_timeout_min             = 15
