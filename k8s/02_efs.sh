@@ -37,11 +37,23 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | head -1`
-subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | tail -1`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output json | jq --raw-output "[.Subnets[] | select(.VpcId == \"${vpcId}\") | .SubnetId][0]"`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output json | jq --raw-output "[.Subnets[] | select(.VpcId == \"${vpcId}\") | .SubnetId][1]"`
 
 echo "Detected Subnet: $subnetIdZoneA"
 echo "Detected Subnet: $subnetIdZoneB"
+
+# Verify with the user before continuing.
+echo
+echo "EFS will be installed based on the params above."
+echo -n "Do they look right to you? [y/n]: "
+read response
+
+if [ "$response" != "y" ]
+then
+  echo "Canceling ."
+  exit 2
+fi
 
 pushd efs-terraform
 
