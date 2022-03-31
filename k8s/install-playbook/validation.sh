@@ -29,6 +29,11 @@ then
   echo -e "Environment variable KOPS_STATE_STORE must be set."
   exit 2
 fi
+if [ -z "$ZONE" ]
+then
+  echo -e "Environment variable ZONE must be set."
+  exit 2
+fi
 if [ -z "$ZONE_A" ]
 then
   echo -e "Environment variable ZONE_A must be set."
