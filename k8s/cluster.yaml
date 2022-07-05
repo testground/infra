@@ -4,6 +4,8 @@ metadata:
   creationTimestamp: null
   name: ${CLUSTER_NAME}
 spec:
+  kubeAPIServer:
+    disableBasicAuth: false
   docker:
     skipInstall: true
   cloudLabels:
