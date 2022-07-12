@@ -88,6 +88,7 @@ popd
 echo "Installing Redis and Grafana dashboards"
 pushd testground-infra
 helm dep build
+helm dep build
 helm install testground-infra .
 popd
 

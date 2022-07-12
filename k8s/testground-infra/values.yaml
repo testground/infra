@@ -22,7 +22,9 @@ redis:
         memory: 256Mi
   cluster:
     enabled: false
-  usePassword: false
+
+  auth:
+    enabled: false
   securityContext:
     sysctls:
       - name: net.core.somaxconn
