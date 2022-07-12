@@ -81,7 +81,7 @@ popd
 
 echo "Installing InfluxDB"
 pushd influxdb
-helm install influxdb bitnami/influxdb -f ./values.yaml
+helm install influxdb influxdb-0.4.1.tgz -f values.yaml
 popd
 
 

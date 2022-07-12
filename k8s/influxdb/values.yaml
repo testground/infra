@@ -1,4 +1,9 @@
+image:
+  registry: docker.io
+  repository: bitnami/influxdb
+  tag: 1.7.10-debian-10-r37
 authEnabled: false
+database: testground
 influxdb:
   nodeSelector:
     testground.node.role.infra: "true"
