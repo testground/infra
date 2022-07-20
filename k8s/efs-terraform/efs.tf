@@ -1,6 +1,6 @@
 provider "aws" {
   region  = var.aws_region
-  version = "~> 2.50"
+  version = "~> 3.70.0"
 }
 
 # EFS for Testground outputs
