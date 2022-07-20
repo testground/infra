@@ -37,8 +37,8 @@ fi
 
 echo "Detected Security Group ID: $securityGroupId"
 
-subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | head -1`
-subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $13 }' | sort | tail -1`
+subnetIdZoneA=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $15 }' | sort | head -1`
+subnetIdZoneB=`aws ec2 describe-subnets --region=$AWS_REGION --output text | awk '/'$vpcId'/ { print $15 }' | sort | tail -1`
 
 echo "Detected Subnet: $subnetIdZoneA"
 echo "Detected Subnet: $subnetIdZoneB"
@@ -55,9 +55,9 @@ terraform init -backend-config=bucket=$S3_BUCKET \
 
 terraform apply -var aws_region=$AWS_REGION -var fs_subnet_id_zone_a=$subnetIdZoneA -var fs_subnet_id_zone_b=$subnetIdZoneB -var fs_sg_id=$securityGroupId -auto-approve
 
-export EFS_DNSNAME=`terraform output dns_name`
+export EFS_DNSNAME=`terraform output -raw dns_name`
 
-fsId=`terraform output filesystem_id`
+fsId=`terraform output -raw filesystem_id`
 
 popd
 
