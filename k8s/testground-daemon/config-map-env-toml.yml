@@ -19,6 +19,15 @@ data:
       "net.core.somaxconn=10000",
     ]
 
+    [runners."cluster:swarm"]
+    disabled = true
+
+    [runners."local:docker"]
+    disabled = true
+
+    [runners."local:exec"]
+    disabled = true
+
     [daemon]
     listen = "0.0.0.0:8042"
     slack_webhook_url = ""
