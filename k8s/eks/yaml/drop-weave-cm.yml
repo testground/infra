@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: entrypoint
+  labels:
+    app: drop-weave
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    cat <<EOT >> /tmp/script.sh
+    sudo iptables -D FORWARD -o weave -j DROP &> /tmp/info.txt
+    sudo rm /etc/cron.d/cron
+    EOT
+    chmod +x /tmp/script.sh
+    cat <<EOT>> /etc/cron.d/cron
+    SHELL=/bin/bash
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+    * * * * * root /tmp/script.sh
+    EOT
