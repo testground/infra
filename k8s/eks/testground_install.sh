@@ -100,3 +100,11 @@ echo "========================"
 echo "Making multus softlink..."
 multus_soflink
 echo "========================"
+
+echo "Creating cluster config file with name $CLUSTER_NAME.yaml"
+make_cluster_config
+echo "========================"
+
+echo "Creating cluster now..."
+create_cluster
+echo "========================"
