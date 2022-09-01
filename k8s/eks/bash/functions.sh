@@ -1,6 +1,6 @@
 #!/bin/bash
 create_cluster() {
-    eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION<
+    eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
 } | tee -a ./log/$start-log/create_cluster.log
 
 remove_aws_node_ds() {
@@ -60,3 +60,7 @@ multus_soflink() {
     kubectl create -f ./yaml/soflink-cm.yml
     kubectl create -f ./yaml/drop-weave-ds.yml
 } | tee -a ./log/$start-log/multus_soflink.log
+
+aws_create_file_system(){
+    create-file-system --region $REGION --availability-zone-name #first find out cluster avialbility zone
+}

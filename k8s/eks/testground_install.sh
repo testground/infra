@@ -22,11 +22,12 @@ if [[ "$CLUSTER_NAME" == "default" ]]
  then
    echo "Your cluster name cant be "default" " 
    echo "Please edit .env which is located in the same directory as this script"
+   exit 1
 else
   echo "Creating cluster with name: $CLUSTER_NAME "
   echo "Please note, this can take up to 20 minutes to complete." 
-  cluster_created = 1
   create_cluster
+  cluster_created = 1
   echo "========================"
   echo ""
 fi
@@ -36,7 +37,7 @@ sleep 1
 echo ""
 if [ -d "./multus-cni" ] 
 then
-    echo "/usr/bin/printf "[\xE2\x9C\x94] Multus-CNI\n"" >> ./log/$start-log/deploy_multus_ds.log
+    /usr/bin/printf "[\xE2\x9C\x94] Multus-CNI\n"" >> ./log/$start-log/deploy_multus_ds.log"
     echo "Now deploying multus-cni DS"
     deploy_multus_ds
     echo "========================"
@@ -59,6 +60,9 @@ if [[ "$CNI_COMBINATION" == "calico_weave" ]]
    echo "Deploying tigera operator"
    deploy_tigera_operator
    echo "========================"
+elif [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
+  then
+  echo "aws_vpc_cni_weave combination is selected."
 else
   echo "Invalid selecton in .env"  >> ./log/$start-log/erorr.log
   echo "CNI_COMBINATION cant be $CNI_COMBINATION" >> ./log/$start-log/erorr.log
@@ -79,7 +83,7 @@ if [[ "$CNI_COMBINATION" == "calico_weave" ]]
   deploy_vpc_multus_cm_calico
   echo "========================"
 else
-  echo "Deploying multusds and selected cni failed" >> ./log/$start-log/erorr.log
+  echo "Deploying multus DS and selected cni failed" >> ./log/$start-log/erorr.log
   echo "exiting" >> ./log/$start-log/erorr.log
   echo "========================"
   exit 1
