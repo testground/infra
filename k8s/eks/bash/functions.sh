@@ -62,7 +62,7 @@ multus_soflink() {
 } | tee -a ./log/$start-log/multus_soflink.log
 
 
-make_node_group_file(){
+make_cluster_config(){
     cat <<EOT >> /$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -108,7 +108,7 @@ managedNodeGroups:
     availabilityZones: [$AVAILAVILITY_ZONES_PLAN]
     ssh:
       allow: true
-      publicKeyPath: ~/.ssh/id_rsa.pub
+      publicKeyPath: $SSH_PATH_PLAN
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -126,6 +126,10 @@ managedNodeGroups:
        --use-max-pods false
 EOT
 }
+
+create_cluster(){
+    eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
+}  | tee -a ./log/$start-log/create_cluster.log
 
 #####Aws cli part#######
 aws_create_file_system(){
