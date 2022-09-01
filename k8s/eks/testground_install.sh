@@ -14,7 +14,7 @@ cat << "EOF"
 
 EOF
 
-export $(grep -v '^#' .env | xargs) #exporting .env vars
+source .env #setting .env vars
 
 #Lets do sanity check
 
