@@ -93,7 +93,7 @@ managedNodeGroups:
    
     overrideBootstrapCommand: |
       #!/bin/bash
-      /etc/eks/bootstrap.sh calico-weave \
+      /etc/eks/bootstrap.sh $CLUSTER_NAME \
         --kubelet-extra-args '--max-pods=58' \
         --use-max-pods false
   - name: ng-2-plan
@@ -121,7 +121,7 @@ managedNodeGroups:
     # 234 is the max number of pods for c5.4xlarge
     overrideBootstrapCommand: |
       #!/bin/bash
-      /etc/eks/bootstrap.sh calico-weave \
+      /etc/eks/bootstrap.sh $CLUSTER_NAME \
        --kubelet-extra-args '--max-pods=234' \
        --use-max-pods false
 EOT
@@ -133,5 +133,5 @@ create_cluster(){
 
 #####Aws cli part#######
 aws_create_file_system(){
-    create-file-system --region $REGION --availability-zone-name #first find out cluster avialbility zone
-}
+    create-file-system --region $REGION --availability-zone-name $AVAILAVILITY_ZONES_INFRA #first find out cluster avialbility zone
+} | tee -a ./log/$start-log/aws-cli.log
