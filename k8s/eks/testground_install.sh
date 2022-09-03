@@ -108,3 +108,10 @@ echo "========================"
 echo "Creating cluster now..."
 create_cluster
 echo "========================"
+
+echo "Creating and mounting efs"
+jq_check
+create_cluster
+aws_create_efs_sg
+aws_get_subent_id
+aws_create_efs_mount_point

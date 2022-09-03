@@ -127,11 +127,38 @@ managedNodeGroups:
 EOT
 }
 
+jq_check() { 
+has_jq_installed=$(which jq)
+if [[ "$OSTYPE" == "linux-gnu"* ]]
+ then
+   if [ -z $has_jq_installed ]
+     then
+       sudo apt update
+       sudo apt install jq
+   else
+       echo "" 
+   fi
+}  | tee -a ./log/$start-log/jq.log
 create_cluster(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
 }  | tee -a ./log/$start-log/create_cluster.log
 
 #####Aws cli part#######
 aws_create_file_system(){
-    create-file-system --region $REGION --availability-zone-name $AVAILAVILITY_ZONES_INFRA #first find out cluster avialbility zone
+    create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
+    efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
+} | tee -a ./log/$start-log/aws-cli.log
+
+aws_create_efs_sg(){
+    create_efs_sg=$(aws ec2 create-security-group --region $REGION --group-name efs-$CLUSTER_NAME-sg --description "Security group crreated by testground eks automation script" )
+    efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
+} | tee -a ./log/$start-log/aws-cli.log
+
+aws_get_subent_id(){
+    subnet_id=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
+} | tee -a ./log/$start-log/aws-cli.log
+
+aws_create_efs_mount_point(){
+    create_efs_mp=$(aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION )
+    efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
 } | tee -a ./log/$start-log/aws-cli.log
