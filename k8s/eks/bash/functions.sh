@@ -164,14 +164,42 @@ aws_get_subnet_id(){
 
 aws_get_subent_cidr_block(){
     subnet_cidr_block=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
-} 
+} | tee -a ./log/$start-log/aws-cli.log
 
 aws_efs_sg_rule_add(){
     aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
-} 
+} | tee -a ./log/$start-log/aws-cli.log
 
 aws_create_efs_mount_point(){
     aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
     efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
     echo "Your efs mountpoint dns is: $efs_dns"
 } | tee -a ./log/$start-log/aws-cli.log
+
+create_cm_efs(){
+  kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+}
+
+create_efs_manifest(){
+    EFS_DNSNAME="$efs_dns"
+    AWS_REGION="$REGION"
+    fsId="$efs_fs_id"
+
+    EFS_MANIFEST_SPEC=$(mktemp)
+    envsubst <../kops/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
+    kubectl apply -f ../kops/efs/rbac.yaml -f $EFS_MANIFEST_SPEC
+}
+
+aws_create_ebs(){
+  create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
+  echo "$create_ebs_volume"
+  ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
+}
+
+make_persistant_volume(){  
+aws_create_ebs
+TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
+EBS_PV=$(mktemp)
+envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
+kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
+}
