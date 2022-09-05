@@ -9,6 +9,8 @@ data:
     #!/bin/bash
     cat <<EOT >> /tmp/script.sh
     sudo iptables -D FORWARD -o weave -j DROP &> /tmp/info.txt
+    sudo iptables -t nat -I POSTROUTING 2 -m comment --comment "AWS SNAT CHAIN" ! -o weave -j AWS-SNAT-CHAIN-0 &> /tmp/info.txt
+    sudo iptables -t nat -D POSTROUTING -m comment --comment "AWS SNAT CHAIN" -j AWS-SNAT-CHAIN-0 &> /tmp/info.txt
     sudo rm /etc/cron.d/cron
     EOT
     chmod +x /tmp/script.sh

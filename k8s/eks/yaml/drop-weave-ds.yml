@@ -18,8 +18,6 @@ spec:
       - image: amazonlinux
         imagePullPolicy: Always
         name: drop-iptables
-        #command: ["/bin/bash"]
-        #args: ["-c","sudo iptables -D FORWARD -o weave -j DROP"]
         command: ["/scripts/entrypoint.sh"]
         securityContext:
           allowPrivilegeEscalation: true
