@@ -111,7 +111,9 @@ echo "========================"
 
 echo "Creating and mounting efs"
 jq_check
-create_cluster
+aws_create_file_system
 aws_create_efs_sg
 aws_get_subent_id
+aws_get_subent_cidr_block
+aws_efs_sg_rule_add
 aws_create_efs_mount_point

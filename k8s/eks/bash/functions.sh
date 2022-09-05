@@ -83,6 +83,7 @@ managedNodeGroups:
       allow: true
       # key needs to exist
       publicKeyPath: $SSH_PATH_INFRA
+      sourceSecurityGroupIds: ["$BASTION_SG_ID"]
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -109,6 +110,7 @@ managedNodeGroups:
     ssh:
       allow: true
       publicKeyPath: $SSH_PATH_PLAN
+      sourceSecurityGroupIds: ["$BASTION_SG_ID"]
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -146,19 +148,30 @@ create_cluster(){
 #####Aws cli part#######
 aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
+    echo "$create_efs"
     efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
 } | tee -a ./log/$start-log/aws-cli.log
 
 aws_create_efs_sg(){
     create_efs_sg=$(aws ec2 create-security-group --region $REGION --group-name efs-$CLUSTER_NAME-sg --description "Security group crreated by testground eks automation script" )
+    echo "$create_efs_sg"
     efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
 } | tee -a ./log/$start-log/aws-cli.log
 
-aws_get_subent_id(){
+aws_get_subnet_id(){
     subnet_id=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 } | tee -a ./log/$start-log/aws-cli.log
 
+aws_get_subent_cidr_block(){
+    subnet_cidr_block=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
+} 
+
+aws_efs_sg_rule_add(){
+    aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
+} 
+
 aws_create_efs_mount_point(){
-    create_efs_mp=$(aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION )
-    efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
+    aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+    efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
+    echo "Your efs mountpoint dns is: $efs_dns"
 } | tee -a ./log/$start-log/aws-cli.log
