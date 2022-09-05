@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testground-sync-service
+spec:
+  selector:
+    matchLabels:
+      name: testground-sync-service
+  template:
+    metadata:
+      labels:
+        name: testground-sync-service
+    spec:
+      terminationGracePeriodSeconds: 10
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: testground-sync-service
+          image: iptestground/sync-service:latest
+          command: ["/service"]
+          ports:
+            - name: syncservicehttp
+              containerPort: 5050
+          env:
+            - name: DEBUG
+              value: "true"
+          resources:
+            limits:
+              cpu: 240m
+              memory: 260Mi
+            requests:
+              cpu: 120m
+              memory: 130Mi
+      nodeSelector:
+        testground.node.role.plan: "true"

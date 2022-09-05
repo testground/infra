@@ -20,20 +20,6 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
         testground.node.role.infra: "true"
-      initContainers:
-      - name: iproute-add
-        image: busybox:1.31.1
-        securityContext:
-          privileged: true
-        command:
-        - sh
-        - -ac
-        - >
-          while [ "$GW" = "" ]; do export GW=$(ip route | grep cni0 | awk '{print $7}'); echo "Got GW: $GW"; sleep 5; done;
-          echo $GW &&
-          ip route &&
-          ip route add 100.64.0.0/16 via $GW &&
-          ip route || true;
       containers:
       - name: goproxy
         image: iptestground/goproxy:2.0.2
@@ -48,16 +34,17 @@ spec:
             mountPath: "/go"
         resources:
           requests:
-            memory: 512Mi
+            memory: 700Mi
             cpu: 500m
           limits:
-            memory: 512Mi
+            memory: 1000Mi
+            cpu: 700m
       - name: testground-daemon
-        image: iptestground/testground:edge
+        image: 909427826938.dkr.ecr.eu-west-2.amazonaws.com/bloxico-testground:eks_26_july
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
-          value: "testground-infra-redis-headless"
+          value: "testground-infra-redis-master.default.svc.cluster.local"
         securityContext:
           privileged: true
         ports:
@@ -78,7 +65,8 @@ spec:
             memory: 2048Mi
             cpu: 2000m
           limits:
-            memory: 2048Mi
+            memory: 4096Mi
+            cpu: 2500m
       volumes:
         - name: efs-pvc
           persistentVolumeClaim:
