@@ -145,7 +145,7 @@ create_cluster(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
 }  | tee -a ./log/$start-log/create_cluster.log
 
-#####Aws cli part#######
+#####EFS and EBS#######
 aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
@@ -194,7 +194,7 @@ aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-}
+} | tee -a ./log/$start-log/aws-cli.log
 
 make_persistant_volume(){  
 aws_create_ebs
@@ -202,4 +202,108 @@ TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
 envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
 kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
+} | tee -a ./log/$start-log/make_persistant_volume.log
+
+#Not sure if relevant
+# tg_daemon_config_map(){
+#   kubectl apply -f ../kops/testground-daemon/config-map-env-toml.yml
+# } | tee -a ./log/$start-log/tg_daemon_config_map.log
+
+# tg_daemon_service_account(){
+#   kubectl apply -f ./testground-daemon/service-account.yml
+# } | tee -a ./log/$start-log/tg_daemon_service_account.log
+
+# tg_daemon_role_binding(){
+#   kubectl apply -f ./testground-daemon/role-binding.yml
+# } | tee -a ./log/$start-log/tg_daemon_role_binding.log
+
+# tg_daemon_services(){
+#   kubectl apply -f ./testground-daemon/service.yml
+# } | tee -a ./log/$start-log/tg_daemon_services.log
+
+# tg_daemon_svc_sync_service(){
+#   kubectl apply -f ./testground-daemon/svc-sync-service.yaml
+# } | tee -a ./log/$start-log/tg_daemon_svc_sync_servic.log
+
+# tg_daemon_sync_service(){
+#   kubectl apply -f ./testground-daemon/sync-service.yaml
+# } | tee -a ./log/$start-log/tg_daemon_sync_service.log
+
+# tg_daemon_sidecar(){
+#   kubectl apply -f ./testground-daemon/sidecar.yaml
+# } | tee -a ./log/$start-log/tg_daemon_sidecar.log
+
+# tg_daemon_deployment(){
+#   kubectl apply -f testground-daemon/deployment.yml
+# } | tee -a ./log/$start-log/tg_daemon_deployment.log
+
+tg_daemon_env_toml(){
+  kubectl create -f - <<EOF
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: env-toml-cfg
+  namespace: default
+data:
+  .env.toml: |
+    ["aws"]
+    region = "$REGION"   
+
+    [runners."cluster:k8s"]
+    run_timeout_min             = 15
+    testplan_pod_cpu            = "100m"
+    testplan_pod_memory         = "100Mi"
+    collect_outputs_pod_cpu     = "1000m"
+    collect_outputs_pod_memory  = "1000Mi"
+    provider                    = "aws"
+    sysctls = [
+      "net.core.somaxconn=10000",
+    ]
+
+    [daemon]
+    listen = "0.0.0.0:8042"
+    slack_webhook_url = ""
+    github_repo_status_token = ""
+
+    [daemon.scheduler]
+    workers = 2
+    task_timeout_min  = 20
+    task_repo_type    = "disk"
+
+    [client]
+    endpoint = "localhost:8080"
+
+EOF
 }
+tg_daemon_service_account(){
+  kubectl create -f ./yaml/tg-daemon-service-account.yml
+} | tee -a ./log/$start-log/tg_daemon_service_account.log
+
+tg_daemon_cluster_role(){
+  kubectl create -f ./yaml/tg-daemon-cluster-role.yml
+} | tee -a ./log/$start-log/tg_daemon_cluster_role.log
+
+tg_sync_service(){
+  kubectl create -f ./yaml/tg-sync-service.yml
+} | tee -a ./log/$start-log/tg_sync_service.log
+
+tg_daemon_testground_daemon(){
+  kubectl create -f ./yaml/tg-testground-daemon.yml
+} | tee -a ./log/$start-log/tg_daemon_testground_daemon.log
+
+tg_sync_service_deployment(){
+  kubectl create -f ./yaml/tg-sync-service-deployment.yml
+} | tee -a ./log/$start-log/tg_sync_service_deployment.log
+
+tg_sync_service_deployment(){
+  kubectl create -f ./yaml/tg-sync-service-deployment.yml
+} | tee -a ./log/$start-log/tg_sync_service_deployment.log
+
+tg_ds_sidecar(){
+  kubectl create -f ./yaml/tg-ds-sidecar.yml
+} | tee -a ./log/$start-log/tg_ds_sidecar.log
+
+tg_daemon_deployment(){
+  kubectl create -f ./yaml/tg-daemon-depoyment.yml
+} | tee -a ./log/$start-log/tg_daemon_deployment.log
+
