@@ -16,7 +16,7 @@ deploy_tigera_operator() {
 } | tee -a ./log/$start-log/deploy_tigera_operator.log
 
 deploy_multus_ds() {
-    kubectl apply ./multus-cni/deployments/multus-daemonset.yml
+    kubectl apply ../../multus-cni/deployments/multus-daemonset.yml
 } | tee -a ./log/$start-log/deploy_multus_ds.log
 
 clone_multus() {
@@ -237,6 +237,14 @@ kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
 #   kubectl apply -f testground-daemon/deployment.yml
 # } | tee -a ./log/$start-log/tg_daemon_deployment.log
 
+helm_redis_add_repo(){
+  helm repo add bitnami https://charts.bitnami.com/bitnami
+} 
+
+helm_infra_install_redis(){
+  helm install testground-infra-redis --set auth.enabled=false bitnami/redis
+} 
+
 tg_daemon_env_toml(){
   kubectl create -f - <<EOF
 kind: ConfigMap
@@ -275,6 +283,8 @@ data:
 
 EOF
 }
+
+
 tg_daemon_service_account(){
   kubectl create -f ./yaml/tg-daemon-service-account.yml
 } | tee -a ./log/$start-log/tg_daemon_service_account.log
@@ -287,13 +297,9 @@ tg_sync_service(){
   kubectl create -f ./yaml/tg-sync-service.yml
 } | tee -a ./log/$start-log/tg_sync_service.log
 
-tg_daemon_testground_daemon(){
-  kubectl create -f ./yaml/tg-testground-daemon.yml
-} | tee -a ./log/$start-log/tg_daemon_testground_daemon.log
-
-tg_sync_service_deployment(){
-  kubectl create -f ./yaml/tg-sync-service-deployment.yml
-} | tee -a ./log/$start-log/tg_sync_service_deployment.log
+tg_daemon_testground_daemon_service(){
+  kubectl create -f ./yaml/tg-testground-daemon-service.yml
+} | tee -a ./log/$start-log/tg_daemon_testground_daemon_service.log
 
 tg_sync_service_deployment(){
   kubectl create -f ./yaml/tg-sync-service-deployment.yml

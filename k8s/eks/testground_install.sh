@@ -32,23 +32,9 @@ else
   echo ""
 fi
 
-echo "Detecting if multus-cni repo exists...."
-sleep 1
-echo ""
-if [ -d "./multus-cni" ] 
-then
-    /usr/bin/printf "[\xE2\x9C\x94] Multus-CNI\n"" >> ./log/$start-log/deploy_multus_ds.log"
-    echo "Now deploying multus-cni DS"
-    deploy_multus_ds
-    echo "========================"
-else
-    echo "[X] Multus-CNI" >> ./log/$start-log/deploy_multus_ds.log
-    echo "Now cloning Multus repository..."
-    clone_multus
-    echo "Now deploying multus-cni DS"
-    deploy_multus_ds
-     echo "========================"
-fi
+echo "Now deploying multus-cni DS"
+deploy_multus_ds
+echo "========================"
 
 if [[ "$CNI_COMBINATION" == "calico_weave" ]]
  then
@@ -117,3 +103,24 @@ aws_get_subent_id
 aws_get_subent_cidr_block
 aws_efs_sg_rule_add
 aws_create_efs_mount_point
+echo "========================"
+
+echo "Creating ebs"
+aws_create_ebs
+make_persistant_volume
+echo "========================"
+
+echo "Seting up redis..."
+helm_redis_add_repo
+helm_infra_install_redis
+
+echo "We will setup the test-ground daemon now."
+tg_daemon_env_toml
+tg_daemon_service_account
+tg_daemon_cluster_role
+tg_sync_service
+tg_daemon_testground_daemon_service
+tg_sync_service_deployment
+tg_ds_sidecar
+tg_daemon_deployment
+
