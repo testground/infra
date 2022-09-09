@@ -16,7 +16,7 @@ deploy_tigera_operator() {
 } | tee -a ./log/$start-log/deploy_tigera_operator.log
 
 deploy_multus_ds() {
-    kubectl apply ../../multus-cni/deployments/multus-daemonset.yml
+    kubectl apply ../multus-cni/deployments/multus-daemonset.yml
 } | tee -a ./log/$start-log/deploy_multus_ds.log
 
 clone_multus() {
@@ -204,38 +204,6 @@ envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
 kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
 } | tee -a ./log/$start-log/make_persistant_volume.log
 
-#Not sure if relevant
-# tg_daemon_config_map(){
-#   kubectl apply -f ../kops/testground-daemon/config-map-env-toml.yml
-# } | tee -a ./log/$start-log/tg_daemon_config_map.log
-
-# tg_daemon_service_account(){
-#   kubectl apply -f ./testground-daemon/service-account.yml
-# } | tee -a ./log/$start-log/tg_daemon_service_account.log
-
-# tg_daemon_role_binding(){
-#   kubectl apply -f ./testground-daemon/role-binding.yml
-# } | tee -a ./log/$start-log/tg_daemon_role_binding.log
-
-# tg_daemon_services(){
-#   kubectl apply -f ./testground-daemon/service.yml
-# } | tee -a ./log/$start-log/tg_daemon_services.log
-
-# tg_daemon_svc_sync_service(){
-#   kubectl apply -f ./testground-daemon/svc-sync-service.yaml
-# } | tee -a ./log/$start-log/tg_daemon_svc_sync_servic.log
-
-# tg_daemon_sync_service(){
-#   kubectl apply -f ./testground-daemon/sync-service.yaml
-# } | tee -a ./log/$start-log/tg_daemon_sync_service.log
-
-# tg_daemon_sidecar(){
-#   kubectl apply -f ./testground-daemon/sidecar.yaml
-# } | tee -a ./log/$start-log/tg_daemon_sidecar.log
-
-# tg_daemon_deployment(){
-#   kubectl apply -f testground-daemon/deployment.yml
-# } | tee -a ./log/$start-log/tg_daemon_deployment.log
 
 helm_redis_add_repo(){
   helm repo add bitnami https://charts.bitnami.com/bitnami
@@ -245,7 +213,13 @@ helm_infra_install_redis(){
   helm install testground-infra-redis --set auth.enabled=false bitnami/redis
 } 
 
-tg_daemon_env_toml(){
+
+#Until we find a better way for region var
+# tg_daemon_config_map(){
+#   kubectl apply -f ../kops/testground-daemon/config-map-env-toml.yml
+# } | tee -a ./log/$start-log/tg_daemon_config_map.log
+
+tg_daemon_config_map(){
   kubectl create -f - <<EOF
 kind: ConfigMap
 apiVersion: v1
@@ -286,30 +260,43 @@ EOF
 
 
 tg_daemon_service_account(){
-  kubectl create -f ./yaml/tg-daemon-service-account.yml
+  kubectl apply -f ./testground-daemon/service-account.yml
 } | tee -a ./log/$start-log/tg_daemon_service_account.log
 
-tg_daemon_cluster_role(){
-  kubectl create -f ./yaml/tg-daemon-cluster-role.yml
-} | tee -a ./log/$start-log/tg_daemon_cluster_role.log
+tg_daemon_role_binding(){
+  kubectl apply -f ./testground-daemon/role-binding.yml
+} | tee -a ./log/$start-log/tg_daemon_role_binding.log
 
-tg_sync_service(){
-  kubectl create -f ./yaml/tg-sync-service.yml
-} | tee -a ./log/$start-log/tg_sync_service.log
+tg_daemon_services(){
+  kubectl apply -f ./testground-daemon/service.yml
+} | tee -a ./log/$start-log/tg_daemon_services.log
 
-tg_daemon_testground_daemon_service(){
-  kubectl create -f ./yaml/tg-testground-daemon-service.yml
-} | tee -a ./log/$start-log/tg_daemon_testground_daemon_service.log
+tg_daemon_svc_sync_service(){
+  kubectl apply -f ./testground-daemon/svc-sync-service.yaml
+} | tee -a ./log/$start-log/tg_daemon_svc_sync_servic.log
 
-tg_sync_service_deployment(){
-  kubectl create -f ./yaml/tg-sync-service-deployment.yml
-} | tee -a ./log/$start-log/tg_sync_service_deployment.log
+tg_daemon_sync_service(){
+  kubectl apply -f ./testground-daemon/sync-service.yaml
+} | tee -a ./log/$start-log/tg_daemon_sync_service.log
 
-tg_ds_sidecar(){
-  kubectl create -f ./yaml/tg-ds-sidecar.yml
-} | tee -a ./log/$start-log/tg_ds_sidecar.log
+tg_daemon_sidecar(){
+  kubectl apply -f ./testground-daemon/sidecar.yaml
+} | tee -a ./log/$start-log/tg_daemon_sidecar.log
 
 tg_daemon_deployment(){
-  kubectl create -f ./yaml/tg-daemon-depoyment.yml
+  kubectl apply -f testground-daemon/deployment.yml
 } | tee -a ./log/$start-log/tg_daemon_deployment.log
 
+
+log(){
+  tar czf $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $start-log/
+  echo "##########################################"
+  echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
+  echo "##########################################"
+  rm -r $start-log/
+}
+
+# cluster_creation_manifest(){
+#   mkdir -p .cluster_manifest
+#   echo "$CLUSTER_NAME" >> clusters
+# }

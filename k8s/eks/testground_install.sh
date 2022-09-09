@@ -115,12 +115,16 @@ helm_redis_add_repo
 helm_infra_install_redis
 
 echo "We will setup the test-ground daemon now."
-tg_daemon_env_toml
+
+tg_daemon_config_map
 tg_daemon_service_account
-tg_daemon_cluster_role
-tg_sync_service
-tg_daemon_testground_daemon_service
-tg_sync_service_deployment
-tg_ds_sidecar
+tg_daemon_role_binding
+tg_daemon_services
+tg_daemon_svc_sync_service
+tg_daemon_sync_service
+tg_daemon_sidecar
 tg_daemon_deployment
 
+echo "========================"
+
+echo "Your cluster is ready to be used"
