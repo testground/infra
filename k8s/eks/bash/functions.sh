@@ -143,6 +143,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
    else
      then
        echo ""
+   fi
    else
        echo "Unsuported operating system" 
  fi
