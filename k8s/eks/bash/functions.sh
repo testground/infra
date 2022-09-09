@@ -132,7 +132,7 @@ managedNodeGroups:
 EOT
 }
 
-jq_check() { 
+jq_check(){ 
 has_jq_installed=$(which jq)
 if [[ "$OSTYPE" == "linux-gnu"* ]]
  then
@@ -141,8 +141,11 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
        sudo apt update
        sudo apt install jq
    else
-       echo "" 
-   fi
+     then
+       echo ""
+   else
+       echo "Unsuported operating system" 
+ fi
 }  | tee -a ./log/$start-log/jq.log
 
 create_cluster(){
