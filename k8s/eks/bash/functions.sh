@@ -141,7 +141,6 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
        sudo apt update
        sudo apt install jq
    else
-     then
        echo ""
    fi
    else
