@@ -1,7 +1,7 @@
 #!/bin/bash
-prepare_for_loging(){
-  mkdir -p ./log/$start-log/
-}
+#error log prep check
+mkdir -p ./log/$start-log/
+
 create_cluster() {
     eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
 } | tee -a ./log/$start-log/create_cluster.log
@@ -144,6 +144,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
        echo "" 
    fi
 }  | tee -a ./log/$start-log/jq.log
+
 create_cluster(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
 }  | tee -a ./log/$start-log/create_cluster.log

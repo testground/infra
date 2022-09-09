@@ -2,7 +2,7 @@
 set -e #lets make sure that exit code 1 drops the script
 start=$(date +"%Y-%m-%d-%T")
 source ./bash/functions.sh
-prepare_for_loging
+
 cat << "EOF"
  _____         _   _____                           _ 
 |_   _|       | | |  __ \                         | |
@@ -18,7 +18,6 @@ EOF
 source .env #setting .env vars
 
 #Lets do sanity check
-
 if [[ "$CLUSTER_NAME" == "default" ]]
  then
    echo "Your cluster name cant be "default" " 
