@@ -1,68 +1,69 @@
 #!/bin/bash
 #error log prep check
+prep_log_dir(){ 
 mkdir -p ./log/$start-log/
-
+}
 create_cluster() {
-    eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
-} | tee -a ./log/$start-log/create_cluster.log
+  eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
+}
 
 remove_aws_node_ds() {
     kubectl delete daemonset -n kube-system aws-node
-} | tee -a ./log/$start-log/remove_aws_node_ds.log
+}
 
 add_tigera_operator() {
     kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
-} | tee -a ./log/$start-log/add_tigera_operator.log
+}
 
 deploy_tigera_operator() {
     kubectl create -f ./yaml/tigera.yml
-} | tee -a ./log/$start-log/deploy_tigera_operator.log
+}
 
 deploy_multus_ds() {
     kubectl apply ../multus-cni/deployments/multus-daemonset.yml
-} | tee -a ./log/$start-log/deploy_multus_ds.log
+}
 
 clone_multus() {
     git clone https://github.com/k8snetworkplumbingwg/multus-cni.git
-} | tee -a ./log/$start-log/deploy_multus_ds.log
+}
 
 apply_weave() {
     kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
-} | tee -a ./log/$start-log/apply_weave.log
+}
 
 create_weave() {
     kubectl create -f ./yaml/weave.yml
-} | tee -a ./log/$start-log/create_weave.log
+}
 
 
 #Not used until we have aws vpc cni ready
 deploy_multus_cm_vpc_cni() {
     kubectl create -f ./yaml/multus-cm-vpc-cni.yaml
-} | tee -a ./log/$start-log/deploy_multus_cm_vpc_cni.log
+}
 
 deploy_vpc_weave_multusds() {
     kubectl create -f ./yaml/vpc-weave-multusds.yaml
-} | tee -a ./log/$start-log/vpc_weave_multusds.log
+}
 
 
 deploy_vpc_multus_cm_calico() {
     kubectl create -f ./yaml/multus-cm-calico.yaml
-} | tee -a ./log/$start-log/deploy_vpc_multus_cm_calico.log
+}
 
 deploy_cluster_role_binding() {
     kubectl create clusterrolebinding service-reader --clusterrole=service-reader --serviceaccount=default:default
     kubectl create -f ./yaml/clusterrolebinding.yml
-} | tee -a ./log/$start-log/deploy_cluster_role_binding.log
+}
 
 weave_ip_tables_drop() {
     kubectl create -f ./yaml/drop-weave-cm.yml
     kubectl create -f ./yaml/drop-weave-ds.yml
-} | tee -a ./log/$start-log/weave_ip_tables_drop.log
+}
 
 multus_soflink() {
     kubectl create -f ./yaml/soflink-cm.yml
     kubectl create -f ./yaml/drop-weave-ds.yml
-} | tee -a ./log/$start-log/multus_soflink.log
+}
 
 
 make_cluster_config(){
@@ -146,42 +147,42 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
    else
        echo "Unsuported operating system" 
  fi
-}  | tee -a ./log/$start-log/jq.log
+}
 
-create_cluster(){
+create_node_group(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
-}  | tee -a ./log/$start-log/create_cluster.log
+}
 
 #####EFS and EBS#######
 aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
     efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 aws_create_efs_sg(){
     create_efs_sg=$(aws ec2 create-security-group --region $REGION --group-name efs-$CLUSTER_NAME-sg --description "Security group crreated by testground eks automation script" )
     echo "$create_efs_sg"
     efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 aws_get_subnet_id(){
     subnet_id=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 aws_get_subent_cidr_block(){
     subnet_cidr_block=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 aws_efs_sg_rule_add(){
     aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 aws_create_efs_mount_point(){
     aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
     efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
-    echo "Your efs mountpoint dns is: $efs_dns"
-} | tee -a ./log/$start-log/aws-cli.log
+   
+}
 
 create_cm_efs(){
   kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
@@ -201,15 +202,14 @@ aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-} | tee -a ./log/$start-log/aws-cli.log
+}
 
 make_persistant_volume(){  
-aws_create_ebs
 TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
 envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
 kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
-} | tee -a ./log/$start-log/make_persistant_volume.log
+}
 
 
 helm_redis_add_repo(){
@@ -268,31 +268,31 @@ EOF
 
 tg_daemon_service_account(){
   kubectl apply -f ./testground-daemon/service-account.yml
-} | tee -a ./log/$start-log/tg_daemon_service_account.log
+}
 
 tg_daemon_role_binding(){
   kubectl apply -f ./testground-daemon/role-binding.yml
-} | tee -a ./log/$start-log/tg_daemon_role_binding.log
+}
 
 tg_daemon_services(){
   kubectl apply -f ./testground-daemon/service.yml
-} | tee -a ./log/$start-log/tg_daemon_services.log
+}
 
 tg_daemon_svc_sync_service(){
   kubectl apply -f ./testground-daemon/svc-sync-service.yaml
-} | tee -a ./log/$start-log/tg_daemon_svc_sync_servic.log
+}
 
 tg_daemon_sync_service(){
   kubectl apply -f ./testground-daemon/sync-service.yaml
-} | tee -a ./log/$start-log/tg_daemon_sync_service.log
+}
 
 tg_daemon_sidecar(){
   kubectl apply -f ./testground-daemon/sidecar.yaml
-} | tee -a ./log/$start-log/tg_daemon_sidecar.log
+}
 
 tg_daemon_deployment(){
   kubectl apply -f testground-daemon/deployment.yml
-} | tee -a ./log/$start-log/tg_daemon_deployment.log
+}
 
 
 log(){
@@ -300,7 +300,7 @@ log(){
   echo "##########################################"
   echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
   echo "##########################################"
-  rm -rf ./log/$start-log/
+  # rm -rf ./log/$start-log/ return after test
 }
 
 # cluster_creation_manifest(){
