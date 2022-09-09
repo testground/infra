@@ -20,7 +20,7 @@ deploy_tigera_operator() {
 }
 
 deploy_multus_ds() {
-    kubectl apply ../multus-cni/deployments/multus-daemonset.yml
+    kubectl apply -f ../multus-cni/deployments/multus-daemonset.yml
 }
 
 clone_multus() {
