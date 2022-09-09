@@ -1,4 +1,7 @@
 #!/bin/bash
+prepare_for_loging(){
+  mkdir -p ./log/$start-log/
+}
 create_cluster() {
     eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
 } | tee -a ./log/$start-log/create_cluster.log
@@ -289,11 +292,11 @@ tg_daemon_deployment(){
 
 
 log(){
-  tar czf $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $start-log/
+  tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $start-log/
   echo "##########################################"
   echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
   echo "##########################################"
-  rm -r $start-log/
+  rm -rf ./log/$start-log/
 }
 
 # cluster_creation_manifest(){
