@@ -2,6 +2,7 @@
 set -e #lets make sure that exit code 1 drops the script
 start=$(date +"%Y-%m-%d-%T")
 source ./bash/functions.sh
+prepare_for_loging
 cat << "EOF"
  _____         _   _____                           _ 
 |_   _|       | | |  __ \                         | |
