@@ -1,6 +1,6 @@
 #!/bin/bash
 set -e #lets make sure that exit code 1 drops the script
-start = $(date +"%Y-%m-%d-%T")
+start=$(date +"%Y-%m-%d-%T")
 source ./bash/functions.sh
 cat << "EOF"
  _____         _   _____                           _ 
@@ -27,7 +27,7 @@ else
   echo "Creating cluster with name: $CLUSTER_NAME "
   echo "Please note, this can take up to 20 minutes to complete." 
   create_cluster
-  cluster_created = 1
+  cluster_created=1
   echo "========================"
   echo ""
 fi
