@@ -16,7 +16,7 @@ cat << "EOF"
 EOF
 
 source .env #setting .env vars
-
+echo "Log path is ./log/$start-log/cluster.log "
 #Lets do sanity check
 if [[ "$CLUSTER_NAME" == "default" ]]
  then
