@@ -64,7 +64,7 @@ echo "========================"
 if [[ "$CNI_COMBINATION" == "calico_weave" ]]
  then
   echo "Deploying calico and multus DS"
-  deploy_vpc_weave_multusds >> ./log/$start-log/cluster.log
+ # deploy_vpc_weave_multusds >> ./log/$start-log/cluster.log
   deploy_vpc_multus_cm_calico >> ./log/$start-log/cluster.log
   echo "========================"
 else
@@ -90,7 +90,7 @@ echo "Creating cluster config file with name $CLUSTER_NAME.yaml"
 make_cluster_config >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
-echo "Creating node group now..."
+echo "Creating node group now, this can also take some time..."
 create_node_group >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
@@ -107,11 +107,11 @@ aws_create_efs_sg >> ./log/$start-log/cluster.log
 echo "efs security group created with id: $efs_sg_id"
 echo ""
 echo "now extracting subnet group id...."
-aws_get_subent_id >> ./log/$start-log/cluster.log
+aws_get_subnet_id >> ./log/$start-log/cluster.log
 echo "subnet group id: $subnet_id"
 echo ""
 echo "now extractin cidr block..."
-aws_get_subent_cidr_block >> ./log/$start-log/cluster.log
+aws_get_subnet_cidr_block >> ./log/$start-log/cluster.log
 echo "Cidr block is: $subnet_cidr_block"
 echo ""
 echo "Now authorising subnet cidr block $subnet_cidr_block to access $efs_sg_id "

@@ -62,12 +62,11 @@ weave_ip_tables_drop() {
 
 multus_soflink() {
     kubectl create -f ./yaml/soflink-cm.yml
-    kubectl create -f ./yaml/drop-weave-ds.yml
 }
 
 
 make_cluster_config(){
-    cat <<EOT >> /$CLUSTER_NAME.yaml
+    cat <<EOT >> ./$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -82,7 +81,7 @@ managedNodeGroups:
     desiredCapacity: $DESIRED_CAPACIY_INFRA
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
-    availabilityZones: ["$AVAILAVILITY_ZONES_INFRA"]
+    availabilityZones: ["$AVAILABILITY_ZONE"]
     ssh:
       allow: true
       # key needs to exist
@@ -110,7 +109,7 @@ managedNodeGroups:
     desiredCapacity: $DESIRED_CAPACIY_PLAN
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
-    availabilityZones: [$AVAILAVILITY_ZONES_PLAN]
+    availabilityZones: [$AVAILABILITY_ZONE]
     ssh:
       allow: true
       publicKeyPath: $SSH_PATH_PLAN
@@ -170,7 +169,7 @@ aws_get_subnet_id(){
     subnet_id=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
 
-aws_get_subent_cidr_block(){
+aws_get_subnet_cidr_block(){
     subnet_cidr_block=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
 }
 
