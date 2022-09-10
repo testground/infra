@@ -1,0 +1,54 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: multus-cni-config
+  namespace: kube-system
+  labels:
+    tier: node
+    app: multus
+data:
+  # NOTE: If you'd prefer to manually apply a configuration file, you may create one here.
+  # In the case you'd like to customize the Multus installation, you should change the arguments to the Multus pod
+  # change the "args" line below from
+  # - "--multus-conf-file=auto"
+  # to:
+  # "--multus-conf-file=/tmp/multus-conf/70-multus.conf"
+  # Additionally -- you should ensure that the name "70-multus.conf" is the alphabetically first name in the
+  # /etc/cni/net.d/ directory on each node, otherwise, it will not be used by the Kubelet.
+  cni-conf.json: |
+    {
+      "name": "multus-cni-network",
+      "cniVersion": "0.3.1",
+      "type": "multus",
+      "capabilities": {
+        "portMappings": true
+      },
+      "delegates": [
+        {
+          "cniVersion": "0.3.1",
+          "name": "calico",
+          "plugins": [
+            {
+              "name": "calico",
+              "type": "calico",
+              "log_level": "info",
+              "datastore_type": "kubernetes",
+              "mtu": "1500",
+              "ipam": {
+                  "type": "calico-ipam"
+              },
+              "policy": {
+                  "type": "k8s"
+              },
+              "kubernetes": {
+                  "kubeconfig": "/etc/cni/net.d/calico-kubeconfig"
+              }
+            },
+            {
+              "type": "portmap",
+              "snat": true,
+              "capabilities": {"portMappings": true}
+            }
+          ],
+      "kubeconfig": "/etc/cni/net.d/multus.d/multus.kubeconfig"
+    }
