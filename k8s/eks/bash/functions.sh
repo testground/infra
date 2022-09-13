@@ -86,7 +86,6 @@ managedNodeGroups:
       allow: true
       # key needs to exist
       publicKeyPath: $SSH_PATH_INFRA
-      sourceSecurityGroupIds: ["$BASTION_SG_ID"]
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -113,7 +112,6 @@ managedNodeGroups:
     ssh:
       allow: true
       publicKeyPath: $SSH_PATH_PLAN
-      sourceSecurityGroupIds: ["$BASTION_SG_ID"]
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
