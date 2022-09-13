@@ -67,6 +67,9 @@ if [[ "$CNI_COMBINATION" == "calico_weave" ]]
  # deploy_vpc_weave_multusds >> ./log/$start-log/cluster.log
   deploy_vpc_multus_cm_calico >> ./log/$start-log/cluster.log
   echo "========================"
+ elif [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
+  then
+  echo "aws_vpc_cni_weave combination is selected."
 else
   echo "Deploying multus DS and selected cni failed" >> ./log/$start-log/erorr.log
   echo "exiting" >> ./log/$start-log/erorr.log
