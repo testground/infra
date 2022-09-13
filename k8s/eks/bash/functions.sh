@@ -162,13 +162,19 @@ aws_create_efs_sg(){
     echo "$create_efs_sg"
     efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
 }
-
-aws_get_subnet_id(){
-    subnet_id=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
+aws_get_vpc_id(){
+  vpc_id=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/VPC |jq -r ".Vpcs[] | .VpcId")
+}
+aws_get_subnet_id(){ 
+    upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
+    subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPublic$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
 
+
 aws_get_subnet_cidr_block(){
-    subnet_cidr_block=$(aws ec2 describe-subnets | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
+    upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
+    subnet_cidr_block=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id"  "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPublic$upper_az" | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
+
 }
 
 aws_efs_sg_rule_add(){
@@ -176,7 +182,7 @@ aws_efs_sg_rule_add(){
 }
 
 aws_create_efs_mount_point(){
-    aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+    aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id1 --region $REGION
     efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
    
 }
