@@ -194,9 +194,9 @@ create_cm_efs(){
 }
 
 create_efs_manifest(){
-    EFS_DNSNAME="$efs_dns"
-    AWS_REGION="$REGION"
-    fsId="$efs_fs_id"
+    export EFS_DNSNAME="$efs_dns"
+    export AWS_REGION="$REGION"
+    export fsId="$efs_fs_id"
 
     EFS_MANIFEST_SPEC=$(mktemp)
     envsubst <../kops/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
@@ -210,7 +210,7 @@ aws_create_ebs(){
 }
 
 make_persistant_volume(){  
-TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
+export TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
 envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
 kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
