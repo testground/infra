@@ -272,31 +272,31 @@ EOF
 
 
 tg_daemon_service_account(){
-  kubectl apply -f ./testground-daemon/service-account.yml
+  kubectl apply -f ../kops/testground-daemon/service-account.yml
 }
 
 tg_daemon_role_binding(){
-  kubectl apply -f ./testground-daemon/role-binding.yml
+  kubectl apply -f ../kops/testground-daemon/role-binding.yml
 }
 
 tg_daemon_services(){
-  kubectl apply -f ./testground-daemon/service.yml
+  kubectl apply -f ../kops/testground-daemon/service.yml
 }
 
 tg_daemon_svc_sync_service(){
-  kubectl apply -f ./testground-daemon/svc-sync-service.yaml
+  kubectl apply -f ../kops/testground-daemon/svc-sync-service.yaml
 }
 
 tg_daemon_sync_service(){
-  kubectl apply -f ./testground-daemon/sync-service.yaml
+  kubectl apply -f ../kops/testground-daemon/sync-service.yaml
 }
 
 tg_daemon_sidecar(){
-  kubectl apply -f ./testground-daemon/sidecar.yaml
+  kubectl apply -f ../kops/testground-daemon/sidecar.yaml
 }
 
 tg_daemon_deployment(){
-  kubectl apply -f testground-daemon/deployment.yml
+  kubectl apply -f ../kops/testground-daemon/deployment.yml
 }
 
 
