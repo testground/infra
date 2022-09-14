@@ -105,10 +105,6 @@ echo "creating efs file-system.."
 aws_create_file_system >> ./log/$start-log/cluster.log
 echo "efs file system created with id : $efs_fs_id "
 echo ""
-echo "creating security group for efs..."
-aws_create_efs_sg >> ./log/$start-log/cluster.log
-echo "efs security group created with id: $efs_sg_id"
-echo ""
 echo "now extracting subnet group id...."
 aws_get_subnet_id >> ./log/$start-log/cluster.log
 echo "subnet group id: $subnet_id"
@@ -117,10 +113,15 @@ echo "now extractin cidr block..."
 aws_get_subnet_cidr_block >> ./log/$start-log/cluster.log
 echo "Cidr block is: $subnet_cidr_block"
 echo ""
+echo "creating security group for efs..."
+aws_create_efs_sg >> ./log/$start-log/cluster.log
+echo "efs security group created with id: $efs_sg_id"
+echo ""
 echo "Now authorising subnet cidr block $subnet_cidr_block to access $efs_sg_id "
 aws_efs_sg_rule_add >> ./log/$start-log/cluster.log
 echo "done"
 echo ""
+
 echo "Creating efs mount point"
 aws_create_efs_mount_point >> ./log/$start-log/cluster.log
 echo "Your efs mountpoint dns is: $efs_dns"
