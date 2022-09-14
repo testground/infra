@@ -284,15 +284,15 @@ tg_daemon_services(){
 }
 
 tg_daemon_svc_sync_service(){
-  kubectl apply -f ../kops/testground-daemon/svc-sync-service.yaml
+  kubectl apply -f ../kops/testground-daemon/svc-sync-service.yml
 }
 
 tg_daemon_sync_service(){
-  kubectl apply -f ../kops/testground-daemon/sync-service.yaml
+  kubectl apply -f ../kops/testground-daemon/sync-service.yml
 }
 
 tg_daemon_sidecar(){
-  kubectl apply -f ../kops/testground-daemon/sidecar.yaml
+  kubectl apply -f ../kops/testground-daemon/sidecar.yml
 }
 
 tg_daemon_deployment(){
