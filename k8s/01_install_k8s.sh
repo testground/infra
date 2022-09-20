@@ -56,6 +56,7 @@ kops create secret --name $CLUSTER_NAME sshpublickey admin -i $PUBKEY
 kops update cluster $CLUSTER_NAME --yes
 
 # Wait for worker nodes and master to be ready
+kops export kubecfg --admin --name $CLUSTER_NAME 
 kops validate cluster --wait 20m
 
 echo "Cluster nodes are Ready"
