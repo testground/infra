@@ -164,7 +164,7 @@ aws_get_vpc_id(){
 aws_get_subnet_id(){ 
     aws_get_vpc_id
     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
-    subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPublic$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
+    subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
 
 
