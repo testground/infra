@@ -184,6 +184,7 @@ aws_get_subnet_id(){
 # }
 
 aws_get_sg_id(){
+  aws_get_vpc_id
   efs_sg_id=$(aws ec2 describe-security-groups --region $REGION --filter Name=vpc-id,Values=$vpc_id Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/ClusterSharedNodeSecurityGroup --query 'SecurityGroups[*].[GroupId]' --output text)
 }
 aws_create_efs_mount_point(){
