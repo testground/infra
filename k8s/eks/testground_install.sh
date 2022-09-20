@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e #lets make sure that exit code 1 drops the script
+set -e # Let's make sure that exit code 1 drops the script
 start=$(date +"%Y-%m-%d-%T")
 source ./bash/functions.sh
 prep_log_dir
@@ -15,13 +15,13 @@ cat << "EOF"
 
 EOF
 
-source .env #setting .env vars
+source .env # Setting .env vars
 echo "Log path is ./log/$start-log/cluster.log "
-#Lets do sanity check
+# Let's do a sanity check
 if [[ "$CLUSTER_NAME" == "default" ]]
  then
-   echo "Your cluster name cant be "default" " 
-   echo "Please edit .env which is located in the same directory as this script"
+   echo "Your cluster name can't be "default" " 
+   echo "Please edit the .env file, which is located in the same directory as this script."
    exit 1
 else
   echo "Creating cluster with name: $CLUSTER_NAME "
@@ -31,14 +31,14 @@ else
   echo ""
 fi
 
-echo "Now deploying multus-cni DS"
+echo "Now deploying multus-cni daemonset"
 deploy_multus_ds >> ./log/$start-log/cluster.log
 echo "========================"
 
 if [[ "$CNI_COMBINATION" == "calico_weave" ]]
  then
    echo "Calico - weave combination is selected."
-   echo "Removing aws_node DS" 
+   echo "Removing aws_node daemonset" 
    remove_aws_node_ds >> ./log/$start-log/cluster.log
    echo "Adding tigera operator"
    add_tigera_operator >> ./log/$start-log/cluster.log
@@ -50,8 +50,8 @@ elif [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
   echo "aws_vpc_cni_weave combination is selected."
 else
   echo "Invalid selecton in .env"  >> ./log/$start-log/erorr.log
-  echo "CNI_COMBINATION cant be $CNI_COMBINATION" >> ./log/$start-log/erorr.log
-  echo "Option are calico_weave or aws_vpc_cni_weave"
+  echo "CNI_COMBINATION can't be $CNI_COMBINATION" >> ./log/$start-log/erorr.log
+  echo "Options are calico_weave or aws_vpc_cni_weave"
   echo "========================"
   exit 1
 fi
@@ -63,7 +63,7 @@ echo "========================"
 
 if [[ "$CNI_COMBINATION" == "calico_weave" ]]
  then
-  echo "Deploying calico and multus DS"
+  echo "Deploying calico and multus daemonset"
  # deploy_vpc_weave_multusds >> ./log/$start-log/cluster.log
   deploy_vpc_multus_cm_calico >> ./log/$start-log/cluster.log
   echo "========================"
@@ -71,105 +71,108 @@ if [[ "$CNI_COMBINATION" == "calico_weave" ]]
   then
   echo "aws_vpc_cni_weave combination is selected."
 else
-  echo "Deploying multus DS and selected cni failed" >> ./log/$start-log/erorr.log
+  echo "Deploying multus daemonset and selected CNI failed" >> ./log/$start-log/erorr.log
   echo "exiting" >> ./log/$start-log/erorr.log
   echo "========================"
   exit 1
 fi
 
-echo "Now setging role binding..."
+echo "Now setting role binding..."
 deploy_cluster_role_binding >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
-echo "Droping weave ip table rule..."
+echo "Dropping weave iptables rule..."
 weave_ip_tables_drop >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
 echo "Making multus softlink..."
-multus_soflink >> ./log/$start-log/cluster.log
+multus_softlink >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
 echo "Creating cluster config file with name $CLUSTER_NAME.yaml"
 make_cluster_config >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
-echo "Creating node group now, this can also take some time..."
+echo "Creating nodegroup now, this can also take some time..."
 create_node_group >> ./log/$start-log/cluster.log
 echo "========================"
 echo ""
-echo "now configuring storage.."
+echo "Now configuring storage.."
 echo ""
-echo "lets check uitlity.."
+echo "Let's check utility..."
 jq_check >> ./log/$start-log/cluster.log
-echo "creating efs file-system.."
+echo "Creating EFS (Elastic File System)..."
 aws_create_file_system >> ./log/$start-log/cluster.log
-echo "efs file system created with id : $efs_fs_id "
+echo "EFS created with ID : $efs_fs_id "
 echo ""
-echo "now extracting subnet group id...."
+echo "Now extracting subnet group ID..."
 aws_get_subnet_id >> ./log/$start-log/cluster.log
-echo "subnet group id: $subnet_id"
+echo "Subnet group ID: $subnet_id"
 echo ""
-echo "now extractin cidr block..."
+echo "Now extracting CIDR block..."
 aws_get_subnet_cidr_block >> ./log/$start-log/cluster.log
-echo "Cidr block is: $subnet_cidr_block"
+echo "CIDR block is: $subnet_cidr_block"
 echo ""
-echo "creating security group for efs..."
+echo "Creating security group for EFS..."
 aws_create_efs_sg >> ./log/$start-log/cluster.log
-echo "efs security group created with id: $efs_sg_id"
+echo "EFS security group created with ID: $efs_sg_id"
 echo ""
-echo "Now authorising subnet cidr block $subnet_cidr_block to access $efs_sg_id "
+echo "Now authorising subnet CIDR block $subnet_cidr_block to access $efs_sg_id "
 aws_efs_sg_rule_add >> ./log/$start-log/cluster.log
-echo "done"
+echo "Done."
 echo ""
 
-echo "Creating efs mount point"
+echo "Creating EFS mount point"
 aws_create_efs_mount_point >> ./log/$start-log/cluster.log
-echo "Your efs mountpoint dns is: $efs_dns"
+echo "Your EFS mountpoint DNS is: $efs_dns"
 echo ""
-echo "now creating efs manifest"
+echo "Now creating EFS configmap"
+create_cm_efs >> ./log/$start-log/cluster.log
+echo ""
+echo "Now creating EFS manifest"
 create_efs_manifest >> ./log/$start-log/cluster.log
 
 echo "========================"
 echo ""
 echo ""
 
-echo "Creating ebs volume"
+echo "Creating EBS volume (Elastic Block Store)"
 aws_create_ebs >> ./log/$start-log/cluster.log
-echo "efs created with this volume id: $ebs_volume "
+echo "EBS created with this volume ID: $ebs_volume "
 echo ""
-echo "now making persistant volume on eks"
-make_persistant_volume >> ./log/$start-log/cluster.log
-echo "done"
+echo "Now making persistent volume on EKS"
+make_persistent_volume >> ./log/$start-log/cluster.log
+echo "Done."
 echo "========================"
 
-echo "Seting up redis..."
+echo "Setting up Redis..."
 helm_redis_add_repo ./log/$start-log/cluster.log
-echo "helm redis repo added"
-echo "now proceding helm install"
+echo "Helm Redis repo added"
+echo "Now proceeding with Helm install"
 helm_infra_install_redis ./log/$start-log/cluster.log
-echo "redis installed"
+echo "Redis installed"
 echo "========================"
-echo "We will setup the test-ground daemon now."
+echo "We will setup the testground daemon now."
 echo ""
 echo ""
-echo "creating config map now..."
+echo "Creating configmap..."
 tg_daemon_config_map >> ./log/$start-log/cluster.log
-echo "creating service account..."
+echo "Creating service account..."
 tg_daemon_service_account >> ./log/$start-log/cluster.log
-echo "creating role binding..."
+echo "Creating role binding..."
 tg_daemon_role_binding >> ./log/$start-log/cluster.log
-echo "creating services.."
+echo "Creating the testground service.."
 tg_daemon_services >> ./log/$start-log/cluster.log
-echo "creating svc sync service..."
+echo "Creating svc sync service..."
 tg_daemon_svc_sync_service >> ./log/$start-log/cluster.log
-echo "creating sync sevice..."
+echo "Creating sync service deployment..."
 tg_daemon_sync_service >> ./log/$start-log/cluster.log
-echo "creating sidecar..."
+echo "Creating sidecar..."
 tg_daemon_sidecar >> ./log/$start-log/cluster.log
-echo "create deployment"
+echo "Creating testground daemon deployment..."
 tg_daemon_deployment >> ./log/$start-log/cluster.log
 
 echo "========================"
 echo ""
 echo ""
-echo "Your cluster is ready to be used"
+echo "Your cluster is ready to be used."

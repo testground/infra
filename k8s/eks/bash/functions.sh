@@ -1,5 +1,5 @@
 #!/bin/bash
-#error log prep check
+# error log prep check
 prep_log_dir(){ 
 mkdir -p ./log/$start-log/
 }
@@ -36,7 +36,7 @@ create_weave() {
 }
 
 
-#Not used until we have aws vpc cni ready
+# Not used until we have aws vpc cni ready
 deploy_multus_cm_vpc_cni() {
     kubectl create -f ./yaml/multus-cm-vpc-cni.yaml
 }
@@ -60,8 +60,8 @@ weave_ip_tables_drop() {
     kubectl create -f ./yaml/drop-weave-ds.yml
 }
 
-multus_soflink() {
-    kubectl create -f ./yaml/soflink-cm.yml
+multus_softlink() {
+    kubectl create -f ./yaml/softlink-cm.yml
 }
 
 
@@ -78,7 +78,7 @@ managedNodeGroups:
       "testground.node.role.infra": "true"
     instanceType: $INSTANCE_TYPE_INFRA
     ami: $AMI_INFRA
-    desiredCapacity: $DESIRED_CAPACIY_INFRA
+    desiredCapacity: $DESIRED_CAPACITY_INFRA
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
     availabilityZones: ["$AVAILABILITY_ZONE"]
@@ -105,7 +105,7 @@ managedNodeGroups:
     instanceType: $INSTANCE_TYPE_PLAN 
     # Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022
     ami: $AMI_PLAN
-    desiredCapacity: $DESIRED_CAPACIY_PLAN
+    desiredCapacity: $DESIRED_CAPACITY_PLAN
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
     availabilityZones: [$AVAILABILITY_ZONE]
@@ -142,7 +142,7 @@ if [[ "$OSTYPE" == "linux-gnu"* ]]
        echo ""
    fi
    else
-       echo "Unsuported operating system" 
+       echo "Unsupported operating system. This will work for 'linux-gnu'." 
  fi
 }
 
@@ -209,7 +209,7 @@ aws_create_ebs(){
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
 }
 
-make_persistant_volume(){  
+make_persistent_volume(){  
 export TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
 envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
@@ -222,11 +222,12 @@ helm_redis_add_repo(){
 } 
 
 helm_infra_install_redis(){
-  helm install testground-infra-redis --set auth.enabled=false bitnami/redis
+  #helm install testground-infra-redis --set auth.enabled=false bitnami/redis
+  helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
 } 
 
 
-#Until we find a better way for region var
+# Until we find a better way for region var
 # tg_daemon_config_map(){
 #   kubectl apply -f ../kops/testground-daemon/config-map-env-toml.yml
 # } | tee -a ./log/$start-log/tg_daemon_config_map.log
