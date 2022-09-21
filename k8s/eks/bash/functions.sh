@@ -311,7 +311,7 @@ tg_daemon_deployment(){
 
 
 log(){
-  tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $start-log/
+  tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz /log/$start-log/
   echo "##########################################"
   echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
   echo "##########################################"
