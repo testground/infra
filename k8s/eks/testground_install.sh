@@ -18,6 +18,17 @@ EOF
 source .env # Setting .env vars
 echo "Log path is ./log/$start-log/cluster.log "
 # Let's do a sanity check
+if [ -n "$cluster_setup_init" ]; then
+  echo "We found that you already have cluster provisioned with this script"
+  read -p "Do you want to remove it? (y/n)?" choice
+  case "$choice" in 
+  y|Y ) cleanup;;
+  n|N ) exit;;
+  * ) echo "invalid selection";;
+  esac
+  exit 1
+fi
+
 if [[ "$CLUSTER_NAME" == "default" ]]
  then
    echo "Your cluster name can't be "default" " 

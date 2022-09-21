@@ -5,6 +5,7 @@ mkdir -p ./log/$start-log/
 }
 create_cluster() {
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
+  echo "cluster_setup_init=true" >> ./.env
 }
 
 remove_aws_node_ds() {
@@ -156,6 +157,7 @@ aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
     efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
+    echo "efs=$efs_fs_id" >> ./.env
 }
 
 
@@ -212,6 +214,7 @@ aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
+  echo "ebs=$ebs_volume" >> ./.env
 }
 
 make_persistent_volume(){  
@@ -306,6 +309,7 @@ tg_daemon_deployment(){
 }
 
 
+
 log(){
   tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $start-log/
   echo "##########################################"
@@ -318,3 +322,12 @@ log(){
 #   mkdir -p .cluster_manifest
 #   echo "$CLUSTER_NAME" >> clusters
 # }
+
+cleanup(){
+  echo "Now removing EFS $efs"
+  aws efs delete-file-system --file-system $efs
+  echo "Now removing cluster, this may take some time"
+  eksctl delete cluster --name $CLUSTER_NAME
+  echo "Now removing ebs: $ebs"
+  aws ec2 delete-volume --volume-id $ebs
+}
