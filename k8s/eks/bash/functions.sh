@@ -315,7 +315,7 @@ log(){
   echo "##########################################"
   echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
   echo "##########################################"
-  # rm -rf ./log/$start-log/ return after test
+  rm -rf ./log/$start-log/ 
 }
 
 # cluster_creation_manifest(){
@@ -330,4 +330,5 @@ cleanup(){
   eksctl delete cluster --name $CLUSTER_NAME
   echo "Now removing ebs: $ebs"
   aws ec2 delete-volume --volume-id $ebs
+  rm ./$CLUSTER_NAME.yaml
 }

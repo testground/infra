@@ -188,3 +188,6 @@ echo "========================"
 echo ""
 echo ""
 echo "Your cluster is ready to be used."
+echo ""
+log
+echo "Log for this build can be fonud on this path ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
