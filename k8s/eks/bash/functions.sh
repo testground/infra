@@ -62,6 +62,7 @@ weave_ip_tables_drop() {
 
 multus_softlink() {
     kubectl create -f ./yaml/softlink-cm.yml
+    kubectl create -f ./yaml/softlink-ds.yml
 }
 
 
