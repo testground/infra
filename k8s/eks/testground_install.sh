@@ -26,7 +26,7 @@ if [ -n "$cluster_setup_init" ]; then
   n|N ) exit;;
   * ) echo "invalid selection";;
   esac
-  exit 1
+  exit
 fi
 
 if [[ "$CLUSTER_NAME" == "default" ]]
