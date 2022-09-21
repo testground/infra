@@ -324,6 +324,9 @@ log(){
 # }
 
 cleanup(){
+  mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
+  echo "removing mount target"
+  aws efs delete-mount-target --mount-target-id $mnt_target_id
   echo "Now removing EFS $efs"
   aws efs delete-file-system --file-system $efs
   echo "Now removing cluster, this may take some time"
@@ -331,4 +334,6 @@ cleanup(){
   echo "Now removing EBS: $ebs"
   aws ec2 delete-volume --volume-id $ebs
   rm ./$CLUSTER_NAME.yaml
+  echo "now fixng .env for the next usage"
+  head -n -3 .env >> .env.tmp && mv .env.tmp .env
 }
