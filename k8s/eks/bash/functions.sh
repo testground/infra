@@ -328,7 +328,7 @@ cleanup(){
   aws efs delete-file-system --file-system $efs
   echo "Now removing cluster, this may take some time"
   eksctl delete cluster --name $CLUSTER_NAME
-  echo "Now removing ebs: $ebs"
+  echo "Now removing EBS: $ebs"
   aws ec2 delete-volume --volume-id $ebs
   rm ./$CLUSTER_NAME.yaml
 }

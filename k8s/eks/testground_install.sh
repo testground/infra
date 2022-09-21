@@ -19,7 +19,7 @@ source .env # Setting .env vars
 echo "Log path is ./log/$start-log/cluster.log "
 # Let's do a sanity check
 if [ -n "$cluster_setup_init" ]; then
-  echo "We found that you already have cluster provisioned with this script"
+  echo "We found that you already have a cluster provisioned with this script"
   read -p "Do you want to remove it? (y/n)?" choice
   case "$choice" in 
   y|Y ) cleanup;;
