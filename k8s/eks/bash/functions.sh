@@ -165,25 +165,29 @@ aws_get_vpc_id(){
 aws_get_subnet_id(){ 
     aws_get_vpc_id
     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
-    subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPublic$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
+    subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
 
 
-aws_get_subnet_cidr_block(){
-    upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
-    subnet_cidr_block=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id"  "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPublic$upper_az" | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
+# aws_get_subnet_cidr_block(){
+#     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
+#     subnet_cidr_block=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id"  "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az" | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
 
-}
-aws_create_efs_sg(){
-    create_efs_sg=$(aws ec2 create-security-group --region $REGION --vpc-id $vpc_id --group-name efs-$CLUSTER_NAME-sg  --description "Security group crreated by testground eks automation script" )
-    echo "$create_efs_sg"
-    efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
-}
+# }
+# aws_create_efs_sg(){
+#     create_efs_sg=$(aws ec2 create-security-group --region $REGION --vpc-id $vpc_id --group-name efs-$CLUSTER_NAME-sg  --description "Security group crreated by testground eks automation script" )
+#     echo "$create_efs_sg"
+#     efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
+# }
 
-aws_efs_sg_rule_add(){
-    aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
-}
+# aws_efs_sg_rule_add(){
+#     aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
+# }
 
+aws_get_sg_id(){
+  aws_get_vpc_id
+  efs_sg_id=$(aws ec2 describe-security-groups --region $REGION --filter Name=vpc-id,Values=$vpc_id Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/ClusterSharedNodeSecurityGroup --query 'SecurityGroups[*].[GroupId]' --output text)
+}
 aws_create_efs_mount_point(){
     aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
     efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com

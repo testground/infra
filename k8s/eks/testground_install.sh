@@ -109,16 +109,17 @@ echo "Now extracting subnet group ID..."
 aws_get_subnet_id >> ./log/$start-log/cluster.log
 echo "Subnet group ID: $subnet_id"
 echo ""
-echo "Now extracting CIDR block..."
-aws_get_subnet_cidr_block >> ./log/$start-log/cluster.log
-echo "CIDR block is: $subnet_cidr_block"
-echo ""
-echo "Creating security group for EFS..."
-aws_create_efs_sg >> ./log/$start-log/cluster.log
-echo "EFS security group created with ID: $efs_sg_id"
-echo ""
-echo "Now authorising subnet CIDR block $subnet_cidr_block to access $efs_sg_id "
-aws_efs_sg_rule_add >> ./log/$start-log/cluster.log
+# echo "Now extracting CIDR block..."
+# aws_get_subnet_cidr_block >> ./log/$start-log/cluster.log
+# echo "CIDR block is: $subnet_cidr_block"
+# echo ""
+# echo "Creating security group for EFS..."
+# aws_create_efs_sg >> ./log/$start-log/cluster.log
+# echo "EFS security group created with ID: $efs_sg_id"
+# echo ""
+# echo "Now authorising subnet CIDR block $subnet_cidr_block to access $efs_sg_id "
+# aws_efs_sg_rule_add >> ./log/$start-log/cluster.log
+aws_get_sg_id >> ./log/$start-log/cluster.log
 echo "Done."
 echo ""
 
@@ -146,10 +147,10 @@ echo "Done."
 echo "========================"
 
 echo "Setting up Redis..."
-helm_redis_add_repo ./log/$start-log/cluster.log
+helm_redis_add_repo >> ./log/$start-log/cluster.log
 echo "Helm Redis repo added"
 echo "Now proceeding with Helm install"
-helm_infra_install_redis ./log/$start-log/cluster.log
+helm_infra_install_redis >> ./log/$start-log/cluster.log
 echo "Redis installed"
 echo "========================"
 echo "We will setup the testground daemon now."
