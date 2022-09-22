@@ -84,10 +84,10 @@ managedNodeGroups:
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
     availabilityZones: ["$AVAILABILITY_ZONE"]
-    ssh:
-      allow: true
-      # key needs to exist
-      publicKeyPath: $SSH_PATH_INFRA
+    # ssh:
+    #   allow: true
+    #   # key needs to exist
+    #   publicKeyPath: $SSH_PATH_INFRA
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -111,9 +111,9 @@ managedNodeGroups:
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
     availabilityZones: [$AVAILABILITY_ZONE]
-    ssh:
-      allow: true
-      publicKeyPath: $SSH_PATH_PLAN
+    # ssh:
+    #   allow: true
+    #   publicKeyPath: $SSH_PATH_PLAN
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess

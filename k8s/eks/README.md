@@ -181,14 +181,12 @@ ssh-keygen -t rsa -b 4096
 
 The keys will be saved in `~/.ssh/` or `/home/$USERNAME/.ssh`, as both `id_rsa` and `id_rsa.pub`.
 
-Then, in the installation script, edit the `make_cluster_config` function and add the following:
+Then, in the installation script, edit the `make_cluster_config` function and uncomment the following:
 
 ```
-    availabilityZones: ["$AVAILABILITY_ZONE"]  # this exists
-    ssh:                                       # add this
-      allow: true                              # add this
-      publicKeyPath: $SSH_PATH_INFRA           # add this; note that this needs to reflect the path to your generated ssh key. Or you can set up a variable in the `.env` file and refer it here as an env var
-    iam:                                       # this exists
+    ssh:
+      allow: true
+      publicKeyPath: $SSH_PATH_INFRA  # note that this needs to reflect the path to your generated ssh key. Or you can set up a variable in the `.env` file and refer it here as an env var, like shown in the example
 ```
 
 **Important note: when you allow ssh access like this, eksctl will create another AWS Security Group which allows ssh traffic (port 22) from `0.0.0.0/0` and `::/0`. This means that all public IPv4 and IPv6 addresses from the Internet will be able to access the hosts via ssh. The only line of defense would be the ssh key you have generated above. This is a very bad security practice and is not recommended.**
