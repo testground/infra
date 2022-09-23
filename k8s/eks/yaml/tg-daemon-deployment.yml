@@ -22,7 +22,7 @@ spec:
         testground.node.role.infra: "true"
       containers:
       - name: goproxy
-        image: iptestground/goproxy:2.0.2
+        image: public.ecr.aws/n6b0k8i7/testground-goproxy:2.0.2
         ports:
         - containerPort: 8081
           hostPort: 8081
@@ -40,7 +40,7 @@ spec:
             memory: 1000Mi
             cpu: 700m
       - name: testground-daemon
-        image: 909427826938.dkr.ecr.eu-west-2.amazonaws.com/bloxico-testground:eks_26_july
+        image: public.ecr.aws/n6b0k8i7/testground-daemon:eks_v1.0
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST

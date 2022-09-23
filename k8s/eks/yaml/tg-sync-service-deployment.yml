@@ -17,7 +17,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: testground-sync-service
-          image: iptestground/sync-service:latest
+          image: public.ecr.aws/n6b0k8i7/testground-goproxy:sync-svc-v1.0
           command: ["/service"]
           ports:
             - name: syncservicehttp

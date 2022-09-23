@@ -62,7 +62,7 @@ kubectl version --client
 
 **4. AWS CLI (v2) with AWS credentials and ECR login**
 
-First install the aws cli (note that it is already installed if using amazon linux):
+First install the aws cli v2 (note that v1 is already installed if using amazon linux, so you will first need to remove the v1 and install v2):
 
 https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html#cliv2-linux-install
 
@@ -74,6 +74,10 @@ Verify you can log into ECR using the set credentials:
 
 ```
 aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+# or in this case since the images are moved to a public repo:
+
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/n6b0k8i7
 ```
 
 **5. eksctl**
