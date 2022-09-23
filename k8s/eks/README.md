@@ -215,3 +215,12 @@ There is a workaround for this behavior, in short:
 - Attach this SG to the worker nodes on port 22
 - Or you can always manually add a rule in the worker nodes' SG to whitelist the desired IP address on port 22
 - Note that all manual additions will prevent the eksctl stack from getting deleted, please refer to the `delete cluster` section of this guide
+
+## Additional notes
+
+When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 
+By default, this API server endpoint is public to the internet, and access to the API server is secured using a combination of AWS Identity and Access Management (IAM) and native Kubernetes Role Based Access Control (RBAC).
+
+If you need to lock down your EKS public API access, please refer to the following link: 
+
+https://eksctl.io/usage/vpc-cluster-access/#restricting-access-to-the-eks-kubernetes-public-api-endpoint
