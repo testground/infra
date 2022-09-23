@@ -112,6 +112,16 @@ The script explained in short:
 - It can also be used to uninstall a provisioned cluster; one of the first steps in the script is checking for existing resources
 - The `functions.sh` file relies on the content of `eks/yaml` - all cluster resources are located inside this folder
 - If you need to scale the worker nodegroups, or introduce any other changes, you are able to edit the `functions.sh` script
+- Once the cluster is created, eksctl will automatically switch the context to the new cluster. If you create another cluster, eksctl will once again switch the context to the newest cluster. If you wish to switch to another cluster, issue:
+
+```
+kubectl config get-contexts
+
+# currently selected cluster will be mark with an asterisk (*)
+# then switch contexts to the desired cluster
+
+kubectl config use-context $USERNAME@$CLUSTER_NAME.$AWS_REGION.eksctl.io
+```
 
 4. Create the `.env.toml` file inside the `testground` folder and populate it (explained here as well https://github.com/testground/docs/blob/master/getting-started.md#configuration-envtoml):
 
@@ -142,7 +152,7 @@ Forwarding from [::1]:8080 -> 8042
 
 This means you are successfully forwarding traffic to the testground daemon from your localhost; remember that you've specified this in the `.env.toml` config file.
 
-6. Now you are ready to run testground tests. You can use the provided script `perf.sh`, or run a single command:
+6. Now you are ready to run testground tests:
 
 ```
 # ping-pong test
@@ -150,6 +160,14 @@ testground run single --plan network --testcase ping-pong --builder docker:go --
 
 # storm test
 testground run single --plan=benchmarks --testcase=storm --builder=docker:go --runner=cluster:k8s --instances=10
+
+# You can also use the provided script `eks/bash/perf.sh` to run multiple storm tests:
+
+./perf.sh <run_count> <plan> <case> <instance_count> <builder> <runner>
+
+# e.g. to schedule 10 runs with 50 pods/instances each:
+
+./perf.sh 10 benchmarks storm 50 docker:go cluster:k8s
 ```
 
 7. After the test has finished, obtain results:
