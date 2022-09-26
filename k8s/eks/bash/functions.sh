@@ -21,7 +21,7 @@ deploy_tigera_operator() {
 }
 
 deploy_multus_ds() {
-    kubectl apply -f ../../multus-cni/deployments/multus-daemonset.yml
+    kubectl apply -f ./yaml/multus-daemonset.yml
 }
 
 clone_multus() {
@@ -281,31 +281,31 @@ EOF
 
 
 tg_daemon_service_account(){
-  kubectl apply -f ../yaml/tg-daemon-service-account.yml
+  kubectl apply -f ./yaml/tg-daemon-service-account.yml
 }
 
 tg_daemon_role_binding(){
-  kubectl apply -f ../yaml/tg-daemon-cluster-role.yml
+  kubectl apply -f ./yaml/tg-daemon-cluster-role.yml
 }
 
 tg_daemon_services(){
-  kubectl apply -f ../yaml/tg-testground-daemon-service.yml
+  kubectl apply -f ./yaml/tg-testground-daemon-service.yml
 }
 
 tg_daemon_svc_sync_service(){
-  kubectl apply -f ../yaml/tg-sync-service.yml
+  kubectl apply -f ./yaml/tg-sync-service.yml
 }
 
 tg_daemon_sync_service(){
-  kubectl apply -f ../yaml/tg-sync-service-deployment.yml
+  kubectl apply -f ./yaml/tg-sync-service-deployment.yml
 }
 
 tg_daemon_sidecar(){
-  kubectl apply -f ../yaml/tg-ds-sidecar.yml
+  kubectl apply -f ./yaml/tg-ds-sidecar.yml
 }
 
 tg_daemon_deployment(){
-  kubectl apply -f ../yaml/tg-daemon-deployment.yml
+  kubectl apply -f ./yaml/tg-daemon-deployment.yml
 }
 
 
