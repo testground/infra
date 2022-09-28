@@ -5,8 +5,10 @@ metadata:
   labels:
     app: testground-daemon
 spec:
+  type: LoadBalancer
   ports:
-  - port: 8042
+  - port: 80
     protocol: TCP
+    targetPort: 8042
   selector:
     app: testground-daemon

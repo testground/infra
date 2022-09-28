@@ -129,25 +129,45 @@ kubectl config use-context $USERNAME@$CLUSTER_NAME.$AWS_REGION.eksctl.io
 
 4. Create the `.env.toml` file inside the `testground` folder and populate it (explained here as well https://github.com/testground/docs/blob/master/getting-started.md#configuration-envtoml):
 
-**Note: The endpoint refers to the `testground-daemon` service, so depending on your setup, this could be, for example, a Load Balancer fronting the kubernetes cluster and forwarding proper requests to the `tg-daemon` service, or a simple port forward to your local workstation, for example:**
-
-```
-kubectl port-forward service/testground-daemon 8080:8042
-```
-
-where 8042 is the port on which the `tg-daemon` is listening, and 8080 is a port on your local workstation/bastion host.
+**Note: The endpoint refers to the `testground-daemon` service, so depending on your setup, this could be, for example, a Load Balancer fronting the kubernetes cluster and forwarding proper requests to the `tg-daemon` service, or a simple port forward to your local workstation.**
 
 `.env.toml` example:
 
 ```
 ["aws"]
 region = "$YOUR_REGION" # where the cluster will be created
-[client]
-endpoint = "http://localhost:8080"
+[client] # Note: Only one endpoint can be active, please refer to steps 5. and 6. for clarification
+endpoint = "http://localhost:8080" # if using port-forwarding
+endpoint = "http://acca15c6ah3eh45n68ad6052c20ba9ec-1569872837.eu-west-3.elb.amazonaws.com:80" # if using LB (default)
 user = "myname"
 ```
 
-5. If you are using the simple port-forward solution, issue the command in another terminal window and you should see something like this:
+5. Using the simple port-forward solution
+
+**NOTE: By default, the script will deploy the testground service with a LB in front. If you would like to use port-forward instead of the LB, you need to edit the `eks/yaml/tg-testground-daemon-service.yml` to look like this:**
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: testground-daemon
+    labels:
+    app: testground-daemon
+spec:
+  ports:
+  - port: 8042
+    protocol: TCP
+  selector:
+    app: testground-daemon
+```
+
+Issue the following command in another terminal window and you should see something like this:
+
+```
+kubectl port-forward service/testground-daemon 8080:8042
+```
+
+where 8042 is the port on which the `tg-daemon` is listening, and 8080 is a port on your local workstation/bastion host.
 
 ```
 Forwarding from 127.0.0.1:8080 -> 8042
@@ -156,7 +176,28 @@ Forwarding from [::1]:8080 -> 8042
 
 This means you are successfully forwarding traffic to the testground daemon from your localhost; remember that you've specified this in the `.env.toml` config file.
 
-6. Now you are ready to run testground tests:
+6. Setup the Load Balancer
+
+The LB has only one listener on port 80 (HTTP) and it is completely open to the public Internet (0.0.0.0/0).
+Optional: If you want to limit access to the LB, you can edit the SG attached to the LB in order to remove 0.0.0.0/0 and add your/your bastion's public IP.
+
+Next you need to verify the service and obtain the DNS A record you will use to connect to:
+```
+kubectl get svc
+
+NAME                              TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+testground-daemon                 LoadBalancer   10.100.16.157    acca15c6ah3eh45n68ad6052c20ba9ec-1569872837.eu-west-3.elb.amazonaws.com   80:31386/TCP   30d
+```
+
+You need to edit the `.env.toml` file in the `testground` folder and set the LB DNS A record as endpoint, for example:
+
+```
+endpoint = "http://acca15c6ah3eh45n68ad6052c20ba9ec-1569872837.eu-west-3.elb.amazonaws.com:80"
+```
+
+You can now run testground tests without having to port-forward to your laptop/bastion host.
+
+7. Now you are ready to run testground tests:
 
 ```
 # ping-pong test
@@ -174,7 +215,7 @@ testground run single --plan=benchmarks --testcase=storm --builder=docker:go --r
 ./perf.sh 10 benchmarks storm 50 docker:go cluster:k8s
 ```
 
-7. After the test has finished, obtain results:
+8. After the test has finished, obtain results:
 
 ```
 testground collect --runner=cluster:k8s $RUN_ID
@@ -182,7 +223,7 @@ testground collect --runner=cluster:k8s $RUN_ID
 
 where the $RUN_ID will be generated and shown in the test output. It looks like this `cccb96126un8ibqhe7p0`.
 
-8. After you are done, you can delete the cluster since AWS resources cost money while running:
+9. After you are done, you can delete the cluster since AWS resources cost money while running:
 
 Simply run the `testground_install.sh` script again and you will be prompted to remove the previously created resources, as the script will automatically detect them:
 
