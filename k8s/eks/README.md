@@ -220,6 +220,19 @@ There is a workaround for this behavior, in short:
 - Or you can always manually add a rule in the worker nodes' SG to whitelist the desired IP address on port 22
 - Note that all manual additions will prevent the eksctl stack from getting deleted, please refer to the `delete cluster` section of this guide
 
+### Scaling a running cluster
+
+Once the script creates a cluster, you will find a file called `$CLUSTER_NAME.yaml` in the `eks` folder you ran the script from. This is the eksctl config file for the nodegroups.
+You can simply open the file and edit the field `desiredCapacity` for the `ng-2-plan` nodegroup, and add the number of nodes you wish to scale to.
+
+Save the file and execute the following:
+
+```
+eksctl scale nodegroup --config-file=$CLUSTER_NAME.yaml --name=ng-2-plan
+```
+
+**Please note that for the `AWS VPC CNI` scaling up and down works fine, while for `calico` you need to reset the `kube-multus-ds` daemonset and `coredns` deployment after nodegroup scaling; both located in the `kube-system` namespace. We are working on a fix that will automate this.**
+
 ## Additional notes
 
 When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 
