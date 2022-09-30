@@ -19,3 +19,11 @@ data:
     PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
     * * * * * root /tmp/script.sh
     EOT
+
+# Notes:
+# ping between weave interfaces wasn't working; ARP resolution works, ICMP doesn't
+# The solution was to DROP the above iptables rules; easiest way to achieve this was to deploy a configmap and a daemonset that would
+# pull from this CM and execute the script
+# Issues referenced here:
+# https://github.com/testground/testground/issues/1455
+# https://github.com/testground/testground/issues/1456

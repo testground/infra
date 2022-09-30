@@ -46,23 +46,13 @@ echo "Now deploying multus-cni daemonset"
 deploy_multus_ds >> ./log/$start-log/cluster.log
 echo "========================"
 
-if [[ "$CNI_COMBINATION" == "calico_weave" ]]
- then
-   echo "Calico - weave combination is selected."
-   echo "Removing aws_node daemonset" 
-   remove_aws_node_ds >> ./log/$start-log/cluster.log
-   echo "Adding tigera operator"
-   add_tigera_operator >> ./log/$start-log/cluster.log
-   echo "Deploying tigera operator"
-   deploy_tigera_operator >> ./log/$start-log/cluster.log
-   echo "========================"
-elif [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
+if [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
   then
   echo "aws_vpc_cni_weave combination is selected."
 else
   echo "Invalid selecton in .env"  >> ./log/$start-log/erorr.log
   echo "CNI_COMBINATION can't be $CNI_COMBINATION" >> ./log/$start-log/erorr.log
-  echo "Options are calico_weave or aws_vpc_cni_weave"
+  echo "CNI combination must be aws_vpc_cni_weave."
   echo "========================"
   exit 1
 fi
@@ -71,22 +61,6 @@ echo "Applying and creating weave network attachment"
 apply_weave >> ./log/$start-log/cluster.log
 create_weave >> ./log/$start-log/cluster.log
 echo "========================"
-
-if [[ "$CNI_COMBINATION" == "calico_weave" ]]
- then
-  echo "Deploying calico and multus daemonset"
- # deploy_vpc_weave_multusds >> ./log/$start-log/cluster.log
-  deploy_vpc_multus_cm_calico >> ./log/$start-log/cluster.log
-  echo "========================"
- elif [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
-  then
-  echo "aws_vpc_cni_weave combination is selected."
-else
-  echo "Deploying multus daemonset and selected CNI failed" >> ./log/$start-log/erorr.log
-  echo "exiting" >> ./log/$start-log/erorr.log
-  echo "========================"
-  exit 1
-fi
 
 echo "Now setting role binding..."
 deploy_cluster_role_binding >> ./log/$start-log/cluster.log

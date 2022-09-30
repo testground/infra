@@ -53,3 +53,15 @@ spec:
           path: /opt/cni/bin
       nodeSelector:
         testground.node.role.plan: "true"
+
+# Notes:
+# add: ["NET_ADMIN", "SYS_ADMIN", "SYS_TIME"] had to be added to the config because sidecar pods were unable to be scheduled with the following error:
+# ERROR  sidecar worker failed: failed to initialise the container: failed to get handle to network namespace: failed to set into network namespace 19 while creating netlink socket: operation not permitted  {"host": "unix:///var/run/docker.sock", "container": "b510d89b2c66dc8a18472be548170657d28114cc8eeb3d368d266a2787c68007"}
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1461
+
+# testground (storm) tests failing when using more than 40 instances/pods; errors encountered:
+# FATAL error while reading socket {"error": "failed to read JSON message: failed to get reader: failed to read frame header: EOF"}
+# The solution was to increase hardware limits and requests for both the sidecar and the daemon
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1454

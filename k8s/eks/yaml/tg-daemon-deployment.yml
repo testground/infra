@@ -80,3 +80,10 @@ spec:
         - name: envtoml
           configMap:
             name: env-toml-cfg
+
+# Notes:
+# testground (storm) tests failing when using more than 40 instances/pods; errors encountered:
+# FATAL error while reading socket {"error": "failed to read JSON message: failed to get reader: failed to read frame header: EOF"}
+# The solution was to increase hardware limits and requests for both the sidecar and the daemon
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1454

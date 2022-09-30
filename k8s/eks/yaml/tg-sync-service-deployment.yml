@@ -34,3 +34,9 @@ spec:
               memory: 130Mi
       nodeSelector:
         testground.node.role.plan: "true"
+
+# Notes:
+# testground (storm) tests failing when using more than 40 instances/pods; sync-service showed an OOMkilled error
+# The solution was to increase requests for the sync service pod from 20cpu/20MB RAM to 120cpu/130MB, and also increase the limits as well just as a buffer for larger deployments
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1453

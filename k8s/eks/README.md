@@ -272,8 +272,6 @@ Save the file and execute the following:
 eksctl scale nodegroup --config-file=$CLUSTER_NAME.yaml --name=ng-2-plan
 ```
 
-**Please note that for the `AWS VPC CNI` scaling up and down works fine, while for `calico` you need to reset the `kube-multus-ds` daemonset and `coredns` deployment after nodegroup scaling; both located in the `kube-system` namespace. We are working on a fix that will automate this.**
-
 ## Additional notes
 
 When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 

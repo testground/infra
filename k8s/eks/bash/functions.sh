@@ -1,8 +1,10 @@
 #!/bin/bash
+
 # error log prep check
 prep_log_dir(){ 
 mkdir -p ./log/$start-log/
 }
+
 create_cluster() {
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
   echo "cluster_setup_init=true" >> ./.env
@@ -12,20 +14,8 @@ remove_aws_node_ds() {
     kubectl delete daemonset -n kube-system aws-node
 }
 
-add_tigera_operator() {
-    kubectl create -f https://projectcalico.docs.tigera.io/manifests/tigera-operator.yaml
-}
-
-deploy_tigera_operator() {
-    kubectl create -f ./yaml/tigera.yml
-}
-
 deploy_multus_ds() {
     kubectl apply -f ./yaml/multus-daemonset.yml
-}
-
-clone_multus() {
-    git clone https://github.com/k8snetworkplumbingwg/multus-cni.git
 }
 
 apply_weave() {
@@ -34,21 +24,6 @@ apply_weave() {
 
 create_weave() {
     kubectl create -f ./yaml/weave.yml
-}
-
-
-# Not used until we have aws vpc cni ready
-deploy_multus_cm_vpc_cni() {
-    kubectl create -f ./yaml/multus-cm-vpc-cni.yaml
-}
-
-deploy_vpc_weave_multusds() {
-    kubectl create -f ./yaml/vpc-weave-multusds.yaml
-}
-
-
-deploy_vpc_multus_cm_calico() {
-    kubectl create -f ./yaml/multus-cm-calico.yaml
 }
 
 deploy_cluster_role_binding() {
@@ -65,7 +40,6 @@ multus_softlink() {
     kubectl create -f ./yaml/softlink-cm.yml
     kubectl create -f ./yaml/softlink-ds.yml
 }
-
 
 make_cluster_config(){
     cat <<EOT >> ./$CLUSTER_NAME.yaml
@@ -152,7 +126,8 @@ create_node_group(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
 }
 
-#####EFS and EBS#######
+##### EFS and EBS #######
+
 aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
@@ -160,16 +135,15 @@ aws_create_file_system(){
     echo "efs=$efs_fs_id" >> ./.env
 }
 
-
 aws_get_vpc_id(){
   vpc_id=$(aws ec2 describe-vpcs --filters Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/VPC |jq -r ".Vpcs[] | .VpcId")
 }
+
 aws_get_subnet_id(){ 
     aws_get_vpc_id
     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
     subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
-
 
 # aws_get_subnet_cidr_block(){
 #     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
@@ -190,6 +164,7 @@ aws_get_sg_id(){
   aws_get_vpc_id
   efs_sg_id=$(aws ec2 describe-security-groups --region $REGION --filter Name=vpc-id,Values=$vpc_id Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/ClusterSharedNodeSecurityGroup --query 'SecurityGroups[*].[GroupId]' --output text)
 }
+
 aws_create_efs_mount_point(){
     aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
     efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
@@ -224,16 +199,13 @@ envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
 kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
 }
 
-
 helm_redis_add_repo(){
   helm repo add bitnami https://charts.bitnami.com/bitnami
 } 
 
 helm_infra_install_redis(){
-  #helm install testground-infra-redis --set auth.enabled=false bitnami/redis
   helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
 } 
-
 
 # Until we find a better way for region var
 # tg_daemon_config_map(){
@@ -279,7 +251,6 @@ data:
 EOF
 }
 
-
 tg_daemon_service_account(){
   kubectl apply -f ./yaml/tg-daemon-service-account.yml
 }
@@ -307,8 +278,6 @@ tg_daemon_sidecar(){
 tg_daemon_deployment(){
   kubectl apply -f ./yaml/tg-daemon-deployment.yml
 }
-
-
 
 log(){
   tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz /log/$start-log/
