@@ -29,9 +29,9 @@ if [ -n "$cluster_setup_init" ]; then
   exit
 fi
 
-if [[ "$CLUSTER_NAME" == "default" ]]
+if [[ "$CLUSTER_NAME" == "" ]]
  then
-   echo "Your cluster name can't be "default" " 
+   echo "Your cluster name can't be empty. " 
    echo "Please edit the .env file, which is located in the same directory as this script."
    exit 1
 else
@@ -57,9 +57,9 @@ else
   exit 1
 fi
 
-echo "Applying and creating weave network attachment"
-apply_weave >> ./log/$start-log/cluster.log
-create_weave >> ./log/$start-log/cluster.log
+echo "Deploying the weave CNI to the cluster and creating the weave NetworkAttachmentDefinition"
+deploy_weave_cni >> ./log/$start-log/cluster.log
+create_weave_networkattachmentdefinition >> ./log/$start-log/cluster.log
 echo "========================"
 
 echo "Now setting role binding..."

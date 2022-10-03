@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: ec2-public-key
+  name: ec2-public-key
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      k8s-app: ec2-public-key
+  template:
+    metadata:
+      labels:
+        k8s-app: ec2-public-key
+    spec:
+      containers:
+      - image: amazonlinux
+        imagePullPolicy: Always
+        name: ec2pubkey
+        command: ["/bin/bash"]
+        # Replace AAAA......Op1xUQd8Q== with your actual public key; first `A` is the beginning of the key, and `==` is the end of the key
+        args: ["-c","echo 'ssh-rsa AAAA......Op1xUQd8Q==  me@me.com' >> /etc/ec2home/.ssh/authorized_keys && chown -R 1000:1000 /etc/ec2home/.ssh && chmod 600  /etc/ec2home/.ssh/authorized_keys && sleep 5000"]
+        securityContext:
+          allowPrivilegeEscalation: true
+        volumeMounts:
+        - mountPath: /etc/ec2home
+          name: ec2home
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+      - name: ec2home
+        hostPath:
+          path: /home/ec2-user
+          type: Directory
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      terminationGracePeriodSeconds: 30
+
+# Notes:
+# This daemonset adds your public ssh key to the worker nodes inside the cluster.
+# Once it runs (pods in 'Running' state), you will know the key has been deployed to the worker nodes and you will be able to access them via ssh.
+# Make sure the Security Group of the worker nodes allows ssh access on port 22 from your instance.

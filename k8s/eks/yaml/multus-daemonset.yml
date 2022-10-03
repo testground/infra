@@ -116,6 +116,8 @@ data:
   # "--multus-conf-file=/tmp/multus-conf/70-multus.conf"
   # Additionally -- you should ensure that the name "70-multus.conf" is the alphabetically first name in the
   # /etc/cni/net.d/ directory on each node, otherwise, it will not be used by the Kubelet.
+  # NOTE: comment added by multus devs - https://github.com/k8snetworkplumbingwg/multus-cni/blob/ce11203f5c55f7ed6cc6278e9b4438e625e5c9b3/images/multus-daemonset.yml
+  # commit hash ce11203
   cni-conf.json: |
     {
       "name": "multus-cni-network",

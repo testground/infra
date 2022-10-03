@@ -10,6 +10,12 @@ It is assumed that you already have the following:
 **Note: the software and installation guides have been tested on amazon linux. Please verify which OS are you using and follow the official guides accordingly.
 Links have been included for each software requirement. Listed guides are for example purposes only.**
 
+You can find the official AWS guide for setting up a bastion host here:
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/get-set-up-for-amazon-ec2.html
+
+**TODO: As manual setup is error-prone, and likely will get outdated pretty quickly. We need to look into creating a custom AMI.**
+
 **1. docker**
 
 Official installation guide:
@@ -32,10 +38,23 @@ Official installation guide:
 
 https://helm.sh/docs/intro/install/
 
+
+Latest:
 ```
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
 chmod 700 get_helm.sh
 ./get_helm.sh
+```
+
+Specific version used at the time of writing this guide (v3.8.2):
+
+https://github.com/helm/helm/releases/tag/v3.8.2
+
+```
+wget https://get.helm.sh/helm-v3.8.2-linux-amd64.tar.gz
+tar -zxvf helm-v3.8.2-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
+helm version
 ```
 
 **3. kubectl**
@@ -61,6 +80,10 @@ kubectl version --client
 ```
 
 **4. AWS CLI (v2) with AWS credentials and ECR login**
+
+**NOTE: You decide which AWS region you want to use, there are no limitations when it comes to this script. A list can be found here:**
+
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html
 
 First install the aws cli v2 (note that v1 is already installed if using amazon linux, so you will first need to remove the v1 and install v2):
 
@@ -91,6 +114,14 @@ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/d
 sudo mv /tmp/eksctl /usr/local/bin
 eksctl version
 ```
+
+**6. jq**
+
+jq is a lightweight and flexible command-line JSON processor, used within the setup script.
+
+Official installation guide:
+
+https://stedolan.github.io/jq/download/
 
 
 ## Step by step installation guide
@@ -234,6 +265,8 @@ Simply run the `testground_install.sh` script again and you will be prompted to 
 
 ## Optional steps
 
+### Adding SSH access to worker nodes on setup
+
 By default, ssh access to the worker nodes is not enabled. In case you do need to access your worker nodes, do the following:
 
 - Generate an ssh key on your laptop/bastion (which you use to create the cluster):
@@ -244,7 +277,7 @@ ssh-keygen -t rsa -b 4096
 
 The keys will be saved in `~/.ssh/` or `/home/$USERNAME/.ssh`, as both `id_rsa` and `id_rsa.pub`.
 
-Then, in the installation script, edit the `make_cluster_config` function and uncomment the following:
+Then, in the installation script, edit the `make_cluster_config` function and add the following after `availabilityZones`:
 
 ```
     ssh:
@@ -260,6 +293,14 @@ There is a workaround for this behavior, in short:
 - Attach this SG to the worker nodes on port 22
 - Or you can always manually add a rule in the worker nodes' SG to whitelist the desired IP address on port 22
 - Note that all manual additions will prevent the eksctl stack from getting deleted, please refer to the `delete cluster` section of this guide
+
+
+### Adding SSH access to running worker nodes
+
+In case you have already created a cluster using the script and want to add SSH access to your worker nodes, you may execute the `add-ssh-key-to-running-nodes.yml` on the cluster.
+It will deploy a daemonset (one pod per worker node) which will deploy your public key to the nodes.
+
+After that is done, you may delete the daemonset and proceed connecting to the worker nodes. Refer to the `.yml` for more details.
 
 ### Scaling a running cluster
 

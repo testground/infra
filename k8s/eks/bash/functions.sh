@@ -18,11 +18,11 @@ deploy_multus_ds() {
     kubectl apply -f ./yaml/multus-daemonset.yml
 }
 
-apply_weave() {
+deploy_weave_cni() {
     kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
 }
 
-create_weave() {
+create_weave_networkattachmentdefinition() {
     kubectl create -f ./yaml/weave.yml
 }
 
@@ -53,15 +53,11 @@ managedNodeGroups:
     labels:
       "testground.node.role.infra": "true"
     instanceType: $INSTANCE_TYPE_INFRA
-    ami: $AMI_INFRA
+    ami: $AMI_ID
     desiredCapacity: $DESIRED_CAPACITY_INFRA
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
     availabilityZones: ["$AVAILABILITY_ZONE"]
-    # ssh:
-    #   allow: true
-    #   # key needs to exist
-    #   publicKeyPath: $SSH_PATH_INFRA
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -80,14 +76,11 @@ managedNodeGroups:
       "testground.node.role.plan": "true"
     instanceType: $INSTANCE_TYPE_PLAN 
     # Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022
-    ami: $AMI_PLAN
+    ami: $AMI_ID
     desiredCapacity: $DESIRED_CAPACITY_PLAN
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
     availabilityZones: [$AVAILABILITY_ZONE]
-    # ssh:
-    #   allow: true
-    #   publicKeyPath: $SSH_PATH_PLAN
     iam:
       attachPolicyARNs:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
@@ -145,21 +138,6 @@ aws_get_subnet_id(){
     subnet_id=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
 
-# aws_get_subnet_cidr_block(){
-#     upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
-#     subnet_cidr_block=$(aws ec2 describe-subnets --filters "Name=vpc-id,Values=$vpc_id"  "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az" | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .CidrBlock " | tr -d \" )
-
-# }
-# aws_create_efs_sg(){
-#     create_efs_sg=$(aws ec2 create-security-group --region $REGION --vpc-id $vpc_id --group-name efs-$CLUSTER_NAME-sg  --description "Security group crreated by testground eks automation script" )
-#     echo "$create_efs_sg"
-#     efs_sg_id=$(echo $create_efs_sg | jq -r '.GroupId')
-# }
-
-# aws_efs_sg_rule_add(){
-#     aws ec2 authorize-security-group-ingress --group-id $efs_sg_id --protocol tcp --port 2049 --cidr $subnet_cidr_block
-# }
-
 aws_get_sg_id(){
   aws_get_vpc_id
   efs_sg_id=$(aws ec2 describe-security-groups --region $REGION --filter Name=vpc-id,Values=$vpc_id Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/ClusterSharedNodeSecurityGroup --query 'SecurityGroups[*].[GroupId]' --output text)
@@ -206,11 +184,6 @@ helm_redis_add_repo(){
 helm_infra_install_redis(){
   helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
 } 
-
-# Until we find a better way for region var
-# tg_daemon_config_map(){
-#   kubectl apply -f ../kops/testground-daemon/config-map-env-toml.yml
-# } | tee -a ./log/$start-log/tg_daemon_config_map.log
 
 tg_daemon_config_map(){
   kubectl create -f - <<EOF
@@ -286,11 +259,6 @@ log(){
   echo "##########################################"
   rm -rf ./log/$start-log/ 
 }
-
-# cluster_creation_manifest(){
-#   mkdir -p .cluster_manifest
-#   echo "$CLUSTER_NAME" >> clusters
-# }
 
 cleanup(){
   mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
