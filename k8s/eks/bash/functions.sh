@@ -99,21 +99,6 @@ managedNodeGroups:
 EOT
 }
 
-jq_check(){ 
-has_jq_installed=$(which jq)
-if [[ "$OSTYPE" == "linux-gnu"* ]]
- then
-   if [ -z $has_jq_installed ]
-     then
-       sudo apt update
-       sudo apt install jq
-   else
-       echo ""
-   fi
-   else
-       echo "Unsupported operating system. This will work for 'linux-gnu'." 
- fi
-}
 
 create_node_group(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
