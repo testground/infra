@@ -71,7 +71,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 kubectl version --client
 ```
 
-Specific version (required when your cluster is not compatible with the latest version):
+Specific version (required when your cluster is not compatible with the latest version, v1.22 used in the example below):
 
 ```
 curl -LO https://dl.k8s.io/release/v1.22.0/bin/linux/amd64/kubectl
@@ -132,9 +132,15 @@ git clone https://github.com/testground/infra.git
 
 and the testground repo from here:
 
-git clone https://github.com/testground/testground
+git clone https://github.com/testground/testground.git
 
 2. You need to populate the `.env` file with the needed parameters before creating the cluster. It is located in `infra/k8s/eks/`
+
+The variables are divided into two main groups - `REQUIRED TO BE CHANGED` and `OPTIONAL TO BE CHANGED/ CAN BE LEFT WITH DEFAULTS`.
+
+The `REQUIRED` variables need to be populated by the user - `CLUSTER_NAME` (unique cluster name, so your EKS cluster will be called `eks-$CLUSTER_NAME-cluster)`, `REGION` (AWS region where you will create your resources), and `AVAILABILITY_ZONE` (AZ within the selected region where you want your resources created)
+
+The `OPTIONAL/DEFAULTS` are safe to remain unchanged, but you are free to modify them to suit your needs. Please refer to the `.env` file for more information about each parameter.
 
 3. Run the installation script `./testground_install.sh`; note that it requires the `.env` file to be populated in order to run properly. In case of any missing variables, the setup will fail and you will get an error message
 
@@ -146,7 +152,8 @@ The script explained in short:
 - Output of every step is logged into a master log file that can be retrieved and reviewed, or even tailed in real time
 - It can also be used to uninstall a provisioned cluster; one of the first steps in the script is checking for existing resources
 - The `functions.sh` file relies on the content of `eks/yaml` - all cluster resources are located inside this folder
-- If you need to scale the worker nodegroups, or introduce any other changes, you are able to edit the `functions.sh` script
+- If you need to scale the worker nodegroups on setup, you are able to edit the `.env` file parameters - `DESIRED_CAPACITY_INFRA` and `DESIRED_CAPACITY_PLAN`
+- You are also able to change the worker node instance type - `INSTANCE_TYPE_INFRA` and `INSTANCE_TYPE_PLAN`
 - Once the cluster is created, eksctl will automatically switch the context to the new cluster. If you create another cluster, eksctl will once again switch the context to the newest cluster. If you wish to switch to another cluster, issue:
 
 ```

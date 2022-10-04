@@ -160,8 +160,11 @@ tg_daemon_deployment >> ./log/$start-log/cluster.log
 
 echo "========================"
 echo ""
+obtain_alb_address
+echo_env_toml
 echo ""
 echo "Your cluster is ready to be used."
+echo ""
 echo ""
 log
 echo "Log for this build can be fonud on this path ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"

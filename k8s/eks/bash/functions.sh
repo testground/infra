@@ -159,8 +159,8 @@ create_efs_manifest(){
     export fsId="$efs_fs_id"
 
     EFS_MANIFEST_SPEC=$(mktemp)
-    envsubst <../kops/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
-    kubectl apply -f ../kops/efs/rbac.yaml -f $EFS_MANIFEST_SPEC
+    envsubst <./yaml/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
+    kubectl apply -f ./yaml/efs/rbac.yaml -f $EFS_MANIFEST_SPEC
 }
 
 aws_create_ebs(){
@@ -173,8 +173,8 @@ aws_create_ebs(){
 make_persistent_volume(){  
 export TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
-envsubst <../kops/ebs/pv.yml.spec >$EBS_PV
-kubectl apply -f ../kops/ebs/storageclass.yml -f $EBS_PV -f ../kops/ebs/pvc.yml
+envsubst <./yaml/ebs/pv.yml.spec >$EBS_PV
+kubectl apply -f ./yaml/ebs/storageclass.yml -f $EBS_PV -f ./yaml/ebs/pvc.yml
 }
 
 helm_redis_add_repo(){
@@ -250,6 +250,21 @@ tg_daemon_sidecar(){
 
 tg_daemon_deployment(){
   kubectl apply -f ./yaml/tg-daemon-deployment.yml
+}
+
+obtain_alb_address(){
+  ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
+}
+
+echo_env_toml(){
+echo "Your 'testground/.env.toml' file needs to look like this:"
+echo ""
+echo "["aws"]"
+echo "region = \"$REGION\""
+echo "[client]"
+echo "endpoint = \"$ALB_ADDRESS:80\""
+echo 'user = "YOUR_NAME"'
+echo ""
 }
 
 log(){
