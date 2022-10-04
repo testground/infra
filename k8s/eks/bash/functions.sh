@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # error log prep check
-prep_dir(){ 
+prep_log_dir(){ 
 mkdir -p $real_path/log/$start-log/
 mkdir -p $real_path/.cluster/
 }
