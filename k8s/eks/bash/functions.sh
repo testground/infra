@@ -2,12 +2,12 @@
 
 # error log prep check
 prep_log_dir(){ 
-mkdir -p ./log/$start-log/
+mkdir -p $real_path/log/$start-log/
 }
 
 create_cluster() {
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
-  echo "cluster_setup_init=true" >> ./.env
+  echo "cluster_setup_init=true" >> $real_path/.env
 }
 
 remove_aws_node_ds() {
@@ -15,7 +15,7 @@ remove_aws_node_ds() {
 }
 
 deploy_multus_ds() {
-    kubectl apply -f ./yaml/multus-daemonset.yml
+    kubectl apply -f $real_path/yaml/multus-daemonset.yml
 }
 
 deploy_weave_cni() {
@@ -23,26 +23,26 @@ deploy_weave_cni() {
 }
 
 create_weave_networkattachmentdefinition() {
-    kubectl create -f ./yaml/weave.yml
+    kubectl create -f $real_path/yaml/weave.yml
 }
 
 deploy_cluster_role_binding() {
     kubectl create clusterrolebinding service-reader --clusterrole=service-reader --serviceaccount=default:default
-    kubectl create -f ./yaml/clusterrolebinding.yml
+    kubectl create -f $real_path/yaml/clusterrolebinding.yml
 }
 
 weave_ip_tables_drop() {
-    kubectl create -f ./yaml/drop-weave-cm.yml
-    kubectl create -f ./yaml/drop-weave-ds.yml
+    kubectl create -f $real_path/yaml/drop-weave-cm.yml
+    kubectl create -f $real_path/yaml/drop-weave-ds.yml
 }
 
 multus_softlink() {
-    kubectl create -f ./yaml/softlink-cm.yml
-    kubectl create -f ./yaml/softlink-ds.yml
+    kubectl create -f $real_path/yaml/softlink-cm.yml
+    kubectl create -f $real_path/yaml/softlink-ds.yml
 }
 
 make_cluster_config(){
-    cat <<EOT >> ./$CLUSTER_NAME.yaml
+    cat <<EOT >> $real_path/$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -125,7 +125,7 @@ aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
     efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-    echo "efs=$efs_fs_id" >> ./.env
+    echo "efs=$efs_fs_id" >> $real_path/.env
 }
 
 aws_get_vpc_id(){
@@ -159,22 +159,22 @@ create_efs_manifest(){
     export fsId="$efs_fs_id"
 
     EFS_MANIFEST_SPEC=$(mktemp)
-    envsubst <./yaml/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
-    kubectl apply -f ./yaml/efs/rbac.yaml -f $EFS_MANIFEST_SPEC
+    envsubst <$real_path/yaml/efs/manifest.yaml.spec >$EFS_MANIFEST_SPEC
+    kubectl apply -f $real_path/yaml/efs/rbac.yaml -f $EFS_MANIFEST_SPEC
 }
 
 aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-  echo "ebs=$ebs_volume" >> ./.env
+  echo "ebs=$ebs_volume" >> $real_path/.env
 }
 
 make_persistent_volume(){  
 export TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 EBS_PV=$(mktemp)
-envsubst <./yaml/ebs/pv.yml.spec >$EBS_PV
-kubectl apply -f ./yaml/ebs/storageclass.yml -f $EBS_PV -f ./yaml/ebs/pvc.yml
+envsubst <$real_path/yaml/ebs/pv.yml.spec >$EBS_PV
+kubectl apply -f $real_path/yaml/ebs/storageclass.yml -f $EBS_PV -f $real_path/yaml/ebs/pvc.yml
 }
 
 helm_redis_add_repo(){
@@ -225,31 +225,31 @@ EOF
 }
 
 tg_daemon_service_account(){
-  kubectl apply -f ./yaml/tg-daemon-service-account.yml
+  kubectl apply -f $real_path/yaml/tg-daemon-service-account.yml
 }
 
 tg_daemon_role_binding(){
-  kubectl apply -f ./yaml/tg-daemon-cluster-role.yml
+  kubectl apply -f $real_path/yaml/tg-daemon-cluster-role.yml
 }
 
 tg_daemon_services(){
-  kubectl apply -f ./yaml/tg-testground-daemon-service.yml
+  kubectl apply -f $real_path/yaml/tg-testground-daemon-service.yml
 }
 
 tg_daemon_svc_sync_service(){
-  kubectl apply -f ./yaml/tg-sync-service.yml
+  kubectl apply -f $real_path/yaml/tg-sync-service.yml
 }
 
 tg_daemon_sync_service(){
-  kubectl apply -f ./yaml/tg-sync-service-deployment.yml
+  kubectl apply -f $real_path/yaml/tg-sync-service-deployment.yml
 }
 
 tg_daemon_sidecar(){
-  kubectl apply -f ./yaml/tg-ds-sidecar.yml
+  kubectl apply -f $real_path/yaml/tg-ds-sidecar.yml
 }
 
 tg_daemon_deployment(){
-  kubectl apply -f ./yaml/tg-daemon-deployment.yml
+  kubectl apply -f $real_path/yaml/tg-daemon-deployment.yml
 }
 
 obtain_alb_address(){
@@ -268,11 +268,11 @@ echo ""
 }
 
 log(){
-  tar czf ./log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz /log/$start-log/
+  tar czf $real_path/log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $real_path/log/$start-log/
   echo "##########################################"
   echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
   echo "##########################################"
-  rm -rf ./log/$start-log/ 
+  rm -rf $real_path/log/$start-log/ 
 }
 
 cleanup(){
@@ -289,7 +289,7 @@ cleanup(){
   eksctl delete cluster --name $CLUSTER_NAME
   echo "Now removing EBS: $ebs"
   aws ec2 delete-volume --volume-id $ebs
-  rm -f ./$CLUSTER_NAME.yaml
+  rm -f $real_path/$CLUSTER_NAME.yaml
   echo "Now fixing the .env file for the next usage"
-  head -n -3 .env >> .env.tmp && mv .env.tmp .env
+  head -n -3 $real_path/.env >> $real_path/.env.tmp && mv /$real_path.env.tmp $real_path/.env
 }
