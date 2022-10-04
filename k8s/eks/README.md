@@ -149,7 +149,7 @@ The script explained in short:
 - Takes approx. 15-20 minutes to provision a cluster with 2 worker nodegroups, along with all other necessary resources and cluster workloads
 - All installation steps have been divided into functions, located in the `eks/bash/functions.sh` script
 - The script calls functions one by one
-- Output of every step is logged into a master log file that can be retrieved and reviewed, or even tailed in real time
+- Output of every step is logged into a master log file that can be retrieved and reviewed, or even tailed in real time from a different terminal window while the script is running
 - It can also be used to uninstall a provisioned cluster; one of the first steps in the script is checking for existing resources
 - The `functions.sh` file relies on the content of `eks/yaml` - all cluster resources are located inside this folder
 - If you need to scale the worker nodegroups on setup, you are able to edit the `.env` file parameters - `DESIRED_CAPACITY_INFRA` and `DESIRED_CAPACITY_PLAN`
