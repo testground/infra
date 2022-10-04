@@ -19,7 +19,7 @@ cat << "EOF"
 
 EOF
 
-source $real_path/env # Setting .env vars
+source $real_path/.env # Setting .env vars
 echo "Log path is $real_path/$start-log/cluster.log "
 # Let's do a sanity check
 if [ -n "$cluster_setup_init" ]; then
