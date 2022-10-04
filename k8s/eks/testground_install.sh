@@ -1,5 +1,6 @@
 #!/bin/bash
-set -e # Let's make sure that exit code 1 drops the script
+# Let's make sure to check for exit code 1, undefined variables, or masked pipeline errors; if encountered, drop the script
+set -euo pipefail
 start=$(date +"%Y-%m-%d-%T")
 cd "$(dirname "$0")"
 real_path=$(/bin/pwd)
@@ -158,4 +159,4 @@ echo "Your cluster is ready to be used."
 echo ""
 echo ""
 log
-echo "Log for this build can be fonud on this path $real_path/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
+echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
