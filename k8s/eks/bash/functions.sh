@@ -1,13 +1,20 @@
 #!/bin/bash
 
 # error log prep check
-prep_log_dir(){ 
+prep_dir(){ 
 mkdir -p $real_path/log/$start-log/
+mkdir -p $real_path/.cluster/
 }
 
 create_cluster() {
+  if test -f "$real_path/.cluster/$CLUSTER_NAME.cs"; then
+    echo "File $real_path/.cluster/$CLUSTER_NAME.cs exists."
+    echo "You may want to run uninstall script first!"
+    exit
+fi
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
-  echo "cluster_setup_init=true" >> $real_path/.env
+  echo "cluster_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  echo "cluster_name=$CLUSTER_NAME" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
 remove_aws_node_ds() {
@@ -102,6 +109,7 @@ EOT
 
 create_node_group(){
     eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
+    echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
 ##### EFS and EBS #######
@@ -110,7 +118,7 @@ aws_create_file_system(){
     create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
     echo "$create_efs"
     efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-    echo "efs=$efs_fs_id" >> $real_path/.env
+    echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
 aws_get_vpc_id(){
@@ -152,7 +160,7 @@ aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-  echo "ebs=$ebs_volume" >> $real_path/.env
+  echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
 make_persistent_volume(){  
@@ -261,20 +269,36 @@ log(){
 }
 
 cleanup(){
-  mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
-  echo "Removing mount target with ID $mnt_target_id"
-  echo "The script will pause here for 20 seconds for the removal to complete"
-  aws efs delete-mount-target --mount-target-id $mnt_target_id
-  sleep 20
-  echo "Now removing EFS $efs"
-  aws efs delete-file-system --file-system $efs
-  echo "The script will pause here for additional 20 seconds"
-  sleep 20
-  echo "Now removing cluster, this may take some time"
-  eksctl delete cluster --name $CLUSTER_NAME
-  echo "Now removing EBS: $ebs"
-  aws ec2 delete-volume --volume-id $ebs
-  rm -f $real_path/$CLUSTER_NAME.yaml
-  echo "Now fixing the .env file for the next usage"
-  head -n -3 $real_path/.env >> $real_path/.env.tmp && mv /$real_path.env.tmp $real_path/.env
+  echo "Removal process for the selection will start"
+  echo ""
+  if [[  -z "$efs" ]]
+   then
+     echo "Looks like no efs was found in this run... " 
+   else
+      mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
+      echo "Removing mount target with ID $mnt_target_id"
+      aws efs wait delete-mount-target --mount-target-id $mnt_target_id
+      echo "Now removing EFS $efs"
+      aws efs wait delete-file-system --file-system $efs
+   fi
+  
+   if [[  -z "$cluster_name" ]]
+   then
+     echo "Looks like cluster was created in this run... " 
+   else
+    echo "Now removing cluster, this may take some time"
+    eksctl delete cluster --name $CLUSTER_NAME --wait
+    rm -f $real_path/$CLUSTER_NAME.yaml
+   fi
+
+   if [[  -z "$ebs" ]]
+   then
+     echo "Looks like no ebs was found in this run... " 
+   else
+    echo "Now removing EBS: $ebs"
+     aws ec2 wait delete-volume --volume-id $ebs
+   fi
+
+ 
+  
 }
