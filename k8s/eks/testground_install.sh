@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e # Let's make sure that exit code 1 drops the script
 start=$(date +"%Y-%m-%d-%T")
-#!/bin/bash
 cd "$(dirname "$0")"
 real_path=$(/bin/pwd)
 
