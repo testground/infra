@@ -19,7 +19,8 @@ deploy_multus_ds() {
 }
 
 deploy_weave_cni() {
-    kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+    #kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+    kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml
 }
 
 create_weave_networkattachmentdefinition() {
@@ -247,7 +248,7 @@ echo ""
 echo "["aws"]"
 echo "region = \"$REGION\""
 echo "[client]"
-echo "endpoint = \"$ALB_ADDRESS:80\""
+echo "endpoint = \"http://$ALB_ADDRESS:80\""
 echo 'user = "YOUR_NAME"'
 echo ""
 }
