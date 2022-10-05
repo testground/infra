@@ -269,6 +269,7 @@ log(){
   rm -rf $real_path/log/$start-log/ 
 }
 remove_efs_fs_timer(){ 
+  efs_fs_state=available #seting the start value for the loop to consider
   while [[ $efs_fs_state  == available ]];do 
     efs_fs_state=$(aws efs describe-file-systems --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
     sleep 1
