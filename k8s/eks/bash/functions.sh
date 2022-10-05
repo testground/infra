@@ -268,7 +268,12 @@ log(){
   echo "##########################################"
   rm -rf $real_path/log/$start-log/ 
 }
-
+remove_efs_fs_timer(){ 
+  while [[ $efs_fs_state  == available ]];do 
+    efs_fs_state=$(aws efs describe-file-systems --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
+    sleep 1
+    done 
+}
 cleanup(){
   echo "Removal process for the selection will start"
   echo ""
@@ -278,9 +283,11 @@ cleanup(){
    else
       mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
       echo "Removing mount target with ID $mnt_target_id"
-      aws efs wait delete-mount-target --mount-target-id $mnt_target_id
+      aws efs  delete-mount-target --mount-target-id $mnt_target_id
+      sleep 20
       echo "Now removing EFS $efs"
-      aws efs wait delete-file-system --file-system $efs
+      aws efs delete-file-system --file-system $efs
+      remove_efs_fs_timer
    fi
   
    if [[  -z "$cluster_name" ]]
@@ -288,8 +295,8 @@ cleanup(){
      echo "Looks like cluster was created in this run... " 
    else
     echo "Now removing cluster, this may take some time"
-    eksctl delete cluster --name $CLUSTER_NAME --wait
-    rm -f $real_path/$CLUSTER_NAME.yaml
+    eksctl delete cluster --name $cluster_name --wait
+    rm -f $real_path/$cluster_name.yaml
    fi
 
    if [[  -z "$ebs" ]]
@@ -299,7 +306,5 @@ cleanup(){
     echo "Now removing EBS: $ebs"
      aws ec2 wait delete-volume --volume-id $ebs
    fi
-
- 
-  
 }
+

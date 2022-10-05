@@ -38,7 +38,7 @@ select opt in "${options[@]}" "Stop the uninstall script"; do
       break
       ;;
     *)
-      echo "This is not a number"
+      echo "Wrong selection. Please try again!"
       ;;
   esac
 done
