@@ -19,10 +19,12 @@ cat << "EOF"
 
 EOF
 echo "Please select the cluster you want to remove"
+
 unset options i
+i=0
 while IFS= read -r -d $'\0' f; do
   options[i++]="$f"
-done < <(find $real_path/.cluster/ -maxdepth 1 -type f -name "*.cs" -print0 )
+done < <(find $real_path/.cluster -maxdepth 1 -type f -name "*.cs" -print0 )
 
 select opt in "${options[@]}" "Stop the uninstall script"; do
   case $opt in
