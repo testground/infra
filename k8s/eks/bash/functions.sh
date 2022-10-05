@@ -307,5 +307,7 @@ cleanup(){
     echo "Now removing EBS: $ebs"
      aws ec2 wait delete-volume --volume-id $ebs
    fi
+   
+   rm -f $real_path/.cluster/$cluster_name.cs
 }
 
