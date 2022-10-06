@@ -21,18 +21,7 @@ EOF
 
 source $real_path/.env # Setting .env vars
 echo "Log path is $real_path/log/$start-log/cluster.log "
-# Let's do a sanity check
-if [ -n "$cluster_setup_init" ]; then
-  echo "We found that you already have a cluster provisioned with this script"
-  read -p "Do you want to remove it? (y/n)?" choice
-  case "$choice" in 
-  y|Y ) cleanup;;
-  n|N ) exit;;
-  * ) echo "invalid selection";;
-  esac
-  exit
-fi
-
+echo ""
 if [[ "$CLUSTER_NAME" == "" ]]
  then
    echo "Your cluster name can't be empty. " 
