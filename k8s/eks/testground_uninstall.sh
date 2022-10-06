@@ -6,6 +6,7 @@ cd "$(dirname "$0")"
 real_path=$(/bin/pwd)
 
 source $real_path/bash/functions.sh
+source $real_path/.env
 prep_log_dir
 cat << "EOF"
  _____         _   _____                           _ 
