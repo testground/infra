@@ -49,7 +49,12 @@ multus_softlink() {
   kubectl create -f $real_path/yaml/softlink-ds.yml
 }
 
+obtain_ami_id(){
+  AMI_ID_REGION_BASED=$(aws ec2 describe-images --filters "Name=name,Values=amazon-eks-node-1.22-v20220802" --owners amazon --region $REGION | jq -r '.Images[0].ImageId')
+}
+
 make_cluster_config(){
+obtain_ami_id
     cat <<EOT >> $real_path/$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -61,7 +66,7 @@ managedNodeGroups:
     labels:
       "testground.node.role.infra": "true"
     instanceType: $INSTANCE_TYPE_INFRA
-    ami: $AMI_ID
+    ami: $AMI_ID_REGION_BASED
     desiredCapacity: $DESIRED_CAPACITY_INFRA
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
@@ -84,7 +89,7 @@ managedNodeGroups:
       "testground.node.role.plan": "true"
     instanceType: $INSTANCE_TYPE_PLAN 
     # Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022
-    ami: $AMI_ID
+    ami: $AMI_ID_REGION_BASED
     desiredCapacity: $DESIRED_CAPACITY_PLAN
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
@@ -119,7 +124,7 @@ aws_create_file_system(){
   create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
   echo "$create_efs"
   efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-  aws efs tag-resource --resource-id $efs_fs_id --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
+  aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
   echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
@@ -162,7 +167,7 @@ aws_create_ebs(){
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-  aws ec2 create-tags --resources $ebs_volume --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
+  aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
   echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
@@ -258,14 +263,14 @@ obtain_alb_address(){
 }
 
 echo_env_toml(){
-echo "Your 'testground/.env.toml' file needs to look like this:"
-echo ""
-echo "["aws"]"
-echo "region = \"$REGION\""
-echo "[client]"
-echo "endpoint = \"http://$ALB_ADDRESS:80\""
-echo 'user = "YOUR_NAME"'
-echo ""
+  echo "Your 'testground/.env.toml' file needs to look like this:"
+  echo ""
+  echo "["aws"]"
+  echo "region = \"$REGION\""
+  echo "[client]"
+  echo "endpoint = \"http://$ALB_ADDRESS:80\""
+  echo 'user = "YOUR_NAME"'
+  echo ""
 }
 
 log(){
@@ -279,7 +284,7 @@ log(){
 remove_efs_fs_timer(){ 
   efs_fs_state=available # setting the start value for the loop to consider
   while [[ $efs_fs_state  == available ]];do 
-    efs_fs_state=$(aws efs describe-file-systems --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
+    efs_fs_state=$(aws efs describe-file-systems --region $REGION --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
     sleep 1
     done 
 }
@@ -291,14 +296,14 @@ cleanup(){
    then
      echo "Looks like no EFS was found in this run. " 
    else
-      mnt_target_id=$(aws efs describe-mount-targets --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
+      mnt_target_id=$(aws efs describe-mount-targets --region $REGION --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
       echo "Removing mount target with ID $mnt_target_id"
-      aws efs  delete-mount-target --mount-target-id $mnt_target_id
+      aws efs delete-mount-target --region $REGION --mount-target-id $mnt_target_id
       sleep 20
       echo "Mount target $mnt_target_id has been deleted."
       echo ""
       echo "Now removing EFS $efs"
-      aws efs delete-file-system --file-system $efs
+      aws efs delete-file-system --file-system $efs --region $REGION
       remove_efs_fs_timer
       echo "EFS $efs has been deleted."
       echo ""
@@ -319,11 +324,10 @@ cleanup(){
      echo "Looks like no EBS was found in this run. " 
    else
     echo "Now removing EBS: $ebs"
-     aws ec2 delete-volume --volume-id $ebs
-     aws ec2 wait volume-deleted --volume-id $ebs
+     aws ec2 delete-volume --volume-id $ebs --region $REGION
+     aws ec2 wait volume-deleted --volume-id $ebs --region $REGION
      echo "Volume $ebs has been deleted."
    fi
    
    rm -f $real_path/.cluster/$cluster_name.cs
 }
-
