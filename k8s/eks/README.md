@@ -71,7 +71,7 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 kubectl version --client
 ```
 
-Specific version (required when your cluster is not compatible with the latest version, v1.22 used in the example below):
+Specific version used at the time of writing this guide (v1.22):
 
 ```
 curl -LO https://dl.k8s.io/release/v1.22.0/bin/linux/amd64/kubectl
@@ -99,8 +99,11 @@ Official installation guide:
 
 https://docs.aws.amazon.com/eks/latest/userguide/eksctl.html
 
+
+Specific version used at the time of writing this guide (v0.112.0):
+
 ```
-curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+curl --silent --location "https://github.com/weaveworks/eksctl/releases/download/v0.112.0/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
 sudo mv /tmp/eksctl /usr/local/bin
 eksctl version
 ```
@@ -124,7 +127,9 @@ and the testground repo from here:
 
 git clone https://github.com/testground/testground.git
 
-2. You need to populate the `.env` file with the needed parameters before creating the cluster. It is located in `infra/k8s/eks/`
+2. You need to generate and populate the `.env` file with the needed parameters before creating the cluster. It needs to be located in `infra/k8s/eks/`
+
+You may use the existing `.env.example` as a template to create your own `.env` file.
 
 The variables are divided into two main groups - `REQUIRED TO BE CHANGED` and `OPTIONAL TO BE CHANGED/ CAN BE LEFT WITH DEFAULTS`.
 

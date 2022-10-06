@@ -15,6 +15,7 @@ fi
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
   echo "cluster_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
   echo "cluster_name=$CLUSTER_NAME" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  echo "region=$REGION" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
 remove_aws_node_ds() {
@@ -296,14 +297,14 @@ cleanup(){
    then
      echo "Looks like no EFS was found in this run. " 
    else
-      mnt_target_id=$(aws efs describe-mount-targets --region $REGION --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
+      mnt_target_id=$(aws efs describe-mount-targets --region $region --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
       echo "Removing mount target with ID $mnt_target_id"
-      aws efs delete-mount-target --region $REGION --mount-target-id $mnt_target_id
+      aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
       sleep 20
       echo "Mount target $mnt_target_id has been deleted."
       echo ""
       echo "Now removing EFS $efs"
-      aws efs delete-file-system --file-system $efs --region $REGION
+      aws efs delete-file-system --file-system $efs --region $region
       remove_efs_fs_timer
       echo "EFS $efs has been deleted."
       echo ""
@@ -324,8 +325,8 @@ cleanup(){
      echo "Looks like no EBS was found in this run. " 
    else
     echo "Now removing EBS: $ebs"
-     aws ec2 delete-volume --volume-id $ebs --region $REGION
-     aws ec2 wait volume-deleted --volume-id $ebs --region $REGION
+     aws ec2 delete-volume --volume-id $ebs --region $region
+     aws ec2 wait volume-deleted --volume-id $ebs --region $region
      echo "Volume $ebs has been deleted."
    fi
    

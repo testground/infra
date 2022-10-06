@@ -4,3 +4,4 @@ efs-terraform/.terraform/
 ###script temp files
 log
 .cluster
+.env
