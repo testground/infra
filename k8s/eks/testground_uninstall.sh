@@ -32,9 +32,10 @@ select opt in "${options[@]}" "Stop the uninstall script"; do
       echo "You have selected to remove: $opt "
       source $opt
       cleanup
+      break
       ;;
-    "Stop the script")
-      echo "You chose to stop"
+    "Stop the uninstall script.")
+      echo "You chose to stop, exiting now."
       break
       ;;
     *)

@@ -325,6 +325,5 @@ cleanup(){
    fi
    
    rm -f $real_path/.cluster/$cluster_name.cs
-  break
 }
 
