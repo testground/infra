@@ -301,6 +301,7 @@ cleanup(){
       aws efs delete-file-system --file-system $efs
       remove_efs_fs_timer
       echo "EFS $efs has been deleted."
+      echo ""
    fi
   
    if [[  -z "$cluster_name" ]]
@@ -308,6 +309,7 @@ cleanup(){
      echo "Looks like the cluster was created in this run. " 
    else
     echo "Now removing the cluster, this may take some time"
+    echo ""
     eksctl delete cluster --name $cluster_name --wait
     rm -f $real_path/$cluster_name.yaml
    fi
@@ -323,5 +325,6 @@ cleanup(){
    fi
    
    rm -f $real_path/.cluster/$cluster_name.cs
+  break
 }
 
