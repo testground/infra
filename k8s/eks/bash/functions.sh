@@ -285,7 +285,7 @@ log(){
 remove_efs_fs_timer(){ 
   efs_fs_state=available # setting the start value for the loop to consider
   while [[ $efs_fs_state  == available ]];do 
-    efs_fs_state=$(aws efs describe-file-systems --region $REGION --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
+    efs_fs_state=$(aws efs describe-file-systems --region $region --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
     sleep 1
     done 
 }
@@ -316,7 +316,7 @@ cleanup(){
    else
     echo "Now removing the cluster, this may take some time"
     echo ""
-    eksctl delete cluster --name $cluster_name --wait
+    eksctl delete cluster --name $cluster_name --region $region --wait
     rm -f $real_path/$cluster_name.yaml
    fi
 

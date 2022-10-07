@@ -145,6 +145,7 @@ obtain_alb_address
 echo_env_toml
 echo ""
 echo "Your cluster is ready to be used."
+echo "Please note that it might take a few minutes for the worker nodes to pass the AWS Load Balancer health checks. When this finishes, you will be able to run tests."
 echo ""
 echo ""
 log

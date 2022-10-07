@@ -196,6 +196,8 @@ endpoint = "http://acca15c6ah3eh45n68ad6052c20ba9ec-1569872837.eu-west-3.elb.ama
 
 You can now run testground tests without having to port-forward to your laptop/bastion host.
 
+**Please note that it might take a few minutes for the worker nodes to pass the AWS Load Balancer health checks. When this finishes, you will be able to run tests.**
+
 6. Now you are ready to run testground tests:
 
 ```

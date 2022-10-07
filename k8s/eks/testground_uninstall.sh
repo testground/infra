@@ -44,6 +44,8 @@ select opt in "${options[@]}" "Stop the uninstall script"; do
       echo "You have selected to remove: $opt "
       source $opt
       cleanup
+      echo ""
+      echo "Uninstall script completed."
       break
       ;;
     "Stop the uninstall script")
@@ -55,5 +57,3 @@ select opt in "${options[@]}" "Stop the uninstall script"; do
       ;;
   esac
 done
-echo ""
-echo "Uninstall script completed."
