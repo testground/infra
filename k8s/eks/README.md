@@ -347,17 +347,27 @@ eksctl scale nodegroup --config-file=$CLUSTER_NAME.yaml --name=ng-2-plan
 The AMI used for worker nodes defaults to Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022, or by image name, `amazon-eks-node-1.22-v20220802`.
 When you run the script, it will automatically find that image in your specified region and implement it into the config file.
 
-If you need to specify a different image, you may use this command from your cli (and make sure you change the name to your desired AMI, and also desired Region):
-```
-aws ec2 describe-images --filters "Name=name,Values=amazon-eks-node-1.22-v20220802" --owners amazon --region $REGION | jq -r '.Images[0].ImageId'
-```
-and add a variable to the `.env` file, for example:
+If you need to specify a different image, you may change the variable `AMI_ID` in your `.env` file, for example change from the default:
 
 ```
-AMI_ID="ami-030609f7e95c0f386"
+AMI_ID=amazon-eks-node-1.22-v20220802
+```
+to:
+```
+AMI_ID=amazon-eks-node-1.23-v20220914
 ```
 
-Next step would be to edit the `make_cluster_config` function in `bash/functions.sh` and replace the `ami: $AMI_ID_REGION_BASED` with your variable.
+You may find a list of all AMI releases on the following link:
+
+https://github.com/awslabs/amazon-eks-ami/releases
+
+## Changing AWS Availability Zone for EBS/EFS/EKS
+
+For now. there must be only one AZ because of the script logic; it defaults to `eu-west-3a`.
+The AZ will be the same for EBS/EFS/Nodegroups, and it must correspond to the selected region (you cannot use `eu-west-3` as region and `eu-west-2a` as AZ).
+
+If you need to change the Availability Zone for any reason, simply update the `AZ_SUFFIX` variable in you `.env` file.
+
 ## Additional notes
 
 When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 

@@ -39,17 +39,6 @@ echo "Now deploying multus-cni daemonset"
 deploy_multus_ds >> $real_path/log/$start-log/cluster.log
 echo "========================"
 
-if [[ "$CNI_COMBINATION" == "aws_vpc_cni_weave" ]]
-  then
-  echo "aws_vpc_cni_weave combination is selected."
-else
-  echo "Invalid selecton in .env"  >> $real_path/log/$start-log/erorr.log
-  echo "CNI_COMBINATION can't be $CNI_COMBINATION" >> $real_path/log/$start-log/erorr.log
-  echo "CNI combination must be aws_vpc_cni_weave."
-  echo "========================"
-  exit 1
-fi
-
 echo "Deploying the weave CNI to the cluster and creating the weave NetworkAttachmentDefinition"
 deploy_weave_cni >> $real_path/log/$start-log/cluster.log
 create_weave_networkattachmentdefinition >> $real_path/log/$start-log/cluster.log
@@ -142,11 +131,16 @@ tg_daemon_deployment >> $real_path/log/$start-log/cluster.log
 echo "========================"
 echo ""
 obtain_alb_address
+echo "Checking with AWS if everything is ready..."
+wait_for_alb_and_instances
+echo ""
+echo "Everything is up and running!"
+echo "========================"
+echo ""
 echo_env_toml
 echo ""
 echo "Your cluster is ready to be used."
-echo "Please note that it might take a few minutes for the worker nodes to pass the AWS Load Balancer health checks. When this finishes, you will be able to run tests."
 echo ""
 echo ""
 log
-echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
+echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME.tar.gz"

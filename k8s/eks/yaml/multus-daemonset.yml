@@ -1,11 +1,5 @@
-# Note:
-#   This deployment file is designed for 'quickstart' of multus, easy installation to test it,
-#   hence this deployment yaml does not care about following things intentionally.
-#     - various configuration options
-#     - minor deployment scenario
-#     - upgrade/update/uninstall scenario
-#   Multus team understand users deployment scenarios are diverse, hence we do not cover
-#   comprehensive deployment scenario. We expect that it is covered by each platform deployment.
+# Forked from here:
+# https://github.com/k8snetworkplumbingwg/multus-cni/blob/f4c0adf54c99d7395d30a050a8d29b674b99d700/deployments/multus-daemonset.yml
 ---
 apiVersion: apiextensions.k8s.io/v1
 kind: CustomResourceDefinition
@@ -108,16 +102,6 @@ metadata:
     tier: node
     app: multus
 data:
-  # NOTE: If you'd prefer to manually apply a configuration file, you may create one here.
-  # In the case you'd like to customize the Multus installation, you should change the arguments to the Multus pod
-  # change the "args" line below from
-  # - "--multus-conf-file=auto"
-  # to:
-  # "--multus-conf-file=/tmp/multus-conf/70-multus.conf"
-  # Additionally -- you should ensure that the name "70-multus.conf" is the alphabetically first name in the
-  # /etc/cni/net.d/ directory on each node, otherwise, it will not be used by the Kubelet.
-  # NOTE: comment added by multus devs - https://github.com/k8snetworkplumbingwg/multus-cni/blob/ce11203f5c55f7ed6cc6278e9b4438e625e5c9b3/images/multus-daemonset.yml
-  # commit hash ce11203
   cni-conf.json: |
     {
       "name": "multus-cni-network",

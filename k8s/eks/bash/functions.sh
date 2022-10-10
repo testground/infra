@@ -6,6 +6,10 @@ prep_log_dir(){
   mkdir -p $real_path/.cluster/
 }
 
+concat_availability_zone(){
+  AVAILABILITY_ZONE=$REGION$AZ_SUFFIX
+}
+
 create_cluster() {
   if test -f "$real_path/.cluster/$CLUSTER_NAME.cs"; then
     echo "File $real_path/.cluster/$CLUSTER_NAME.cs exists."
@@ -16,10 +20,6 @@ fi
   echo "cluster_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
   echo "cluster_name=$CLUSTER_NAME" >> $real_path/.cluster/$CLUSTER_NAME.cs
   echo "region=$REGION" >> $real_path/.cluster/$CLUSTER_NAME.cs
-}
-
-remove_aws_node_ds() {
-  kubectl delete daemonset -n kube-system aws-node
 }
 
 deploy_multus_ds() {
@@ -51,11 +51,12 @@ multus_softlink() {
 }
 
 obtain_ami_id(){
-  AMI_ID_REGION_BASED=$(aws ec2 describe-images --filters "Name=name,Values=amazon-eks-node-1.22-v20220802" --owners amazon --region $REGION | jq -r '.Images[0].ImageId')
+  AMI_ID=$(aws ec2 describe-images --filters "Name=name,Values=$AMI_NAME" --owners amazon --region $REGION | jq -r '.Images[0].ImageId')
 }
 
 make_cluster_config(){
 obtain_ami_id
+concat_availability_zone
     cat <<EOT >> $real_path/$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
@@ -67,7 +68,7 @@ managedNodeGroups:
     labels:
       "testground.node.role.infra": "true"
     instanceType: $INSTANCE_TYPE_INFRA
-    ami: $AMI_ID_REGION_BASED
+    ami: $AMI_ID
     desiredCapacity: $DESIRED_CAPACITY_INFRA
     volumeSize: $VOLUME_SIZE_INFRA
     privateNetworking: false
@@ -90,7 +91,7 @@ managedNodeGroups:
       "testground.node.role.plan": "true"
     instanceType: $INSTANCE_TYPE_PLAN 
     # Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022
-    ami: $AMI_ID_REGION_BASED
+    ami: $AMI_ID
     desiredCapacity: $DESIRED_CAPACITY_PLAN
     volumeSize: $VOLUME_SIZE_PLAN
     privateNetworking: false
@@ -135,6 +136,7 @@ aws_get_vpc_id(){
 
 aws_get_subnet_id(){ 
   aws_get_vpc_id
+  concat_availability_zone
   upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
   subnet_id=$(aws ec2 describe-subnets --region $REGION --filters "Name=vpc-id,Values=$vpc_id" "Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/SubnetPrivate$upper_az"  | jq  ".Subnets[] | select(.AvailabilityZone==\"$AVAILABILITY_ZONE\") | .SubnetId " | tr -d \" )
 }
@@ -165,6 +167,7 @@ create_efs_manifest(){
 }
 
 aws_create_ebs(){
+  concat_availability_zone
   create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
@@ -263,6 +266,15 @@ obtain_alb_address(){
   ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
 }
 
+obtain_alb_name(){
+  ALB_NAME=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}" | cut -d'-' -f1)
+}
+
+wait_for_alb_and_instances(){
+  obtain_alb_name
+  aws elb wait any-instance-in-service --load-balancer-name $ALB_NAME --region $REGION
+}
+
 echo_env_toml(){
   echo "Your 'testground/.env.toml' file needs to look like this:"
   echo ""
@@ -275,9 +287,9 @@ echo_env_toml(){
 }
 
 log(){
-  tar czf $real_path/log/$start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz $real_path/log/$start-log/
+  tar czf $real_path/log/$start-$CLUSTER_NAME.tar.gz $real_path/log/$start-log/
   echo "##########################################"
-  echo "Log file generated with name $start-$CLUSTER_NAME-$CNI_COMBINATION.tar.gz"
+  echo "Log file generated with name $start-$CLUSTER_NAME.tar.gz"
   echo "##########################################"
   rm -rf $real_path/log/$start-log/ 
 }
