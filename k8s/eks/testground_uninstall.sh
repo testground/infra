@@ -45,7 +45,6 @@ select opt in "${options[@]}" "Stop the uninstall script"; do
       source $opt
       cleanup
       echo ""
-      echo "Uninstall script completed."
       break
       ;;
     "Stop the uninstall script")

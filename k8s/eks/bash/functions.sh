@@ -287,9 +287,9 @@ echo_env_toml(){
 
 log(){
   tar czf $real_path/log/$start-$CLUSTER_NAME.tar.gz $real_path/log/$start-log/
-  echo "##########################################"
+  echo "========================"
   echo "Log file generated with name $start-$CLUSTER_NAME.tar.gz"
-  echo "##########################################"
+  echo ""
   rm -rf $real_path/log/$start-log/ 
 }
 
@@ -302,17 +302,17 @@ remove_efs_fs_timer(){
 }
 
 obtain_efs_id(){
-  efs_id=$(aws efs describe-file-systems --query "FileSystems[?Tags[?Key=='Name' && Value=='$cluster_name']].FileSystemId" --region $region | awk -F[\"\"] '{print $2}')
+  efs_id_temp=$(aws efs describe-file-systems --query "FileSystems[?Tags[?Key=='Name' && Value=='$cluster_name']].FileSystemId" --region $region | awk -F[\"\"] '{print $2}')
+  efs_id=$(echo $efs_id_temp|tr -d '\n')
 }
 
 obtain_ebs_id(){
-  ebs_id=$(aws ec2 describe-volumes --filters Name=tag:Name,Values=$cluster_name --query "Volumes[*].VolumeId" --region $region | awk -F[\"\"] '{print $2}')
+  ebs_id_temp=$(aws ec2 describe-volumes --filters Name=tag:Name,Values=$cluster_name --query "Volumes[*].VolumeId" --region $region | awk -F[\"\"] '{print $2}')
+  ebs_id=$(echo $ebs_id_temp|tr -d '\n')
 }
 
 obtain_cluster_name(){
-for cluster in `aws eks list-clusters --region $region | jq .clusters[] -r`; do
-  active_clusters=$(aws eks describe-cluster --name $cluster --region $region --query cluster.tags | grep "alpha.eksctl.io/cluster-name" |  awk -F[\"\"] '{print $4}')
-done
+  readarray -t active_clusters < <(aws eks list-clusters --query clusters --output text --region $region)
 }
 
 cleanup(){
@@ -336,6 +336,7 @@ cleanup(){
     aws efs delete-file-system --file-system $efs --region $region
     remove_efs_fs_timer
     echo "EFS $efs has been deleted."
+    echo "efs_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
     echo ""     
   else
     echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
@@ -344,15 +345,20 @@ cleanup(){
   if [[  -z "$cluster_name" ]]
   then
     echo -e "Looks like no cluster was created in this run. The cluster variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
-  elif [[ "$cluster_name" == "$active_clusters" ]]
-  then
-    echo "Now removing the cluster $cluster_name, this may take some time"
-    echo ""
-    eksctl delete cluster --name $cluster_name --region $region --wait
-    rm -f $real_path/$cluster_name.yaml
-  else
-    echo -e "Looks like the cluster you have specified ($cluster_name) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
+  for i in ${active_clusters[@]}; do
+    if [[ "$cluster_name" == "$i"  ]]
+    then
+      echo "Now removing the cluster $cluster_name, this may take some time"
+      echo ""
+      eksctl delete cluster --name $cluster_name --region $region --wait
+      rm -f $real_path/$cluster_name.yaml
+      echo "cluster_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+    break
+    else
+     echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+    fi
+  done
 
   if [[  -z "$ebs" ]]
   then
@@ -363,9 +369,16 @@ cleanup(){
     aws ec2 delete-volume --volume-id $ebs --region $region
     aws ec2 wait volume-deleted --volume-id $ebs --region $region
     echo "Volume $ebs has been deleted."
+    echo "ebs_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
   else
     echo -e "Looks like the EBS you have specified ($ebs) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
-   
-  rm -f $real_path/.cluster/$cluster_name.cs
+  
+  if [ $efs_deleted == "true" ] && [ $ebs_deleted == "true" ] && [ $cluster_deleted == "true" ]
+  then
+    rm -f $real_path/.cluster/$cluster_name.cs
+    echo -e "Uninstall script completed and removed the '.cluster/CLUSTER_NAME.cs' file.\n"
+  else
+    echo -e "Uninstall script completed, but did not remove the '.cluster/CLUSTER_NAME.cs' file due to other resources not being deleted.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+  fi
 }
