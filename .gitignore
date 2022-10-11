@@ -5,3 +5,4 @@ efs-terraform/.terraform/
 log
 .cluster
 .env
+.yaml

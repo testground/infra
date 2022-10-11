@@ -114,7 +114,6 @@ managedNodeGroups:
 EOT
 }
 
-
 create_node_group(){
   eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
   echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
@@ -126,7 +125,7 @@ aws_create_file_system(){
   create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
   echo "$create_efs"
   efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-  aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
+  aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
   echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
@@ -168,10 +167,10 @@ create_efs_manifest(){
 
 aws_create_ebs(){
   concat_availability_zone
-  create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE  --availability-zone $AVAILABILITY_ZONE)
+  create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE --availability-zone $AVAILABILITY_ZONE)
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-  aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME
+  aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
   echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
@@ -302,45 +301,71 @@ remove_efs_fs_timer(){
     done 
 }
 
+obtain_efs_id(){
+  efs_id=$(aws efs describe-file-systems --query "FileSystems[?Tags[?Key=='Name' && Value=='$cluster_name']].FileSystemId" --region $region | awk -F[\"\"] '{print $2}')
+}
+
+obtain_ebs_id(){
+  ebs_id=$(aws ec2 describe-volumes --filters Name=tag:Name,Values=$cluster_name --query "Volumes[*].VolumeId" --region $region | awk -F[\"\"] '{print $2}')
+}
+
+obtain_cluster_name(){
+for cluster in `aws eks list-clusters --region $region | jq .clusters[] -r`; do
+  active_clusters=$(aws eks describe-cluster --name $cluster --region $region --query cluster.tags | grep "alpha.eksctl.io/cluster-name" |  awk -F[\"\"] '{print $4}')
+done
+}
+
 cleanup(){
+  obtain_efs_id
+  obtain_cluster_name
+  obtain_ebs_id
   echo "Removal process for the selection will start"
   echo ""
   if [[  -z "$efs" ]]
-   then
-     echo "Looks like no EFS was found in this run. " 
-   else
-      mnt_target_id=$(aws efs describe-mount-targets --region $region --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
-      echo "Removing mount target with ID $mnt_target_id"
-      aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
-      sleep 20
-      echo "Mount target $mnt_target_id has been deleted."
-      echo ""
-      echo "Now removing EFS $efs"
-      aws efs delete-file-system --file-system $efs --region $region
-      remove_efs_fs_timer
-      echo "EFS $efs has been deleted."
-      echo ""
-   fi
-  
-   if [[  -z "$cluster_name" ]]
-   then
-     echo "Looks like the cluster was created in this run. " 
-   else
-    echo "Now removing the cluster, this may take some time"
+  then
+    echo -e "Looks like no EFS was created in this run. The EFS variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+  elif [ "$efs" == "$efs_id" ]
+  then
+    mnt_target_id=$(aws efs describe-mount-targets --region $region --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
+    echo "Removing mount target with ID $mnt_target_id"
+    aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
+    sleep 20
+    echo "Mount target $mnt_target_id has been deleted."
+    echo ""
+    echo "Now removing EFS $efs"
+    aws efs delete-file-system --file-system $efs --region $region
+    remove_efs_fs_timer
+    echo "EFS $efs has been deleted."
+    echo ""     
+  else
+    echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+  fi
+
+  if [[  -z "$cluster_name" ]]
+  then
+    echo -e "Looks like no cluster was created in this run. The cluster variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+  elif [[ "$cluster_name" == "$active_clusters" ]]
+  then
+    echo "Now removing the cluster $cluster_name, this may take some time"
     echo ""
     eksctl delete cluster --name $cluster_name --region $region --wait
     rm -f $real_path/$cluster_name.yaml
-   fi
+  else
+    echo -e "Looks like the cluster you have specified ($cluster_name) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+  fi
 
-   if [[  -z "$ebs" ]]
-   then
-     echo "Looks like no EBS was found in this run. " 
-   else
+  if [[  -z "$ebs" ]]
+  then
+    echo -e "Looks like no EBS was created in this run. The EBS variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+  elif [ "$ebs" == "$ebs_id" ]
+  then
     echo "Now removing EBS: $ebs"
-     aws ec2 delete-volume --volume-id $ebs --region $region
-     aws ec2 wait volume-deleted --volume-id $ebs --region $region
-     echo "Volume $ebs has been deleted."
-   fi
+    aws ec2 delete-volume --volume-id $ebs --region $region
+    aws ec2 wait volume-deleted --volume-id $ebs --region $region
+    echo "Volume $ebs has been deleted."
+  else
+    echo -e "Looks like the EBS you have specified ($ebs) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+  fi
    
-   rm -f $real_path/.cluster/$cluster_name.cs
+  rm -f $real_path/.cluster/$cluster_name.cs
 }

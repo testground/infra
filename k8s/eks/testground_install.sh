@@ -38,12 +38,12 @@ fi
 echo "Now deploying multus-cni daemonset"
 deploy_multus_ds >> $real_path/log/$start-log/cluster.log
 echo "========================"
-
+echo ""
 echo "Deploying the weave CNI to the cluster and creating the weave NetworkAttachmentDefinition"
 deploy_weave_cni >> $real_path/log/$start-log/cluster.log
 create_weave_networkattachmentdefinition >> $real_path/log/$start-log/cluster.log
 echo "========================"
-
+echo ""
 echo "Now setting role binding..."
 deploy_cluster_role_binding >> $real_path/log/$start-log/cluster.log
 echo "========================"
@@ -100,7 +100,7 @@ echo "Now making persistent volume on EKS"
 make_persistent_volume >> $real_path/log/$start-log/cluster.log
 echo "Done."
 echo "========================"
-
+echo ""
 echo "Setting up Redis..."
 helm_redis_add_repo >> $real_path/log/$start-log/cluster.log
 echo "Helm Redis repo added"
@@ -108,6 +108,7 @@ echo "Now proceeding with Helm install"
 helm_infra_install_redis >> $real_path/log/$start-log/cluster.log
 echo "Redis installed"
 echo "========================"
+echo ""
 echo "We will setup the testground daemon now."
 echo ""
 echo ""
