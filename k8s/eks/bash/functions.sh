@@ -57,7 +57,7 @@ obtain_ami_id(){
 make_cluster_config(){
 obtain_ami_id
 concat_availability_zone
-    cat <<EOT >> $real_path/$CLUSTER_NAME.yaml
+    cat <<EOT >> $real_path/.cluster/$CLUSTER_NAME.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -115,7 +115,7 @@ EOT
 }
 
 create_node_group(){
-  eksctl create nodegroup --config-file=$CLUSTER_NAME.yaml
+  eksctl create nodegroup --config-file=$real_path/.cluster/$CLUSTER_NAME.yaml
   echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
 }
 
@@ -354,7 +354,7 @@ cleanup(){
       echo "Now removing the cluster $cluster_name, this may take some time"
       echo ""
       eksctl delete cluster --name $cluster_name --region $region --wait
-      rm -f $real_path/$cluster_name.yaml
+      rm -f $real_path/.cluster/$cluster_name.yaml
       cluster_deleted=true
       echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name.cs
     break
