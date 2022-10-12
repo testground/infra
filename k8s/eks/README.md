@@ -133,7 +133,7 @@ You may use the existing `.env.example` as a template to create your own `.env` 
 
 The variables are divided into two main groups - `REQUIRED TO BE CHANGED` and `OPTIONAL TO BE CHANGED/ CAN BE LEFT WITH DEFAULTS`.
 
-The `REQUIRED` variables need to be populated by the user - `CLUSTER_NAME` (unique cluster name, so your EKS cluster will be called `eks-$CLUSTER_NAME-cluster)`, `REGION` (AWS region where you will create your resources), and `AVAILABILITY_ZONE` (AZ within the selected region where you want your resources created)
+The `REQUIRED` variables need to be populated by the user - `CLUSTER_NAME` (unique cluster name, so your EKS cluster will be called `eks-$CLUSTER_NAME-cluster)`.
 
 The `OPTIONAL/DEFAULTS` are safe to remain unchanged, but you are free to modify them to suit your needs. Please refer to the `.env` file for more information about each parameter.
 
@@ -145,7 +145,6 @@ The script explained in short:
 - All installation steps have been divided into functions, located in the `eks/bash/functions.sh` script
 - The script calls functions one by one
 - Output of every step is logged into a master log file that can be retrieved and reviewed, or even tailed in real time from a different terminal window while the script is running
-- It can also be used to uninstall a provisioned cluster; one of the first steps in the script is checking for existing resources
 - The `functions.sh` file relies on the content of `eks/yaml` - all cluster resources are located inside this folder
 - If you need to scale the worker nodegroups on setup, you are able to edit the `.env` file parameters - `DESIRED_CAPACITY_INFRA` and `DESIRED_CAPACITY_PLAN`
 - You are also able to change the worker node instance type - `INSTANCE_TYPE_INFRA` and `INSTANCE_TYPE_PLAN`
@@ -247,6 +246,7 @@ Please select the cluster you want to remove
 #? 
 
 ```
+**Please note that the `.cluster/CLUSTER_NAME.cs` file is created by the script and acts as a state file for the AWS resources. The `testground_uninstall.sh` script relies on this file in order to remove resources.<br/> If the file is removed or changed in any way, the uninstall script will output error message(s) stating this. In that case, the `.cs` file needs to be populated again, or the resources will have to be removed manually from your AWS account.  <br/>If you decide to create multiple clusters from the same laptop/bastion host, your `.cluster` folder will have multiple `CLUSTER_NAME.cs` files in it, each corresponding to one cluster.**
 
 ## Optional steps / Advanced setup
 

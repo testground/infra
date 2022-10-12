@@ -275,13 +275,14 @@ wait_for_alb_and_instances(){
 }
 
 echo_env_toml(){
+  username=$(whoami)
   echo "Your 'testground/.env.toml' file needs to look like this:"
   echo ""
   echo "["aws"]"
   echo "region = \"$REGION\""
   echo "[client]"
   echo "endpoint = \"http://$ALB_ADDRESS:80\""
-  echo 'user = "YOUR_NAME"'
+  echo "user = ${username}"
   echo ""
 }
 
