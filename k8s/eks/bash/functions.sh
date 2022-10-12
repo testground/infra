@@ -336,7 +336,8 @@ cleanup(){
     aws efs delete-file-system --file-system $efs --region $region
     remove_efs_fs_timer
     echo "EFS $efs has been deleted."
-    echo "efs_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+    efs_deleted=true
+    echo "efs_deleted=true" >> $real_path/.cluster/$cluster_name.cs
     echo ""     
   else
     echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
@@ -353,7 +354,8 @@ cleanup(){
       echo ""
       eksctl delete cluster --name $cluster_name --region $region --wait
       rm -f $real_path/$cluster_name.yaml
-      echo "cluster_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+      cluster_deleted=true
+      echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name.cs
     break
     else
      echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
@@ -369,12 +371,13 @@ cleanup(){
     aws ec2 delete-volume --volume-id $ebs --region $region
     aws ec2 wait volume-deleted --volume-id $ebs --region $region
     echo "Volume $ebs has been deleted."
-    echo "ebs_deleted=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+    ebs_deleted=true
+    echo "ebs_deleted=true" >> $real_path/.cluster/$cluster_name.cs
   else
     echo -e "Looks like the EBS you have specified ($ebs) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
   
-  if [ $efs_deleted == "true" ] && [ $ebs_deleted == "true" ] && [ $cluster_deleted == "true" ]
+  if [ "$efs_deleted" == "true" ] && [ "$ebs_deleted" == "true" ] && [ "$cluster_deleted" == "true" ]
   then
     rm -f $real_path/.cluster/$cluster_name.cs
     echo -e "Uninstall script completed and removed the '.cluster/CLUSTER_NAME.cs' file.\n"
