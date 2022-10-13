@@ -281,7 +281,7 @@ echo_env_toml(){
   echo "region = \"$REGION\""
   echo "[client]"
   echo "endpoint = \"http://$ALB_ADDRESS:80\""
-  echo "user = ${username}"
+  echo 'user = '${username}'"
   echo ""
 }
 
