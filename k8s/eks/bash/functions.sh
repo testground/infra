@@ -36,7 +36,6 @@ create_weave_networkattachmentdefinition() {
 }
 
 deploy_cluster_role_binding() {
-  kubectl create clusterrolebinding service-reader --clusterrole=service-reader --serviceaccount=default:default
   kubectl create -f $real_path/yaml/clusterrolebinding.yml
 }
 
@@ -84,8 +83,7 @@ managedNodeGroups:
     overrideBootstrapCommand: |
       #!/bin/bash
       /etc/eks/bootstrap.sh $CLUSTER_NAME \
-        --kubelet-extra-args '--max-pods=58' \
-        --use-max-pods false
+        --kubelet-extra-args '--max-pods=58 --use-max-pods=false'
   - name: ng-2-plan
     labels:
       "testground.node.role.plan": "true"
@@ -109,8 +107,7 @@ managedNodeGroups:
     overrideBootstrapCommand: |
       #!/bin/bash
       /etc/eks/bootstrap.sh $CLUSTER_NAME \
-       --kubelet-extra-args '--max-pods=234' \
-       --use-max-pods false
+       --kubelet-extra-args '--max-pods=234 --allowed-unsafe-sysctls=net.core.somaxconn --use-max-pods=false'
 EOT
 }
 

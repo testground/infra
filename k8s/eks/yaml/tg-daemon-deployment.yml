@@ -40,7 +40,7 @@ spec:
             memory: 1000Mi
             cpu: 700m
       - name: testground-daemon
-        image: public.ecr.aws/n6b0k8i7/testground-daemon:eks_v1.0
+        image: public.ecr.aws/n6b0k8i7/testground-daemon:4f59e47c2309ded37560704004ad40e28ce767c0
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
