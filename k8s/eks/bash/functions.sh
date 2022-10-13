@@ -294,6 +294,14 @@ log(){
   rm -rf $real_path/log/$start-log/ 
 }
 
+remove_efs_mp_timer(){ 
+  efs_mp_state=available # setting the start value for the loop to consider
+  while [[ $efs_mp_state  == available ]];do 
+    efs_mp_state=$(aws efs describe-mount-targets --file-system-id $efs --region $region | jq -r ".MountTargets[] | .LifeCycleState")
+    sleep 1
+    done 
+}
+
 remove_efs_fs_timer(){ 
   efs_fs_state=available # setting the start value for the loop to consider
   while [[ $efs_fs_state  == available ]];do 
@@ -330,7 +338,7 @@ cleanup(){
     mnt_target_id=$(aws efs describe-mount-targets --region $region --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
     echo "Removing mount target with ID $mnt_target_id"
     aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
-    sleep 20
+    remove_efs_mp_timer
     echo "Mount target $mnt_target_id has been deleted."
     echo ""
     echo "Now removing EFS $efs"
