@@ -11,15 +11,15 @@ concat_availability_zone(){
 }
 
 create_cluster() {
-  if test -f "$real_path/.cluster/$CLUSTER_NAME.cs"; then
-    echo "File $real_path/.cluster/$CLUSTER_NAME.cs exists."
+  if test -f "$real_path/.cluster/$CLUSTER_NAME-$REGION.cs"; then
+    echo "File $real_path/.cluster/$CLUSTER_NAME-$REGION.cs exists."
     echo "You may want to run uninstall script first!"
     exit
 fi
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
-  echo "cluster_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
-  echo "cluster_name=$CLUSTER_NAME" >> $real_path/.cluster/$CLUSTER_NAME.cs
-  echo "region=$REGION" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  echo "cluster_created=true" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+  echo "cluster_name=$CLUSTER_NAME" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+  echo "region=$REGION" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
 }
 
 deploy_multus_ds() {
@@ -56,7 +56,7 @@ obtain_ami_id(){
 make_cluster_config(){
 obtain_ami_id
 concat_availability_zone
-    cat <<EOT >> $real_path/.cluster/$CLUSTER_NAME.yaml
+    cat <<EOT >> $real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -112,8 +112,8 @@ EOT
 }
 
 create_node_group(){
-  eksctl create nodegroup --config-file=$real_path/.cluster/$CLUSTER_NAME.yaml
-  echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  eksctl create nodegroup --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
+  echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
 }
 
 ##### EFS and EBS #######
@@ -123,7 +123,7 @@ aws_create_file_system(){
   echo "$create_efs"
   efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
   aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
-  echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
 }
 
 aws_get_vpc_id(){
@@ -168,7 +168,7 @@ aws_create_ebs(){
   echo "$create_ebs_volume"
   ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
   aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
-  echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME.cs
+  echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
 }
 
 make_persistent_volume(){  
@@ -343,7 +343,7 @@ cleanup(){
     remove_efs_fs_timer
     echo "EFS $efs has been deleted."
     efs_deleted=true
-    echo "efs_deleted=true" >> $real_path/.cluster/$cluster_name.cs
+    echo "efs_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
     echo ""     
   else
     echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
@@ -359,9 +359,9 @@ cleanup(){
       echo "Now removing the cluster $cluster_name, this may take some time"
       echo ""
       eksctl delete cluster --name $cluster_name --region $region --wait
-      rm -f $real_path/.cluster/$cluster_name.yaml
+      rm -f $real_path/.cluster/$cluster_name-$region.yaml
       cluster_deleted=true
-      echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name.cs
+      echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
     break
     else
      echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
@@ -378,14 +378,14 @@ cleanup(){
     aws ec2 wait volume-deleted --volume-id $ebs --region $region
     echo "Volume $ebs has been deleted."
     ebs_deleted=true
-    echo "ebs_deleted=true" >> $real_path/.cluster/$cluster_name.cs
+    echo "ebs_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
   else
     echo -e "Looks like the EBS you have specified ($ebs) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
   
   if [ "$efs_deleted" == "true" ] && [ "$ebs_deleted" == "true" ] && [ "$cluster_deleted" == "true" ]
   then
-    rm -f $real_path/.cluster/$cluster_name.cs
+    rm -f $real_path/.cluster/$cluster_name-$region.cs
     echo -e "Uninstall script completed and removed the '.cluster/CLUSTER_NAME.cs' file.\n"
   else
     echo -e "Uninstall script completed, but did not remove the '.cluster/CLUSTER_NAME.cs' file due to other resources not being deleted.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"

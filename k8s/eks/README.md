@@ -240,13 +240,14 @@ Once the script finishes, you will be able to verify everything through the AWS 
 ========================
 
 Please select the cluster you want to remove
-1) /home/ec2-user/infra/k8s/eks/.cluster/cluster1.cs
-2) /home/ec2-user/infra/k8s/eks/.cluster/cluster2.cs
-3) Stop the uninstall script
+1) /home/ec2-user/infra/k8s/eks/.cluster/cluster1-region1.cs
+2) /home/ec2-user/infra/k8s/eks/.cluster/cluster2-region1.cs
+3) /home/ec2-user/infra/k8s/eks/.cluster/cluster1-region2.cs
+4) Stop the uninstall script
 #? 
 
 ```
-**Please note that the `.cluster/CLUSTER_NAME.cs` file is created by the script and acts as a state file for the AWS resources. The `testground_uninstall.sh` script relies on this file in order to remove resources.<br/> If the file is removed or changed in any way, the uninstall script will output error message(s) stating this. In that case, the `.cs` file needs to be populated again, or the resources will have to be removed manually from your AWS account.  <br/>If you decide to create multiple clusters from the same laptop/bastion host, your `.cluster` folder will have multiple `CLUSTER_NAME.cs` files in it, each corresponding to one cluster.**
+**Please note that the `.cluster/CLUSTER_NAME-REGION.cs` file is created by the script and acts as a state file for the AWS resources. The `testground_uninstall.sh` script relies on this file in order to remove resources.<br/> If the file is removed or changed in any way, the uninstall script will output error message(s) stating this. In that case, the `.cs` file needs to be populated again, or the resources will have to be removed manually from your AWS account.  <br/>If you decide to create multiple clusters from the same laptop/bastion host, your `.cluster` folder will have multiple `CLUSTER_NAME-REGION.cs` files in it, each corresponding to one cluster.**
 
 ## Optional steps / Advanced setup
 

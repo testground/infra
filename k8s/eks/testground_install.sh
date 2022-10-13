@@ -18,6 +18,18 @@ cat << "EOF"
 
 
 EOF
+echo ""
+echo "========================"
+echo "PLEASE NOTE:"
+echo "Running resources on AWS costs money."
+echo "This script will create the following resources required for Testground:"
+echo "  - 3 Cloudformation stacks created by eksctl - EKS cluster and 2 Nodegroups"
+echo "(Note: if you edited the eksctl config file to add more than the default 2 nodegroups, then there will be more stacks)"
+echo "  - EBS (Elastic Block Storage) volume in the selected Availability Zone"
+echo "  - EFS (Elastic File System) in the selected AWS Region, along with a EFS mount target for the selected Availability Zone"
+echo "Once the script finishes, you will be able to verify everything through the AWS console."
+echo "========================"
+echo ""
 
 source $real_path/.env # Setting .env vars
 echo "Log path is $real_path/log/$start-log/cluster.log "
