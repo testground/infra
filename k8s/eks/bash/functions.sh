@@ -281,7 +281,7 @@ echo_env_toml(){
   echo "region = \"$REGION\""
   echo "[client]"
   echo "endpoint = \"http://$ALB_ADDRESS:80\""
-  echo 'user = '${username}'"
+  echo "user = '${username}'"
   echo ""
 }
 
@@ -295,6 +295,7 @@ log(){
 
 remove_efs_mp_timer(){ 
   efs_mp_state=available # setting the start value for the loop to consider
+  sleep 15
   while [[ $efs_mp_state  == available ]];do 
     efs_mp_state=$(aws efs describe-mount-targets --file-system-id $efs --region $region | jq -r ".MountTargets[] | .LifeCycleState")
     sleep 1
@@ -321,58 +322,70 @@ obtain_ebs_id(){
 
 obtain_cluster_name(){
   readarray -t active_clusters < <(aws eks list-clusters --query clusters --output text --region $region)
+  if [[ -z "${active_clusters-}" ]]
+  then
+    active_clusters=null
+  else
+    echo ""
+  fi
 }
 
 cleanup(){
   obtain_efs_id
   obtain_cluster_name
   obtain_ebs_id
-  echo "Removal process for the selection will start"
-  echo ""
+  echo -e "Removal process for the selection will start\n"
   if [[  -z "$efs" ]]
   then
-    echo -e "Looks like no EFS was created in this run. The EFS variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+    echo -e "Looks like no EFS was created in this run. The EFS variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   elif [ "$efs" == "$efs_id" ]
   then
     mnt_target_id=$(aws efs describe-mount-targets --region $region --file-system-id $efs | jq -r ".MountTargets[] | .MountTargetId")
-    echo "Removing mount target with ID $mnt_target_id"
-    aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
-    remove_efs_mp_timer
-    echo "Mount target $mnt_target_id has been deleted."
-    echo ""
+    if [[ -z "${mnt_target_id-}" ]]
+    then
+      echo -e "No mount targets found in the selected region ($region). Skipping to the next step.\n"
+    else
+      echo "Removing mount target with ID $mnt_target_id"
+      aws efs delete-mount-target --region $region --mount-target-id $mnt_target_id
+      remove_efs_mp_timer
+      echo -e "Mount target $mnt_target_id has been deleted.\n"
+    fi
     echo "Now removing EFS $efs"
     aws efs delete-file-system --file-system $efs --region $region
     remove_efs_fs_timer
-    echo "EFS $efs has been deleted."
+    echo -e "EFS $efs has been deleted.\n"
     efs_deleted=true
     echo "efs_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
-    echo ""     
   else
     echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
 
   if [[  -z "$cluster_name" ]]
   then
-    echo -e "Looks like no cluster was created in this run. The cluster variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+    echo -e "Looks like no cluster was created in this run. The cluster variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   fi
-  for i in ${active_clusters[@]}; do
-    if [[ "$cluster_name" == "$i"  ]]
-    then
-      echo "Now removing the cluster $cluster_name, this may take some time"
-      echo ""
-      eksctl delete cluster --name $cluster_name --region $region --wait
-      rm -f $real_path/.cluster/$cluster_name-$region.yaml
-      cluster_deleted=true
-      echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
-    break
-    else
-     echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
-    fi
-  done
+  if [[ "${active_clusters}" == "null" ]]
+  then
+    echo -e "No active clusters found in the selected region ($region). Skipping to the next step.\n"
+  else
+    for i in ${active_clusters[@]}; do
+      if [[ "$cluster_name" == "$i"  ]]
+      then
+        echo -e "Now removing the cluster $cluster_name, this may take some time\n"
+        eksctl delete cluster --name $cluster_name --region $region --wait
+        rm -f $real_path/.cluster/$cluster_name-$region.yaml
+        cluster_deleted=true
+        echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
+        break
+      else
+        echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+      fi
+    done
+  fi
 
   if [[  -z "$ebs" ]]
   then
-    echo -e "Looks like no EBS was created in this run. The EBS variable is empty.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+    echo -e "Looks like no EBS was created in this run. The EBS variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   elif [ "$ebs" == "$ebs_id" ]
   then
     echo "Now removing EBS: $ebs"
@@ -382,14 +395,14 @@ cleanup(){
     ebs_deleted=true
     echo "ebs_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
   else
-    echo -e "Looks like the EBS you have specified ($ebs) does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+    echo -e "Looks like the EBS you have specified ($ebs) does not exist in the selected region ($region).\nIt is possible that it has already been deleted.\n"
   fi
   
   if [ "$efs_deleted" == "true" ] && [ "$ebs_deleted" == "true" ] && [ "$cluster_deleted" == "true" ]
   then
     rm -f $real_path/.cluster/$cluster_name-$region.cs
-    echo -e "Uninstall script completed and removed the '.cluster/CLUSTER_NAME.cs' file.\n"
+    echo -e "Uninstall script completed and removed the '.cluster/$cluster_name-$region.cs' file.\n"
   else
-    echo -e "Uninstall script completed, but did not remove the '.cluster/CLUSTER_NAME.cs' file due to other resources not being deleted.\nPlease check the '.cluster/CLUSTER_NAME.cs' file and try again.\n"
+    echo -e "Uninstall script completed, but did not remove the '.cluster/$cluster_name-$region.cs' file due to other resources not being deleted.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   fi
 }
