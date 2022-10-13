@@ -40,7 +40,7 @@ if [[ "$CLUSTER_NAME" == "" ]]
    echo "Please edit the .env file, which is located in the same directory as this script."
    exit 1
 else
-  echo "Creating cluster with name: $CLUSTER_NAME "
+  echo "Creating cluster with name: $CLUSTER_NAME in region $REGION."
   echo "Please note, this can take up to 20 minutes to complete." 
   create_cluster &>> $real_path/log/$start-log/cluster.log
   echo "========================"
