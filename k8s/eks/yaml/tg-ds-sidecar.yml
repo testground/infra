@@ -18,7 +18,7 @@ spec:
       priorityClassName: system-node-critical
       containers:
       - name: testground-sidecar
-        image: public.ecr.aws/n6b0k8i7/testground-sidecar:4f59e47c2309ded37560704004ad40e28ce767c0
+        image: public.ecr.aws/n6b0k8i7/testground-sidecar:80c5aca36114de067c33c8718cca95ef16db4c06
         imagePullPolicy: Always
         command: ["testground"]
         args: ["sidecar", "--runner", "k8s"]
