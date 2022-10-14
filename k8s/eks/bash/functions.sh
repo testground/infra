@@ -10,10 +10,68 @@ concat_availability_zone(){
   AVAILABILITY_ZONE=$REGION$AZ_SUFFIX
 }
 
+concat_stack_name(){
+  stack_name=eksctl-$CLUSTER_NAME-cluster
+}
+
+wait_for_create(){
+  while [[ $stack_state  == CREATE_IN_PROGRESS ]];do
+  stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
+  echo "The cluster is still in $stack_state state, please wait. Next update in 30 seconds."
+  sleep 30
+  done
+}
+
+wait_for_delete(){
+  while [[ $stack_state  == DELETE_IN_PROGRESS ]];do
+  stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
+  if [[ -z "${stack_state}" ]]
+  then
+    echo -e "Your cluster $stack_name has been deleted.\n"
+  else
+    echo "The cluster is still in $stack_state state, please wait. Next update in 30 seconds."
+    sleep 30
+  fi
+  done
+}
+
+delete_stack(){
+  echo -e "\n"
+  echo -e "Your cluster $stack_name is in FAILED state, removing the Cloudformation stack. Please wait.\n"
+  aws cloudformation delete-stack --stack-name $stack_name --region $REGION
+  stack_state=DELETE_IN_PROGRESS
+  wait_for_delete
+}
+
+check_stack_state(){
+  concat_stack_name
+  echo -e "\n"
+  echo -e "Checking the state of your cluster\n"
+  stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
+  if [[ -z "${stack_state}" ]]
+  then
+    echo -e "Your cluster $stack_name does not exist, proceeding to create it.\n"
+  elif  [[ $stack_state  == CREATE_COMPLETE ]]
+  then
+    echo -e "Your cluster $stack_name is healthy, skipping to the next step.\n"
+  elif [[ $stack_state == ROLLBACK_COMPLETE ]]
+  then
+    delete_stack
+  elif [[ $stack_state == DELETE_IN_PROGRESS ]]
+  then
+    wait_for_delete
+  elif [[ $stack_state  == CREATE_IN_PROGRESS ]]
+  then
+    wait_for_create
+  else
+    echo -e "Your cluster $stack_name is in $stack_state state. Please check the AWS console for more details.\n"
+  fi
+}
+
 create_cluster() {
   if test -f "$real_path/.cluster/$CLUSTER_NAME-$REGION.cs"; then
     echo "File $real_path/.cluster/$CLUSTER_NAME-$REGION.cs exists."
-    echo "You may want to run uninstall script first!"
+    echo -e "Please note that you cannot have two clusters with the same name in the same region.\nYou may either run the uninstall script first to remove the existing cluster, or select a different AWS region.\n"
     exit
 fi
   eksctl create cluster --name $CLUSTER_NAME --without-nodegroup --region=$REGION
@@ -113,6 +171,49 @@ managedNodeGroups:
 EOT
 }
 
+concat_ng_stack_name(){
+  temp_ng_stack_name=$CLUSTER_NAME-nodegroup
+}
+
+obtain_ng_name(){
+  concat_ng_stack_name
+  readarray -t ng_stack_name < <(aws cloudformation describe-stacks --region $REGION --query "Stacks[?contains(StackName, '$temp_ng_stack_name')].StackName" | awk -F[\"\"] '{print $2}')
+  if [[ -z "${ng_stack_name-}" ]]
+  then
+    ng_stack_name=null
+  else
+    echo -e "\n"
+  fi
+}
+
+check_ng_stack_state(){
+  obtain_ng_name
+  echo -e "Checking the state of your nodegroups\n"
+  if [[ "${ng_stack_name}" == "null" ]]
+  then
+    echo -e "No active nodegroups found in the selected region ($region), proceeding to create them.\n"
+  else
+    for stack_name in ${ng_stack_name[@]}; do
+      stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
+      if [[ $stack_state == CREATE_COMPLETE  ]]
+      then
+        echo -e "Your nodegroup $stack_name is healthy, skipping to the next step.\n"
+      elif [[ $stack_state == ROLLBACK_COMPLETE ]]
+      then
+        delete_stack
+      elif [[ $stack_state == DELETE_IN_PROGRESS ]]
+      then
+        wait_for_delete
+      elif [[ $stack_state  == CREATE_IN_PROGRESS ]]
+      then
+        wait_for_create
+      else
+        echo -e "Your nodegroup $stack_name is in $stack_state state. Please check the AWS console for more details.\n"
+      fi
+    done
+  fi
+}
+
 create_node_group(){
   eksctl create nodegroup --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
   echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
@@ -120,12 +221,30 @@ create_node_group(){
 
 ##### EFS and EBS #######
 
+check_for_efs(){
+  efs_id_temp=$(aws efs describe-file-systems --query "FileSystems[?Tags[?Key=='Name' && Value=='$CLUSTER_NAME']].FileSystemId" --region $REGION | awk -F[\"\"] '{print $2}')
+  efs_id=$(echo $efs_id_temp|tr -d '\n')
+}
+
+check_for_ebs(){
+  ebs_id_temp=$(aws ec2 describe-volumes --filters Name=tag:Name,Values=$CLUSTER_NAME --query "Volumes[*].VolumeId" --region $REGION | awk -F[\"\"] '{print $2}')
+  ebs_id=$(echo $ebs_id_temp|tr -d '\n')
+}
+
 aws_create_file_system(){
-  create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
-  echo "$create_efs"
-  efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
-  aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
-  echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+  check_for_efs
+  if [[ -z "$efs_id" ]]
+  then
+    echo -e "No EFS matching the criteria found in the selected region ($REGION), proceeding to create it.\n"
+    create_efs=$(aws efs create-file-system --tags Key=Name,Value=$CLUSTER_NAME --region $REGION)
+    echo "$create_efs"
+    efs_fs_id=$(echo $create_efs | jq -r '.FileSystemId')
+    aws efs tag-resource --resource-id $efs_fs_id --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
+    echo "efs=$efs_fs_id" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+    echo -e "EFS created with ID : $efs_fs_id\n"
+  else
+    echo "EFS already exists, skipping to the next step."
+  fi
 }
 
 aws_get_vpc_id(){
@@ -165,12 +284,20 @@ create_efs_manifest(){
 }
 
 aws_create_ebs(){
+  check_for_ebs
   concat_availability_zone
-  create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE --availability-zone $AVAILABILITY_ZONE)
-  echo "$create_ebs_volume"
-  ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
-  aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
-  echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+  if [[ -z "$ebs_id" ]]
+  then
+    echo -e "No EBS matching the criteria found in the selected region ($REGION), proceeding to create it.\n"
+    create_ebs_volume=$(aws ec2 create-volume --size $EBS_SIZE --availability-zone $AVAILABILITY_ZONE)
+    echo "$create_ebs_volume"
+    ebs_volume=$(echo $create_ebs_volume | jq -r '.VolumeId' )
+    aws ec2 create-tags --resources $ebs_volume --region $REGION --tags Key=alpha.eksctl.io/cluster-name,Value=$CLUSTER_NAME Key=Name,Value=$CLUSTER_NAME
+    echo "ebs=$ebs_volume" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+    echo -e "EBS created with this volume ID: $ebs_volume\n"
+  else
+    echo "EBS already exists, skipping to the next step."
+  fi  
 }
 
 make_persistent_volume(){  
@@ -276,22 +403,24 @@ wait_for_alb_and_instances(){
 echo_env_toml(){
   username=$(whoami)
   echo "Your 'testground/.env.toml' file needs to look like this:"
-  echo ""
+  echo -e "\n"
   echo "["aws"]"
   echo "region = \"$REGION\""
   echo "[client]"
   echo "endpoint = \"http://$ALB_ADDRESS:80\""
   echo "user = '${username}'"
-  echo ""
+  echo -e "\n"
 }
 
 log(){
   tar czf $real_path/log/$start-$CLUSTER_NAME.tar.gz $real_path/log/$start-log/
   echo "========================"
   echo "Log file generated with name $start-$CLUSTER_NAME.tar.gz"
-  echo ""
+  echo -e "\n"
   rm -rf $real_path/log/$start-log/ 
 }
+
+##### Functions below are used by the 'testground_uninstall.sh' script #######
 
 remove_efs_mp_timer(){ 
   efs_mp_state=available # setting the start value for the loop to consider
@@ -326,7 +455,7 @@ obtain_cluster_name(){
   then
     active_clusters=null
   else
-    echo ""
+    echo -e "\n"
   fi
 }
 
@@ -376,9 +505,10 @@ cleanup(){
         rm -f $real_path/.cluster/$cluster_name-$region.yaml
         cluster_deleted=true
         echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
+        echo -e "\n"
         break
       else
-        echo -e "Looks like the EFS ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
+        echo -e "Looks like the cluster ($cluster_name) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
       fi
     done
   fi
@@ -388,10 +518,10 @@ cleanup(){
     echo -e "Looks like no EBS was created in this run. The EBS variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   elif [ "$ebs" == "$ebs_id" ]
   then
-    echo "Now removing EBS: $ebs"
+    echo -e "Now removing EBS: $ebs\n"
     aws ec2 delete-volume --volume-id $ebs --region $region
     aws ec2 wait volume-deleted --volume-id $ebs --region $region
-    echo "Volume $ebs has been deleted."
+    echo -e "Volume $ebs has been deleted.\n"
     ebs_deleted=true
     echo "ebs_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
   else
