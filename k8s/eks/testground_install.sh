@@ -32,7 +32,7 @@ echo -e "========================\n"
 
 source $real_path/.env # Setting .env vars
 echo -e "Log path is $real_path/log/$start-log/cluster.log \n"
-check_stack_state &>> $real_path/log/$start-log/cluster.log
+
 if [[ "$CLUSTER_NAME" == "" ]]
  then
    echo "Your cluster name can't be empty. " 
@@ -41,7 +41,7 @@ if [[ "$CLUSTER_NAME" == "" ]]
 else
   echo "Creating cluster with name: $CLUSTER_NAME in region $REGION."
   echo "Please note, this can take up to 20 minutes to complete." 
-  create_cluster &>> $real_path/log/$start-log/cluster.log
+  check_stack_state &>> $real_path/log/$start-log/cluster.log
   echo -e "========================\n"
 fi
 
