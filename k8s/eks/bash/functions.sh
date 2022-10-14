@@ -47,10 +47,11 @@ check_stack_state(){
   concat_stack_name
   echo -e "\n"
   echo -e "Checking the state of your cluster\n"
-  stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
+  stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus" || true)
   if [[ -z "${stack_state}" ]]
   then
     echo -e "Your cluster $stack_name does not exist, proceeding to create it.\n"
+    create_cluster
   elif  [[ $stack_state  == CREATE_COMPLETE ]]
   then
     echo -e "Your cluster $stack_name is healthy, skipping to the next step.\n"
@@ -90,21 +91,21 @@ deploy_weave_cni() {
 }
 
 create_weave_networkattachmentdefinition() {
-  kubectl create -f $real_path/yaml/weave.yml
+  kubectl apply -f $real_path/yaml/weave.yml
 }
 
 deploy_cluster_role_binding() {
-  kubectl create -f $real_path/yaml/clusterrolebinding.yml
+  kubectl apply -f $real_path/yaml/clusterrolebinding.yml
 }
 
 weave_ip_tables_drop() {
-  kubectl create -f $real_path/yaml/drop-weave-cm.yml
-  kubectl create -f $real_path/yaml/drop-weave-ds.yml
+  kubectl apply -f $real_path/yaml/drop-weave-cm.yml
+  kubectl apply -f $real_path/yaml/drop-weave-ds.yml
 }
 
 multus_softlink() {
-  kubectl create -f $real_path/yaml/softlink-cm.yml
-  kubectl create -f $real_path/yaml/softlink-ds.yml
+  kubectl apply -f $real_path/yaml/softlink-cm.yml
+  kubectl apply -f $real_path/yaml/softlink-ds.yml
 }
 
 obtain_ami_id(){
@@ -114,7 +115,7 @@ obtain_ami_id(){
 make_cluster_config(){
 obtain_ami_id
 concat_availability_zone
-    cat <<EOT >> $real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
+    cat <<EOT > $real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 metadata:
@@ -191,7 +192,7 @@ check_ng_stack_state(){
   echo -e "Checking the state of your nodegroups\n"
   if [[ "${ng_stack_name}" == "null" ]]
   then
-    echo -e "No active nodegroups found in the selected region ($region), proceeding to create them.\n"
+    echo -e "No active nodegroups found in the selected region ($REGION), proceeding to create them.\n"
   else
     for stack_name in ${ng_stack_name[@]}; do
       stack_state=$(aws cloudformation describe-stacks --region $REGION --stack-name $stack_name | jq -r ".Stacks[] | .StackStatus")
@@ -317,7 +318,7 @@ helm_infra_install_redis(){
 } 
 
 tg_daemon_config_map(){
-  kubectl create -f - <<EOF
+  kubectl apply -f - <<EOF
 kind: ConfigMap
 apiVersion: v1
 metadata:

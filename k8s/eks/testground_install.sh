@@ -61,10 +61,10 @@ echo -e "========================\n"
 echo "Making multus softlink..."
 multus_softlink &>> $real_path/log/$start-log/cluster.log
 echo -e "========================\n"
+check_ng_stack_state &>> $real_path/log/$start-log/cluster.log
 echo "Creating cluster config file with name $CLUSTER_NAME.yaml"
 make_cluster_config &>> $real_path/log/$start-log/cluster.log
 echo -e "========================\n"
-check_ng_stack_state &>> $real_path/log/$start-log/cluster.log
 echo "Creating nodegroup now, this can also take some time..."
 create_node_group &>> $real_path/log/$start-log/cluster.log
 echo -e "========================\n"
@@ -103,9 +103,7 @@ echo "Now proceeding with Helm install"
 helm_infra_install_redis &>> $real_path/log/$start-log/cluster.log
 echo "Redis installed"
 echo -e "========================\n"
-echo "We will setup the testground daemon now."
-echo -e "\n"
-echo -e "\n"
+echo -e "We will setup the testground daemon now.\n"
 echo "Creating configmap..."
 tg_daemon_config_map &>> $real_path/log/$start-log/cluster.log
 echo "Creating service account..."
@@ -131,9 +129,7 @@ echo -e "\n"
 echo "Everything is up and running!"
 echo -e "========================\n"
 echo_env_toml
-echo -e "\n"
 echo "Your cluster is ready to be used."
-echo -e "\n"
 echo -e "\n"
 log
 echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME.tar.gz"
