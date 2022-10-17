@@ -405,10 +405,10 @@ echo_env_toml(){
   username=$(whoami)
   echo "Your 'testground/.env.toml' file needs to look like this:"
   echo -e "\n"
-  echo "["aws"]"
+  echo "[aws]"
   echo "region = \"$REGION\""
   echo "[client]"
-  echo "endpoint = \"http://$ALB_ADDRESS:80\""
+  echo "endpoint = 'http://$ALB_ADDRESS:80'"
   echo "user = '${username}'"
   echo -e "\n"
 }
