@@ -153,10 +153,21 @@ The script explained in short:
 ```
 kubectl config get-contexts
 
-# currently selected cluster will be mark with an asterisk (*)
+# currently selected cluster will be marked with an asterisk (*)
 # then switch contexts to the desired cluster
 
 kubectl config use-context $USERNAME@$CLUSTER_NAME.$AWS_REGION.eksctl.io
+```
+
+**_NOTE:_ kubeconfig file and losing access to the cluster** 
+
+The file that is used to configure access to clusters is called a kubeconfig file.
+After you create your Amazon EKS cluster, you must configure your kubeconfig file with the AWS Command Line Interface (AWS CLI). This configuration allows you to connect to your cluster using the kubectl command line. 
+This is being done automatically for us by eksctl (referenced a bit above).
+
+This file should not be deleted or changed, unless the user knows what they are doing. If it is deleted, you will lose access to your cluster and have to run the following in order to regain access:
+```
+aws eks --region region update-kubeconfig --name cluster_name
 ```
 
 4. Create the `.env.toml` file inside the `testground` folder and populate it (explained here as well https://github.com/testground/docs/blob/master/getting-started.md#configuration-envtoml):
