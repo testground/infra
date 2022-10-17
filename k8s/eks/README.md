@@ -380,6 +380,43 @@ The AZ will be the same for EBS/EFS/Nodegroups, and it must correspond to the se
 
 If you need to change the Availability Zone for any reason, simply update the `AZ_SUFFIX` variable in you `.env` file.
 
+## Docker image build and publish instructions
+
+The images for `testground-daemon`, `testground-sidecar`, and `testground-sync-service` are being kept on public AWS ECR repositories.
+
+Each image is tagged per the latest commit hash of the testground repository on github.
+
+In order to find the latest commit, we need to `git pull` the latest testground code:
+
+```
+git pull
+```
+
+and then:
+
+```
+git rev-parse HEAD
+```
+
+which will give us the image tag that is being used for the docker image(s).
+For example, at the time of writing this guide, images used for daemon and sidecar were called:
+
+```
+image: public.ecr.aws/n6b0k8i7/testground-daemon:80c5aca36114de067c33c8718cca95ef16db4c06
+
+image: public.ecr.aws/n6b0k8i7/testground-sidecar:80c5aca36114de067c33c8718cca95ef16db4c06
+```
+
+which would correspond to the commit from Oct 11, 2022
+
+```
+80c5aca36114de067c33c8718cca95ef16db4c06
+```
+
+Guide and info on building and publishing to AWS ECR can be found on the following link:
+
+https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html
+
 ## Additional notes
 
 When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 
@@ -392,4 +429,5 @@ https://eksctl.io/usage/vpc-cluster-access/#restricting-access-to-the-eks-kubern
 --
 
 More information on max number of pods per node:
-# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPerENI
+
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-eni.html#AvailableIpPerENI
