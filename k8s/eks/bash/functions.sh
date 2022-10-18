@@ -138,7 +138,7 @@ managedNodeGroups:
         - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-   
+
     overrideBootstrapCommand: |
       #!/bin/bash
       /etc/eks/bootstrap.sh $CLUSTER_NAME \
@@ -147,7 +147,7 @@ managedNodeGroups:
   - name: ng-2-plan
     labels:
       "testground.node.role.plan": "true"
-    instanceType: $INSTANCE_TYPE_PLAN 
+    instanceType: $INSTANCE_TYPE_PLAN
     # Amazon EKS optimized Amazon Linux 2 v1.22 built on 08 Aug 2022
     ami: $AMI_ID
     desiredCapacity: $DESIRED_CAPACITY_PLAN
@@ -162,7 +162,32 @@ managedNodeGroups:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
         - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
     preBootstrapCommands:
-      - "echo -e 'fs.file-max=3178504\nnet.core.somaxconn = 131072\nnet.netfilter.nf_conntrack_max = 1048576\nnet.core.netdev_max_backlog = 524288\nnet.core.rmem_max = 16777216\nnet.core.wmem_max = 16777216\nnet.ipv4.tcp_rmem = 16384 131072 16777216\nnet.ipv4.tcp_wmem = 16384 131072 16777216\nnet.ipv4.tcp_mem = 262144 524288 1572864\nnet.ipv4.tcp_max_syn_backlog = 131072\nnet.ipv4.ip_local_port_range = 10000 65535\nnet.ipv4.tcp_tw_reuse = 1\nnet.ipv4.ip_forward = 1\nnet.ipv4.conf.all.rp_filter = 0\nnet.ipv4.neigh.default.gc_thresh2 = 4096\nnet.ipv4.neigh.default.gc_thresh3 = 32768' >> /tmp/999-testground.conf; sudo cp /tmp/999-testground.conf /etc/sysctl.d/999-testground.conf; sudo sysctl -p /etc/sysctl.d/999-testground.conf; echo -e '*  soft  nproc  131072\n*  hard  nproc  262144\n*  soft  nofile 131072\n*  hard  nofile 262144' >> /tmp/999-limits.conf; sudo cp /tmp/999-limits.conf /etc/security/limits.d/999-limits.conf"
+      - |
+        sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
+        fs.file-max = 3178504
+        net.core.somaxconn = 131072
+        net.netfilter.nf_conntrack_max = 1048576
+        net.core.netdev_max_backlog = 524288
+        net.core.rmem_max = 16777216
+        net.core.wmem_max = 16777216
+        net.ipv4.tcp_rmem = 16384 131072 16777216
+        net.ipv4.tcp_wmem = 16384 131072 16777216
+        net.ipv4.tcp_mem = 262144 524288 1572864
+        net.ipv4.tcp_max_syn_backlog = 131072
+        net.ipv4.ip_local_port_range = 10000 65535
+        net.ipv4.tcp_tw_reuse = 1
+        net.ipv4.ip_forward = 1
+        net.ipv4.conf.all.rp_filter = 0
+        net.ipv4.neigh.default.gc_thresh2 = 4096
+        net.ipv4.neigh.default.gc_thresh3 = 32768
+        SYSCTL'
+      - |
+        sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+        *  soft  nproc  131072
+        *  hard  nproc  262144
+        *  soft  nofile 131072
+        *  hard  nofile 262144
+        LIMITS'
     # 234 is the max number of pods for c5.4xlarge
     overrideBootstrapCommand: |
       #!/bin/bash
