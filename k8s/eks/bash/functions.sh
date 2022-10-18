@@ -181,6 +181,7 @@ managedNodeGroups:
         net.ipv4.neigh.default.gc_thresh2 = 4096
         net.ipv4.neigh.default.gc_thresh3 = 32768
         SYSCTL'
+      - "sudo sysctl -p /etc/sysctl.d/999-testground.conf"
       - |
         sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
         *  soft  nproc  131072
