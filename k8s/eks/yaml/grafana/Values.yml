@@ -1,0 +1,9 @@
+sidecar:
+  dashboards:
+    enabled: true
+    label: grafana_dashboard
+    labelValue: "1"
+  datasources:
+    enabled: true
+    label: grafana_datasource
+      #labelValue: 1
