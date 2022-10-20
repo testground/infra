@@ -3,7 +3,10 @@ sidecar:
     enabled: true
     label: grafana_dashboard
     labelValue: "1"
-  datasources:
-    enabled: true
-    label: grafana_datasource
-      #labelValue: 1
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-operated.default.svc.cluster.local:9090
