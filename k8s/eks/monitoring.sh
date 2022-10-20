@@ -17,4 +17,4 @@ helm install testground-infra .
 cd $real_path/yaml/grafana
 helm repo add grafana https://grafana.github.io/helm-charts
 helm repo update
-helm install grafana grafana/grafana
+helm install grafana grafana/grafana -f $real_path/yaml/grafana/Values.yaml
