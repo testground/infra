@@ -417,6 +417,33 @@ Guide and info on building and publishing to AWS ECR can be found on the followi
 
 https://docs.aws.amazon.com/AmazonECR/latest/userguide/getting-started-cli.html
 
+## Cluster monitoring
+
+This repo provides a script called `monitoring.sh` that will install the `kube-prometheus-stack` using helm.
+
+This script will install the following:
+https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
+
+Once installed, you will be able to obtain the admin password for grafana by running the following command:
+```
+kubectl get secret --namespace default tg-monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+```
+
+You may then run the following in order to obtain the grafana pod name:
+```
+export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=tg-monitoring" -o jsonpath="{.items[0].metadata.name}")
+```
+
+Finally, you may run the following in order to port-forward and access the grafana dashboard from your laptop by opening `localhost:3000` in your browser:
+```
+kubectl --namespace default port-forward $POD_NAME 3000
+```
+
+The monitoring stack can be uninstalled by running:
+```
+helm uninstall tg-monitoring
+```
+
 ## Additional notes
 
 When you create a new cluster, Amazon EKS creates an endpoint for the managed Kubernetes API server that you use to communicate with your cluster (using Kubernetes management tools such as kubectl). 
