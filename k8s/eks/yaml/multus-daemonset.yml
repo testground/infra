@@ -173,7 +173,7 @@ spec:
           /entrypoint.sh \
             --multus-conf-file=/tmp/multus-conf/00-multus.conf
         - /usr/src/multus-cni/bin/multus-daemon
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:stable
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.2
         imagePullPolicy: IfNotPresent
         name: kube-multus
         resources:
@@ -202,7 +202,7 @@ spec:
         - cp
         - /usr/src/multus-cni/bin/multus
         - /host/opt/cni/bin/multus
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:stable
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.2
         imagePullPolicy: IfNotPresent
         name: install-multus-binary
         resources:
@@ -222,7 +222,7 @@ spec:
         - -k8s-service-port=$(KUBERNETES_SERVICE_PORT)
         command:
         - /usr/src/multus-cni/bin/generate-kubeconfig
-        image: ghcr.io/k8snetworkplumbingwg/multus-cni:stable
+        image: ghcr.io/k8snetworkplumbingwg/multus-cni:v3.9.2
         imagePullPolicy: IfNotPresent
         name: generate-kubeconfig
         resources:
