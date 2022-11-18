@@ -343,6 +343,10 @@ helm_infra_install_redis(){
   helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
 } 
 
+helm_infra_install_influx_db(){
+  helm install influxdb bitnami/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
+} 
+
 tg_daemon_config_map(){
   kubectl apply -f - <<EOF
 kind: ConfigMap
@@ -370,6 +374,7 @@ data:
     listen = "0.0.0.0:8042"
     slack_webhook_url = ""
     github_repo_status_token = ""
+    influxdb_endpoint = "http://influxdb:8086"
 
     [daemon.scheduler]
     workers = 2

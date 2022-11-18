@@ -103,6 +103,9 @@ echo "Now proceeding with Helm install"
 helm_infra_install_redis &>> $real_path/log/$start-log/cluster.log
 echo "Redis installed"
 echo -e "========================\n"
+helm_infra_install_influx_db &>> $real_path/log/$start-log/cluster.log
+echo "InfluxDB installed"
+echo -e "========================\n"
 echo -e "We will setup the testground daemon now.\n"
 echo "Creating configmap..."
 tg_daemon_config_map &>> $real_path/log/$start-log/cluster.log
