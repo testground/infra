@@ -5,11 +5,14 @@
 # It can be uninstalled by running:
 # helm install tg-monitoring prometheus-community/kube-prometheus-stack
 
+cd "$(dirname "$0")"
+real_path=$(/bin/pwd)
+
 echo -e "Now obtaining the helm charts and installing the monitoring stack. This might take a few minutes.\n"
 
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 helm repo update
-helm install tg-monitoring prometheus-community/kube-prometheus-stack
+helm install tg-monitoring prometheus-community/kube-prometheus-stack -f $real_path/monitoring/values.yml
 
 echo -e "========================"
 echo -e "You can obtain the admin password for grafana by running the following command:\n"
