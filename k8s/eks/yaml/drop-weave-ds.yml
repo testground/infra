@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: drop-weave-iptables-rule
+  name: drop-weave-iptables-rule
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      k8s-app: drop-weave-iptables-rule
+  template:
+    metadata:
+      labels:
+        k8s-app: drop-weave-iptables-rule
+    spec:
+      initContainers:
+      - image: amazonlinux
+        imagePullPolicy: Always
+        name: drop-iptables
+        command: ["/scripts/entrypoint.sh"]
+        securityContext:
+          allowPrivilegeEscalation: true
+        volumeMounts:
+        - mountPath: /tmp
+          name: output
+        - mountPath: /etc/cron.d
+          name: cron
+        - name: entrypoint
+          mountPath: /scripts
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      volumes:
+      - name: output
+        hostPath:
+          path: /tmp
+          type: Directory
+      - name: cron
+        hostPath:
+          path: /etc/cron.d
+          type: Directory
+      - name: entrypoint
+        configMap:
+          name: entrypoint
+          defaultMode: 0744
+      containers:
+        - image: "gcr.io/google-containers/pause:2.0"
+          name: pause

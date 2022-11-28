@@ -1,3 +1,7 @@
 .idea
 ebs-terraform/.terraform/
 efs-terraform/.terraform/
+###script temp files
+log
+.cluster
+.env

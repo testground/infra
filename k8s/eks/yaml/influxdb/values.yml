@@ -1,0 +1,8 @@
+auth:
+  enabled: false
+influxdb:
+  nodeSelector:
+    testground.node.role.infra: "true"
+  service:
+    type: ClusterIP
+    clusterIP: None

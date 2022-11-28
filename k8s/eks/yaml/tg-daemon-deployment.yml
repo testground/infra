@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testground-daemon
+  labels:
+    app: testground-daemon
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testground-daemon
+  template:
+    metadata:
+      labels:
+        app: testground-daemon
+    spec:
+      serviceAccountName: testground-daemon
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        testground.node.role.infra: "true"
+      containers:
+      - name: goproxy
+        image: public.ecr.aws/n6b0k8i7/testground-goproxy:2.0.2
+        ports:
+        - containerPort: 8081
+          hostPort: 8081
+        volumeMounts:
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
+          - name: efs-pvc
+            mountPath: "/go"
+        resources:
+          requests:
+            memory: 700Mi
+            cpu: 500m
+          limits:
+            memory: 1000Mi
+            cpu: 700m
+      - name: testground-daemon
+        image: public.ecr.aws/n6b0k8i7/testground-daemon:80c5aca36114de067c33c8718cca95ef16db4c06
+        imagePullPolicy: Always
+        env:
+        - name: REDIS_HOST
+          value: "testground-infra-redis-master.default.svc.cluster.local"
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 8042
+          hostPort: 8042
+        volumeMounts:
+          - name: daemon-datadir
+            mountPath: "/root/testground/"
+          - name: efs-pvc
+            mountPath: "/efs"
+          - name: dockersock
+            mountPath: "/var/run/docker.sock"
+          - name: envtoml
+            mountPath: /root/testground/.env.toml
+            subPath: .env.toml
+        resources:
+          requests:
+            memory: 2048Mi
+            cpu: 2000m
+          limits:
+            memory: 4096Mi
+            cpu: 2500m
+      volumes:
+        - name: efs-pvc
+          persistentVolumeClaim:
+            claimName: efs
+        - name: daemon-datadir
+          persistentVolumeClaim:
+            claimName: testground-daemon-datadir-pvc
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: envtoml
+          configMap:
+            name: env-toml-cfg
+
+# Notes:
+# testground (storm) tests failing when using more than 40 instances/pods; errors encountered:
+# FATAL error while reading socket {"error": "failed to read JSON message: failed to get reader: failed to read frame header: EOF"}
+# The solution was to increase hardware limits and requests for both the sidecar and the daemon
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1454
