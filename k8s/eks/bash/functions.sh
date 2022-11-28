@@ -492,11 +492,15 @@ obtain_cluster_name(){
 }
 
 cleanup(){
+  efs_deleted=false
+  ebs_deleted=false
+  cluster_deleted=false
+
   obtain_efs_id
   obtain_cluster_name
   obtain_ebs_id
   echo -e "Removal process for the selection will start\n"
-  if [[  -z "$efs" ]]
+  if [[  -z "${efs:-}" ]]
   then
     echo -e "Looks like no EFS was created in this run. The EFS variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   elif [ "$efs" == "$efs_id" ]
@@ -521,7 +525,7 @@ cleanup(){
     echo -e "Looks like the EFS ($efs) you have specified does not exist in the specified region ($region).\nIt is possible that it has already been deleted.\n"
   fi
 
-  if [[  -z "$cluster_name" ]]
+  if [[  -z "${cluster_name:-}" ]]
   then
     echo -e "Looks like no cluster was created in this run. The cluster variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   fi
@@ -545,7 +549,7 @@ cleanup(){
     done
   fi
 
-  if [[  -z "$ebs" ]]
+  if [[  -z "${ebs:-}" ]]
   then
     echo -e "Looks like no EBS was created in this run. The EBS variable is empty.\nPlease check the '.cluster/$cluster_name-$region.cs' file and try again.\n"
   elif [ "$ebs" == "$ebs_id" ]
