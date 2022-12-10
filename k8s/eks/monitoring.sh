@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # This script will install the following:
 # https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack
 #
