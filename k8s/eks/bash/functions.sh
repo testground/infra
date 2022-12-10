@@ -271,6 +271,7 @@ aws_create_file_system(){
     echo -e "EFS created with ID : $efs_fs_id\n"
   else
     echo "EFS already exists, skipping to the next step."
+    efs_fs_id=$(grep 'efs=' $real_path/.cluster/$CLUSTER_NAME-$REGION.cs | cut -d '=' -f 2)
   fi
 }
 
