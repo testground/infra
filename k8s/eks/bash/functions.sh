@@ -291,9 +291,12 @@ aws_get_sg_id(){
 }
 
 aws_create_efs_mount_point(){
-  aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+  mnt_target_id=$(aws efs describe-mount-targets --region $REGION --file-system-id $efs_fs_id | jq -r ".MountTargets[] | .MountTargetId")
+  if [[ -z "${mnt_target_id}" ]]
+  then
+    aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+  fi
   efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
-   
 }
 
 create_cm_efs(){
