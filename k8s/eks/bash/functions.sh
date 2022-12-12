@@ -325,7 +325,8 @@ aws_create_ebs(){
     echo -e "EBS created with this volume ID: $ebs_volume\n"
   else
     echo "EBS already exists, skipping to the next step."
-  fi  
+    ebs_volume=$ebs_id
+  fi
 }
 
 make_persistent_volume(){  
