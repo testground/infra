@@ -300,7 +300,9 @@ aws_create_efs_mount_point(){
 }
 
 create_cm_efs(){
-  kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+  if ! kubectl get configmap | grep --quiet efs-provisioner; then
+    kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+  fi
 }
 
 create_efs_manifest(){
