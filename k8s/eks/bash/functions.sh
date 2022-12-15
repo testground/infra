@@ -302,6 +302,8 @@ aws_create_efs_mount_point(){
 create_cm_efs(){
   if ! kubectl get configmap | grep --quiet efs-provisioner; then
     kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+  else
+    echo "EFS configmap already exists, skipping to the next step."
   fi
 }
 
@@ -345,12 +347,20 @@ helm_redis_add_repo(){
 } 
 
 helm_infra_install_redis(){
-  helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
+  if ! helm ls | grep --quiet testground-infra-redis; then
+    helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
+  else
+    echo "Helm testground-infra-redis already exists, skipping to the next step."
+  fi
 } 
 
 helm_infra_install_influx_db(){
-  helm install influxdb bitnami/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
-} 
+  if ! helm ls | grep --quiet influxdb; then
+    helm install influxdb bitnami/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
+  else
+    echo "Helm influxdb already exists, skipping to the next step."
+  fi
+}
 
 tg_daemon_config_map(){
   kubectl apply -f - <<EOF
