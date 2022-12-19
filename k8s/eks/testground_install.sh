@@ -135,4 +135,4 @@ echo_env_toml
 echo "Your cluster is ready to be used."
 echo -e "\n"
 log
-echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME.tar.gz"
+echo "Log for this build can be found on this path $real_path/log/$start-$CLUSTER_NAME.tar.gz"
