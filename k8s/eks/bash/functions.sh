@@ -420,11 +420,23 @@ tg_daemon_deployment(){
 }
 
 obtain_alb_address(){
-  ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
+  echo -n "Obtaining ALB address... "
+  ALB_ADDRESS=
+  while [[ -z "${ALB_ADDRESS}" ]]; do
+    ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
+    sleep 1
+  done
+  echo "Done"
 }
 
 obtain_alb_name(){
-  ALB_NAME=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}" | cut -d'-' -f1)
+  echo -n "Obtaining ALB name... "
+  ALB_NAME=
+  while [[ -z "${ALB_NAME}" ]]; do
+    ALB_NAME=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}" | cut -d'-' -f1)
+    sleep 1
+  done
+  echo "Done"
 }
 
 wait_for_alb_and_instances(){
