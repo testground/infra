@@ -121,6 +121,16 @@ kind: ClusterConfig
 metadata:
   name: $CLUSTER_NAME
   region: $REGION
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: ebs-csi-controller-sa
+        namespace: kube-system
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      roleName: AmazonEKS_EBS_CSI_DriverRole
+      roleOnly: true
 managedNodeGroups:
   - name: ng-1-infra
     labels:
@@ -244,6 +254,29 @@ check_ng_stack_state(){
 create_node_group(){
   eksctl create nodegroup --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml
   echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
+}
+
+create_iam_service_accounts(){
+  eksctl utils associate-iam-oidc-provider --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml --approve
+  eksctl create iamserviceaccount --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml --approve
+}
+
+install_eks_add_on(){
+  csi_driver_role_arn=$(eksctl get iamserviceaccount --cluster gossipsub | grep ebs-csi-controller-sa | cut -f 3)
+  cat <<EOT > $real_path/.cluster/$CLUSTER_NAME-$REGION-add-on.yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: $CLUSTER_NAME
+  region: $REGION
+iam:
+  withOIDC: true
+addons:
+  - name: aws-ebs-csi-driver
+    serviceAccountRoleARN: "$csi_driver_role_arn"
+EOT
+  eksctl create addon --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION-add-on.yaml
 }
 
 ##### EFS and EBS #######
@@ -551,6 +584,7 @@ cleanup(){
         echo -e "Now removing the cluster $cluster_name, this may take some time\n"
         eksctl delete cluster --name $cluster_name --region $region --wait
         rm -f $real_path/.cluster/$cluster_name-$region.yaml
+        rm -f $real_path/.cluster/$cluster_name-$region-add-on.yaml
         cluster_deleted=true
         echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
         echo -e "\n"
