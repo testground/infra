@@ -272,6 +272,14 @@ aws_create_file_system(){
   else
     echo "EFS already exists, skipping to the next step."
   fi
+
+  echo -n "Waiting for EFS to be available... "
+  efs_state=
+  while [[ "${efs_state}" != "available" ]]; do
+    sleep 1
+    efs_state=$(aws efs describe-file-systems | jq ".FileSystems[] | select(.FileSystemId==\"$efs_fs_id\") | .LifeCycleState" | tr -d \")
+  done
+  echo "Done"
 }
 
 aws_get_vpc_id(){
