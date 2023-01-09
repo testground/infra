@@ -262,7 +262,7 @@ create_iam_service_accounts(){
 }
 
 install_eks_add_on(){
-  csi_driver_role_arn=$(eksctl get iamserviceaccount --cluster gossipsub | grep ebs-csi-controller-sa | cut -f 3)
+  csi_driver_role_arn=$(eksctl get iamserviceaccount --cluster $CLUSTER_NAME | grep ebs-csi-controller-sa | cut -f 3)
   cat <<EOT > $real_path/.cluster/$CLUSTER_NAME-$REGION-add-on.yaml
 apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
