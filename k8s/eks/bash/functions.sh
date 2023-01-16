@@ -385,8 +385,12 @@ helm_infra_install_redis(){
 } 
 
 helm_infra_install_influx_db(){
-  helm install influxdb bitnami/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
-} 
+  # We are using v2.6.1 of the helm chart, which has been evicted from the regular index.yaml.
+  # Adding the archive-full-index branch to use the old version.
+  # SEE: https://github.com/bitnami/charts/issues/10833
+  helm repo add bitnami-full-index https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  helm install influxdb bitnami-full-index/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
+}
 
 tg_daemon_config_map(){
   kubectl apply -f - <<EOF
