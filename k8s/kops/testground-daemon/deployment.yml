@@ -13,6 +13,8 @@ spec:
     metadata:
       labels:
         app: testground-daemon
+      annotations:
+        configHash: "74ef22e1f47ec525283fc145915e3effa39dc900c3fc0f3ce5d9ac29d48ad494"
     spec:
       serviceAccountName: testground-daemon
       hostPID: true
@@ -21,64 +23,67 @@ spec:
       nodeSelector:
         testground.node.role.infra: "true"
       initContainers:
-      - name: iproute-add
-        image: busybox:1.31.1
-        securityContext:
-          privileged: true
-        command:
-        - sh
-        - -ac
-        - >
-          while [ "$GW" = "" ]; do export GW=$(ip route | grep cni0 | awk '{print $7}'); echo "Got GW: $GW"; sleep 5; done;
-          echo $GW &&
-          ip route &&
-          ip route add 100.64.0.0/16 via $GW &&
-          ip route || true;
+        - name: iproute-add
+          image: busybox:1.31.1
+          securityContext:
+            privileged: true
+          command:
+            - sh
+            - -ac
+            - >
+              ip route; while [ "$GW" = "" ]; do export GW=$(ip route | grep cni0 | awk '{print $7}'); echo "Got GW: $GW"; sleep 5; done; echo $GW && ip route && ip route add 100.64.0.0/16 via $GW && ip route || true;
+
       containers:
-      - name: goproxy
-        image: iptestground/goproxy:2.0.2
-        ports:
-        - containerPort: 8081
-          hostPort: 8081
-        volumeMounts:
-          - name: envtoml
-            mountPath: /root/testground/.env.toml
-            subPath: .env.toml
-          - name: efs-pvc
-            mountPath: "/go"
-        resources:
-          requests:
-            memory: 512Mi
-            cpu: 500m
-          limits:
-            memory: 512Mi
-      - name: testground-daemon
-        image: iptestground/testground:edge
-        imagePullPolicy: Always
-        env:
-        - name: REDIS_HOST
-          value: "testground-infra-redis-headless"
-        securityContext:
-          privileged: true
-        ports:
-        - containerPort: 8042
-          hostPort: 8042
-        volumeMounts:
-          - name: daemon-datadir
-            mountPath: "/root/testground/"
-          - name: efs-pvc
-            mountPath: "/efs"
-          - name: dockersock
-            mountPath: "/var/run/docker.sock"
-          - name: envtoml
-            mountPath: /root/testground/.env.toml
-            subPath: .env.toml
-        resources:
-          requests:
-            memory: 2048Mi
-            cpu: 2000m
-          limits:
-            memory: 2048Mi
+        - name: goproxy
+          image: iptestground/goproxy:2.0.2
+          command:
+            - sh
+            - ac
+            - >
+              echo "we reach this stage actually"; ./bin/goproxy -listen=0.0.0.0:8081 git -cacheDir=/tmp/test;
+
+          ports:
+            - containerPort: 8081
+              hostPort: 8081
+          volumeMounts:
+            - name: envtoml
+              mountPath: /root/testground/.env.toml
+              subPath: .env.toml
+            - name: efs-pvc
+              mountPath: "/go"
+          resources:
+            requests:
+              memory: 512Mi
+              cpu: 500m
+            limits:
+              memory: 512Mi
+        - name: testground-daemon
+          image: iptestground/testground:edge
+          imagePullPolicy: Always
+          env:
+            - name: REDIS_HOST
+              value: "testground-infra-redis-headless"
+          securityContext:
+            privileged: true
+          ports:
+            - containerPort: 8042
+              hostPort: 8042
+          volumeMounts:
+            - name: daemon-datadir
+              mountPath: "/root/testground/"
+            - name: efs-pvc
+              mountPath: "/efs"
+            - name: dockersock
+              mountPath: "/var/run/docker.sock"
+            - name: envtoml
+              mountPath: /root/testground/.env.toml
+              subPath: .env.toml
+          resources:
+            requests:
+              memory: 2048Mi
+              cpu: 2000m
+            limits:
+              memory: 2048Mi
       volumes:
         - name: efs-pvc
           persistentVolumeClaim:
