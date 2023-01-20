@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 test_start_time="$(date -u +%s)"
 # Run many testground runs, one by one, and print stats
 #

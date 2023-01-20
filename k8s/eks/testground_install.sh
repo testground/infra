@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Let's make sure to check for exit code 1, undefined variables, or masked pipeline errors; if encountered, drop the script
 set -euo pipefail
 start=$(date +"%Y-%m-%d-%T")
