@@ -332,13 +332,20 @@ aws_get_sg_id(){
 }
 
 aws_create_efs_mount_point(){
-  aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+  mnt_target_id=$(aws efs describe-mount-targets --region $REGION --file-system-id $efs_fs_id | jq -r ".MountTargets[] | .MountTargetId")
+  if [[ -z "${mnt_target_id}" ]]
+  then
+    aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
+  fi
   efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
-   
 }
 
 create_cm_efs(){
-  kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+  if ! kubectl get configmap | grep --quiet efs-provisioner; then
+    kubectl create configmap efs-provisioner --from-literal=file.system.id=$efs_fs_id --from-literal=aws.region=$REGION --from-literal=provisioner.name=testground.io/aws-efs
+  else
+    echo "EFS configmap already exists, skipping to the next step."
+  fi
 }
 
 create_efs_manifest(){
@@ -381,15 +388,23 @@ helm_redis_add_repo(){
 } 
 
 helm_infra_install_redis(){
-  helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
+  if ! helm ls | grep --quiet testground-infra-redis; then
+    helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
+  else
+    echo "Helm testground-infra-redis already exists, skipping to the next step."
+  fi
 } 
 
 helm_infra_install_influx_db(){
-  # We are using v2.6.1 of the helm chart, which has been evicted from the regular index.yaml.
-  # Adding the archive-full-index branch to use the old version.
-  # SEE: https://github.com/bitnami/charts/issues/10833
-  helm repo add bitnami-full-index https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-  helm install influxdb bitnami-full-index/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
+  if ! helm ls | grep --quiet influxdb; then
+    # We are using v2.6.1 of the helm chart, which has been evicted from the regular index.yaml.
+    # Adding the archive-full-index branch to use the old version.
+    # SEE: https://github.com/bitnami/charts/issues/10833
+    helm repo add bitnami-full-index https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+    helm install influxdb bitnami-full-index/influxdb -f $real_path/yaml/influxdb/values.yml --set image.tag=1.8.2 --set image.debug=true --version 2.6.1
+  else
+    echo "Helm influxdb already exists, skipping to the next step."
+  fi
 }
 
 tg_daemon_config_map(){
