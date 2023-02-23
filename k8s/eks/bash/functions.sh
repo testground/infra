@@ -304,6 +304,7 @@ aws_create_file_system(){
     echo -e "EFS created with ID : $efs_fs_id\n"
   else
     echo "EFS already exists, skipping to the next step."
+    efs_fs_id=$(grep 'efs=' $real_path/.cluster/$CLUSTER_NAME-$REGION.cs | cut -d '=' -f 2)
   fi
 
   echo -n "Waiting for EFS to be available... "
@@ -365,7 +366,8 @@ aws_create_ebs(){
     echo -e "EBS created with this volume ID: $ebs_volume\n"
   else
     echo "EBS already exists, skipping to the next step."
-  fi  
+    ebs_volume=$ebs_id
+  fi
 }
 
 make_persistent_volume(){  
