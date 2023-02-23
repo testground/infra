@@ -68,6 +68,12 @@ echo -e "========================\n"
 echo "Creating nodegroup now, this can also take some time..."
 create_node_group &>> $real_path/log/$start-log/cluster.log
 echo -e "========================\n"
+echo "Creating IAM service accounts..."
+create_iam_service_accounts &>> $real_path/log/$start-log/cluster.log
+echo -e "========================\n"
+echo "Installing EKS add-ons..."
+install_eks_add_on &>> $real_path/log/$start-log/cluster.log
+echo -e "========================\n"
 echo "Now configuring storage.."
 echo -e "\n"
 echo "Creating EFS (Elastic File System)..."
@@ -135,4 +141,4 @@ echo_env_toml
 echo "Your cluster is ready to be used."
 echo -e "\n"
 log
-echo "Log for this build can be found on this path $real_path/$start-$CLUSTER_NAME.tar.gz"
+echo "Log for this build can be found on this path $real_path/log/$start-$CLUSTER_NAME.tar.gz"

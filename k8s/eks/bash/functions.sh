@@ -121,6 +121,16 @@ kind: ClusterConfig
 metadata:
   name: $CLUSTER_NAME
   region: $REGION
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: ebs-csi-controller-sa
+        namespace: kube-system
+      attachPolicyARNs:
+        - "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+      roleName: AmazonEKS_EBS_CSI_DriverRole
+      roleOnly: true
 managedNodeGroups:
   - name: ng-1-infra
     labels:
@@ -246,6 +256,29 @@ create_node_group(){
   echo "node_group_created=true" >> $real_path/.cluster/$CLUSTER_NAME-$REGION.cs
 }
 
+create_iam_service_accounts(){
+  eksctl utils associate-iam-oidc-provider --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml --approve
+  eksctl create iamserviceaccount --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION.yaml --approve
+}
+
+install_eks_add_on(){
+  csi_driver_role_arn=$(eksctl get iamserviceaccount --cluster gossipsub | grep ebs-csi-controller-sa | cut -f 3)
+  cat <<EOT > $real_path/.cluster/$CLUSTER_NAME-$REGION-add-on.yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: $CLUSTER_NAME
+  region: $REGION
+iam:
+  withOIDC: true
+addons:
+  - name: aws-ebs-csi-driver
+    serviceAccountRoleARN: "$csi_driver_role_arn"
+EOT
+  eksctl create addon --config-file=$real_path/.cluster/$CLUSTER_NAME-$REGION-add-on.yaml
+}
+
 ##### EFS and EBS #######
 
 check_for_efs(){
@@ -272,6 +305,14 @@ aws_create_file_system(){
   else
     echo "EFS already exists, skipping to the next step."
   fi
+
+  echo -n "Waiting for EFS to be available... "
+  efs_state=
+  while [[ "${efs_state}" != "available" ]]; do
+    sleep 1
+    efs_state=$(aws efs describe-file-systems | jq ".FileSystems[] | select(.FileSystemId==\"$efs_fs_id\") | .LifeCycleState" | tr -d \")
+  done
+  echo "Done"
 }
 
 aws_get_vpc_id(){
@@ -435,11 +476,23 @@ tg_daemon_deployment(){
 }
 
 obtain_alb_address(){
-  ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
+  echo -n "Obtaining ALB address... "
+  ALB_ADDRESS=
+  while [[ -z "${ALB_ADDRESS}" ]]; do
+    ALB_ADDRESS=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}")
+    sleep 1
+  done
+  echo "Done"
 }
 
 obtain_alb_name(){
-  ALB_NAME=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}" | cut -d'-' -f1)
+  echo -n "Obtaining ALB name... "
+  ALB_NAME=
+  while [[ -z "${ALB_NAME}" ]]; do
+    ALB_NAME=$(kubectl get services -l app=testground-daemon -o jsonpath="{.items[0].status.loadBalancer.ingress[0].hostname}" | cut -d'-' -f1)
+    sleep 1
+  done
+  echo "Done"
 }
 
 wait_for_alb_and_instances(){
@@ -554,6 +607,7 @@ cleanup(){
         echo -e "Now removing the cluster $cluster_name, this may take some time\n"
         eksctl delete cluster --name $cluster_name --region $region --wait
         rm -f $real_path/.cluster/$cluster_name-$region.yaml
+        rm -f $real_path/.cluster/$cluster_name-$region-add-on.yaml
         cluster_deleted=true
         echo "cluster_deleted=true" >> $real_path/.cluster/$cluster_name-$region.cs
         echo -e "\n"
