@@ -6,3 +6,6 @@ influxdb:
   service:
     type: ClusterIP
     clusterIP: None
+  initdbScripts:
+    create_database.txt: |-
+      CREATE DATABASE testground;
