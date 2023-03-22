@@ -1,0 +1,24 @@
+#---
+#kind: StorageClass
+#apiVersion: storage.k8s.io/v1
+#metadata:
+#  name: aws-efs
+#provisioner: efs.csi.aws.com
+#parameters:
+#  provisioningMode: efs-ap
+#    #fileSystemId: <EFS file 
+#  directoryPerms: "700"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: efs
+    #annotations:
+    #  volume.beta.kubernetes.io/storage-class: "aws-efs"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: aws-efs
+  resources:
+    requests:
+      storage: 1000Mi

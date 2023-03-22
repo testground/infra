@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: influxdb
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: celestiaorg/influxdb
+    repoURL: ghcr.io
+    targetRevision: 2.6.1
+    helm:
+      values: |
+        image:
+          tag: 1.8.2
+          debug: true
+        releaseName: bitnami-full-index
+        auth:
+          enabled: false
+        influxdb:
+          nodeSelector:
+            testground.node.role.infra: "true"
+          service:
+            type: ClusterIP
+            clusterIP: None
+          initdbScripts:
+            create_database.txt: |-
+              CREATE DATABASE testground;
+  destination:
+    server: "https://kubernetes.default.svc"
+    namespace: default

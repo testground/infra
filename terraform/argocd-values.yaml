@@ -1,0 +1,6 @@
+# This key configures Redis-HA subchart and when enabled (redis-ha.enabled=true)
+# the custom redis deployment is omitted
+# Check the redis-ha chart for more properties
+redis-ha:
+  # -- Enables the Redis HA subchart and disables the custom Redis single node deployment
+  enabled: true

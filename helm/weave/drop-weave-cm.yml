@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: entrypoint
+  labels:
+    app: drop-weave
+data:
+  entrypoint.sh: |
+    #!/bin/bash
+    cat <<EOT >> /tmp/script.sh
+    sudo iptables -D FORWARD -o weave -j DROP &> /tmp/info.txt
+    sudo iptables -t nat -I POSTROUTING 2 -m comment --comment "AWS SNAT CHAIN" ! -o weave -j AWS-SNAT-CHAIN-0 &> /tmp/info.txt
+    sudo iptables -t nat -D POSTROUTING -m comment --comment "AWS SNAT CHAIN" -j AWS-SNAT-CHAIN-0 &> /tmp/info.txt
+    sudo rm /etc/cron.d/cron
+    EOT
+    chmod +x /tmp/script.sh
+    cat <<EOT>> /etc/cron.d/cron
+    SHELL=/bin/bash
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+    * * * * * root /tmp/script.sh
+    EOT
+
+# Notes:
+# ping between weave interfaces wasn't working; ARP resolution works, ICMP doesn't
+# The solution was to DROP the above iptables rules; easiest way to achieve this was to deploy a configmap and a daemonset that would
+# pull from this CM and execute the script
+# Issues referenced here:
+# https://github.com/testground/testground/issues/1455
+# https://github.com/testground/testground/issues/1456

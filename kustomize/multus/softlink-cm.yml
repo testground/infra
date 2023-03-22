@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: softlink-cm
+  labels:
+    app: softlink-cm
+data:
+  softlink-cm.sh: |
+    #!/bin/bash
+    cat <<EOT >> /tmp/link_script.sh
+    sudo mkdir /etc/cni/multus
+    sudo ln -s /etc/cni/net.d /etc/cni/multus/net.d
+    sudo rm /etc/cron.d/cron_link
+    EOT
+    chmod +x /tmp/link_script.sh
+    cat <<EOT>> /etc/cron.d/cron_link
+    SHELL=/bin/bash
+    PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+    * * * * * root /tmp/link_script.sh
+    EOT
+
+# Notes:
+# multus was not linking to weave; pods receiving errors like 'err in GetCNIConfigFromFile: No networks found in /etc/cni/multus/net.d>'
+# or \"weave-net\": error in getting result from DelNetwork: invalid version \"\": the version is empty"
+# The solution was to create a configmap + daemonset that will execute on the worker nodes, creating a softlink for multus configs
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1452
