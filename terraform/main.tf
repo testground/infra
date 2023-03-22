@@ -254,7 +254,16 @@ module "eks_blueprints_kubernetes_addons" {
   enable_metrics_server               = true
   enable_cluster_autoscaler           = true
   enable_aws_load_balancer_controller = true
+
   enable_argocd                       = true
+  argocd_manage_add_ons   = true
+  argocd_applications     = {
+    addons = {
+      path                = "chart"
+      repo_url            = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
+      add_on_application  = true # Indicates the root add-on application.
+    }
+  }
 
 
   argocd_helm_config = {
