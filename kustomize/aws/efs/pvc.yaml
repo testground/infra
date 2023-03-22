@@ -1,14 +1,3 @@
-#---
-#kind: StorageClass
-#apiVersion: storage.k8s.io/v1
-#metadata:
-#  name: aws-efs
-#provisioner: efs.csi.aws.com
-#parameters:
-#  provisioningMode: efs-ap
-#    #fileSystemId: <EFS file 
-#  directoryPerms: "700"
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
