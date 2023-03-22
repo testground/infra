@@ -8,10 +8,11 @@ spec:
   source:
     chart: telegraf-operator
     repoURL: https://helm.influxdata.com/
-    targetRevision: v1.3.10
+    targetRevision: 1.3.11
     helm:
       valueFiles:
       - "../helm/telegraf-operator/values.yml"
+      releaseName: telegraf-operator
   destination:
     server: "https://kubernetes.default.svc"
     namespace: default

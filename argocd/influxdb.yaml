@@ -12,6 +12,7 @@ spec:
     helm:
       valueFiles:
       - "../helm/influxdb/values.yml"
+      releaseName: influxdb
   destination:
     server: "https://kubernetes.default.svc"
     namespace: default

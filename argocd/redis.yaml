@@ -12,6 +12,7 @@ spec:
     helm:
       valueFiles:
       - "../helm/redis/values.yml"
+      releaseName: testground-infra-redis
   destination:
     server: "https://kubernetes.default.svc"
     namespace: default
