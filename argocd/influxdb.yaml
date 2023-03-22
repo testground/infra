@@ -12,9 +12,14 @@ spec:
     helm:
       valueFiles:
       - "../helm/influxdb/values.yml"
-  syncPolicy:
-    automated:
-      selfHeal: true
   destination:
     server: "https://kubernetes.default.svc"
     namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - CreateNamespace=true

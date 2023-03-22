@@ -1,14 +1,13 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: testground-daemon
+  name: ebs
 spec:
   project: default
   source:
     repoURL: https://github.com/celestiaorg/testground-infra.git
-    path: k8s/eks/yaml/tg-daemon/*
-    targetRevision: jose/hackground
+    revision: jose/hackground-k8s-tf
+    path: 'argocd'
   destination:
     name: in-cluster
     namespace: argocd
@@ -20,9 +19,3 @@ spec:
     syncOptions:
     - ApplyOutOfSyncOnly=true
     - CreateNamespace=true
-    retry:
-      limit: 2
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m0s
