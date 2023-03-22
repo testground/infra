@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: testground
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/celestiaorg/testground-infra.git
+      revision: jose/hackground-k8s-tf
+      directories:
+      - path: 'kustomize/testground/*'
+      - path: kustomize/testground/deactivated
+        exclude: true
+  template:
+    metadata:
+      name: 'testground-{{path[1]}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/celestiaorg/testground-infra.git
+        path: 'kustomize/testground/{{path[1]}}'
+      destination:
+        name: in-cluster
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          allowEmpty: true
+          selfHeal: true
+        syncOptions:
+        - ApplyOutOfSyncOnly=true
+        - CreateNamespace=true

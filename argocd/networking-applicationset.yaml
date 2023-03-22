@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: networking
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/celestiaorg/testground-infra.git
+      revision: jose/hackground-k8s-tf
+      directories:
+      - path: 'kustomize/networking/*'
+      - path: kustomize/networking/deactivated
+        exclude: true
+  template:
+    metadata:
+      name: 'networking-{{path[1]}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/celestiaorg/testground-infra.git
+        path: 'kustomize/networking/{{path[1]}}'
+      destination:
+        name: in-cluster
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          allowEmpty: true
+          selfHeal: true
+        syncOptions:
+        - ApplyOutOfSyncOnly=true
+        - CreateNamespace=true

@@ -7,7 +7,6 @@ metadata:
     app: testground-daemon
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "alpha.eksctl.io/cluster-name=celestia-testground-eks"
-    #service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "alpha.eksctl.io/cluster-name=${CLUSTER_NAME}"
 spec:
   type: LoadBalancer
   ports:
