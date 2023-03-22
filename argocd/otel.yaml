@@ -1,20 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: influxdb
-  namespace: argocd
+  name: otel
 spec:
   project: default
   source:
-    chart: celestiaorg/influxdb
-    repoURL: ghcr.io
-    targetRevision: 2.6.1
-    helm:
-      valueFiles:
-      - "../helm/influxdb/values.yml"
+    repoURL: https://github.com/celestiaorg/testground-infra.git
+    revision: jose/hackground-k8s-tf
+    path: 'kustomize/otel'
   destination:
-    server: "https://kubernetes.default.svc"
-    namespace: default
+    name: in-cluster
+    namespace: external-dns
   syncPolicy:
     automated:
       prune: true
