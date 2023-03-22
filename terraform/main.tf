@@ -257,13 +257,13 @@ module "eks_blueprints_kubernetes_addons" {
   enable_aws_load_balancer_controller = true
 
   enable_argocd         = true
-  argocd_manage_add_ons = true
+  argocd_manage_add_ons = false
   argocd_applications = {
-    addons = {
-      path               = "chart"
-      repo_url           = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
-      add_on_application = true # Indicates the root add-on application.
-    }
+    //addons = {
+    //  path               = "chart"
+    //  repo_url           = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
+    //  add_on_application = true # Indicates the root add-on application.
+    //}
 
     kustomize-apps = {
       path     = "argocd-root"
