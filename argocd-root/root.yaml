@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: otel
+  name: ebs
 spec:
   project: default
   source:
     repoURL: https://github.com/celestiaorg/testground-infra.git
     revision: jose/hackground-k8s-tf
-    path: 'kustomize/otel'
+    path: 'argocd'
   destination:
     name: in-cluster
-    namespace: default
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
