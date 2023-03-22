@@ -1,0 +1,28 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: testground-daemon
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/celestiaorg/testground-infra.git
+    path: kustomize/tg-daemon/*
+    targetRevision: jose/hackground-k8s-tf
+  destination:
+    name: in-cluster
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - CreateNamespace=true
+    retry:
+      limit: 2
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m0s
