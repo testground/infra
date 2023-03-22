@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # error log prep check
-prep_log_dir(){ 
+prep_log_dir(){
   mkdir -p $real_path/log/$start-log/
   mkdir -p $real_path/.cluster/
 }
@@ -319,7 +319,7 @@ aws_get_vpc_id(){
   vpc_id=$(aws ec2 describe-vpcs --region $REGION --filters Name=tag:Name,Values=eksctl-$CLUSTER_NAME-cluster/VPC |jq -r ".Vpcs[] | .VpcId")
 }
 
-aws_get_subnet_id(){ 
+aws_get_subnet_id(){
   aws_get_vpc_id
   concat_availability_zone
   upper_az=$(echo $AVAILABILITY_ZONE | tr '[:lower:]' '[:upper:]' |  tr -d \-)
@@ -334,7 +334,7 @@ aws_get_sg_id(){
 aws_create_efs_mount_point(){
   aws efs create-mount-target --file-system-id $efs_fs_id --subnet-id $subnet_id --security-group $efs_sg_id --region $REGION
   efs_dns=$efs_fs_id.efs.$REGION.amazonaws.com
-   
+
 }
 
 create_cm_efs(){
@@ -365,10 +365,10 @@ aws_create_ebs(){
     echo -e "EBS created with this volume ID: $ebs_volume\n"
   else
     echo "EBS already exists, skipping to the next step."
-  fi  
+  fi
 }
 
-make_persistent_volume(){  
+make_persistent_volume(){
   export TG_EBS_DATADIR_VOLUME_ID=$ebs_volume
 
   EBS_PV=$(mktemp)
@@ -378,11 +378,11 @@ make_persistent_volume(){
 
 helm_redis_add_repo(){
   helm repo add bitnami https://charts.bitnami.com/bitnami
-} 
+}
 
 helm_infra_install_redis(){
   helm install testground-infra-redis --set auth.enabled=false --set master.nodeSelector='testground.node.role.infra: "true"' bitnami/redis
-} 
+}
 
 helm_infra_install_influx_db(){
   # We are using v2.6.1 of the helm chart, which has been evicted from the regular index.yaml.
@@ -402,7 +402,7 @@ metadata:
 data:
   .env.toml: |
     ["aws"]
-    region = "$REGION"   
+    region = "$REGION"
 
     [runners."cluster:k8s"]
     run_timeout_min             = 15
@@ -506,26 +506,26 @@ log(){
   echo "========================"
   echo "Log file generated with name $start-$CLUSTER_NAME.tar.gz"
   echo -e "\n"
-  rm -rf $real_path/log/$start-log/ 
+  rm -rf $real_path/log/$start-log/
 }
 
 ##### Functions below are used by the 'testground_uninstall.sh' script #######
 
-remove_efs_mp_timer(){ 
+remove_efs_mp_timer(){
   efs_mp_state=available # setting the start value for the loop to consider
   sleep 15
-  while [[ $efs_mp_state  == available ]];do 
+  while [[ $efs_mp_state  == available ]];do
     efs_mp_state=$(aws efs describe-mount-targets --file-system-id $efs --region $region | jq -r ".MountTargets[] | .LifeCycleState")
     sleep 1
-    done 
+    done
 }
 
-remove_efs_fs_timer(){ 
+remove_efs_fs_timer(){
   efs_fs_state=available # setting the start value for the loop to consider
-  while [[ $efs_fs_state  == available ]];do 
+  while [[ $efs_fs_state  == available ]];do
     efs_fs_state=$(aws efs describe-file-systems --region $region --file-system-id $efs | jq -r ".FileSystems[] | .LifeCycleState")
     sleep 1
-    done 
+    done
 }
 
 obtain_efs_id(){
@@ -621,7 +621,7 @@ cleanup(){
   else
     echo -e "Looks like the EBS you have specified ($ebs) does not exist in the selected region ($region).\nIt is possible that it has already been deleted.\n"
   fi
-  
+
   if [ "$efs_deleted" == "true" ] && [ "$ebs_deleted" == "true" ] && [ "$cluster_deleted" == "true" ]
   then
     rm -f $real_path/.cluster/$cluster_name-$region.cs
