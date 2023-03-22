@@ -115,7 +115,7 @@ module "eks_blueprints" {
       max_size     = 80
       min_size     = 3
       desired_size = 3
-  
+
      create_launch_template = true
      kubelet_extra_args     = "--use-max-pods=false --max-pods=58"
      //bootstrap_extra_args   = ""
@@ -269,7 +269,11 @@ module "eks_blueprints_kubernetes_addons" {
   argocd_helm_config = {
     values = [templatefile("${path.module}/argocd-values.yaml", {})]
   }
-}
+  kustomize_apps = {
+    path                = "argocd"
+    repo_url            = "https://github.com/celestiaorg/testground-infra.git"
+    type                = "kustomize"
+  }
 
 // https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket
 resource "aws_s3_bucket" "bucket" {

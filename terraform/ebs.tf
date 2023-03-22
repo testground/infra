@@ -1,22 +1,22 @@
-# EBS for Testground daemon datadir
-//resource "aws_ebs_volume" "testground-daemon-datadir" {
-//  availability_zone = module.vpc.azs[0]
-//  size = 10
-//  type = "gp3"
-//
-//  tags = {
-//    "project": "testground"
-//  }
-//}
-//
-//resource "kubernetes_secret" "tg-daemon-datadir-pv" {
-//  metadata {
-//    name = "testground-daemon-datadir-pv"
-//  }
-//
-//  data = {
-//    volumeID = "${aws_ebs_volume.testground-daemon-datadir.id}"
-//  }
-//
-//  type = "kubernetes.io/generic"
-//}
+resource "kubernetes_storage_class_v1" "ebs" {
+  metadata {
+    name = "gp2-retain"
+  }
+
+  storage_provisioner = "kubernetes.io/aws-ebs"
+  parameters = {
+    type = "gp2"
+  }
+
+  reclaim_policy = "Retain"
+
+  mount_options = [
+    "debug"
+  ]
+
+  volume_binding_mode = "Immediate"
+
+  depends_on = [
+    module.eks_blueprints_kubernetes_addons
+  ]
+}

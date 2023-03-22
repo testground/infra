@@ -1,3 +1,7 @@
+image:
+  tag: 1.8.2
+  debug: true
+releaseName: bitnami-full-index
 auth:
   enabled: false
 influxdb:
