@@ -59,7 +59,7 @@ module "vpc" {
 ################################################################################
 
 module "eks_blueprints" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.25.0"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.26.0"
 
   # EKS CLUSTER
   cluster_name       = "${local.project_name}-${local.environment}-eks"
@@ -263,17 +263,18 @@ module "eks_blueprints_kubernetes_addons" {
       repo_url            = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
       add_on_application  = true # Indicates the root add-on application.
     }
-  }
 
-
-  argocd_helm_config = {
-    values = [templatefile("${path.module}/argocd-values.yaml", {})]
-  }
   kustomize_apps = {
     path                = "argocd"
     repo_url            = "https://github.com/celestiaorg/testground-infra.git"
     type                = "kustomize"
   }
+  }
+
+  argocd_helm_config = {
+    values = [templatefile("${path.module}/argocd-values.yaml", {})]
+  }
+}
 
 // https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket
 resource "aws_s3_bucket" "bucket" {
