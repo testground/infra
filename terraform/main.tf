@@ -105,7 +105,7 @@ module "eks_blueprints" {
       subnet_ids      = module.vpc.private_subnets
       capacity_type   = "ON_DEMAND"
       disk_size       = 30
-      k8s_labels      = {
+      k8s_labels = {
         "testground.node.role.infra" = "true"
       }
       //remote_access = true
@@ -116,9 +116,9 @@ module "eks_blueprints" {
       min_size     = 3
       desired_size = 3
 
-     create_launch_template = true
-     kubelet_extra_args     = "--use-max-pods=false --max-pods=58"
-     //bootstrap_extra_args   = ""
+      create_launch_template = true
+      kubelet_extra_args     = "--use-max-pods=false --max-pods=58"
+      //bootstrap_extra_args   = ""
       //pre_userdata = <<-EOT
       //sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
       //fs.file-max = 3178504
@@ -147,13 +147,13 @@ module "eks_blueprints" {
       //LIMITS'
       //EOT
 
-//      iam:
-// attachPolicyARNs:
-// - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
-// - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-// - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-// - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-// - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      //      iam:
+      // attachPolicyARNs:
+      // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+      // - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+      // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+      // - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      // - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
     },
     ng-2-plan = {
       node_group_name = "ng-2-plan"
@@ -161,7 +161,7 @@ module "eks_blueprints" {
       subnet_ids      = module.vpc.private_subnets
       capacity_type   = "ON_DEMAND"
       disk_size       = 30
-      k8s_labels      = {
+      k8s_labels = {
         "testground.node.role.plan" = "true"
       }
 
@@ -207,13 +207,13 @@ module "eks_blueprints" {
       //EOT
     }
 
-//      iam:
-// attachPolicyARNs:
-// - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
-// - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-// - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-// - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-// - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+    //      iam:
+    // attachPolicyARNs:
+    // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
+    // - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+    // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+    // - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+    // - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
 
   }
 
@@ -244,8 +244,9 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
   # EKS Addons
-  enable_amazon_eks_vpc_cni            = true
-  enable_amazon_eks_coredns            = true
+  enable_amazon_eks_vpc_cni = true
+  enable_amazon_eks_coredns = true
+  //enable_self_managed_coredns = true
   enable_amazon_eks_kube_proxy         = true
   enable_amazon_eks_aws_ebs_csi_driver = true
   enable_aws_efs_csi_driver            = true
@@ -255,20 +256,20 @@ module "eks_blueprints_kubernetes_addons" {
   enable_cluster_autoscaler           = true
   enable_aws_load_balancer_controller = true
 
-  enable_argocd                       = true
-  argocd_manage_add_ons   = true
-  argocd_applications     = {
+  enable_argocd         = true
+  argocd_manage_add_ons = true
+  argocd_applications = {
     addons = {
-      path                = "chart"
-      repo_url            = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
-      add_on_application  = true # Indicates the root add-on application.
+      path               = "chart"
+      repo_url           = "https://github.com/aws-samples/eks-blueprints-add-ons.git"
+      add_on_application = true # Indicates the root add-on application.
     }
 
-  kustomize-apps = {
-    path                = "argocd-root"
-    repo_url            = "https://github.com/celestiaorg/testground-infra.git"
-    type                = "kustomize"
-  }
+    kustomize-apps = {
+      path     = "argocd-root"
+      repo_url = "https://github.com/celestiaorg/testground-infra.git"
+      type     = "kustomize"
+    }
   }
 
   argocd_helm_config = {
