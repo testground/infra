@@ -1,17 +1,18 @@
 locals {
   region       = "eu-west-1"
-  project_name = "celestia"
-  environment  = "testground"
+  project_name = "celestia-1"
+  environment  = "tg"
   vpc_cidr     = "10.1"
+  azs = ["${local.region}a", "${local.region}b"]
 }
 
-################################################################################
-# Import sysrex KeyPair
-################################################################################
-resource "aws_key_pair" "sysrex" {
-  key_name   = "sysrex"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClLZmoDMTa1Rnd2XcFs5UUb7EGr6vBj2aYUZLM0IiTVHdFzEz2sZBnRpP2SvnN0FuD3dSN36TRZnB1W9yoWwFU5qfg59bwnfC5EaEVLLcg5cmH0bd3FMC3TA1431jlrnRFvdl2f1vQQAA9Ja7kjCBGv+3yA7gof4ZSAROIYompv/3Cpnm++ega8y5Tds9UqnNZY+vganv/91vbO3xim4hfiTCPNfuqgL1Zr6bV4jxBeQrofpg9jISmRE8jXqIh0xt47FKv7aRq6IGOlS1Rzzwma6+uFXobR2gbRxaYp8n8tNsWFRke/5TLJuldiMRXfA8nDrJNVllBk+zyMNOKSHOh alex@sysrex.com"
-}
+//################################################################################
+//# Import sysrex KeyPair
+//################################################################################
+//resource "aws_key_pair" "sysrex" {
+//  key_name   = "sysrex"
+//  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQClLZmoDMTa1Rnd2XcFs5UUb7EGr6vBj2aYUZLM0IiTVHdFzEz2sZBnRpP2SvnN0FuD3dSN36TRZnB1W9yoWwFU5qfg59bwnfC5EaEVLLcg5cmH0bd3FMC3TA1431jlrnRFvdl2f1vQQAA9Ja7kjCBGv+3yA7gof4ZSAROIYompv/3Cpnm++ega8y5Tds9UqnNZY+vganv/91vbO3xim4hfiTCPNfuqgL1Zr6bV4jxBeQrofpg9jISmRE8jXqIh0xt47FKv7aRq6IGOlS1Rzzwma6+uFXobR2gbRxaYp8n8tNsWFRke/5TLJuldiMRXfA8nDrJNVllBk+zyMNOKSHOh alex@sysrex.com"
+//}
 
 ################################################################################
 # VPC Module
@@ -23,17 +24,17 @@ module "vpc" {
   name = "${local.project_name}-${local.environment}"
   cidr = "${local.vpc_cidr}.0.0/16"
 
-  azs = ["${local.region}a"]
   //azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  azs = "${local.azs}"
 
   //private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
   //intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20", "${local.vpc_cidr}.80.0/20"]
   //public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20", "${local.vpc_cidr}.128.0/20"]
 
   // TODO: check this in future, could be the issue about networking :/
-  private_subnets = ["${local.vpc_cidr}.0.0/20"]
-  intra_subnets   = ["${local.vpc_cidr}.48.0/20"]
-  public_subnets  = ["${local.vpc_cidr}.96.0/20"]
+  private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20"]
+  intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20"]
+  public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20"]
 
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
@@ -43,7 +44,7 @@ module "vpc" {
 
   tags = {
     Terraform   = "true"
-    Createdby   = "sysrex"
+    Createdby   = "Terraform"
     Environment = "${local.environment}"
   }
 
@@ -74,10 +75,9 @@ module "eks_blueprints" {
   public_subnet_ids  = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
 
+
   cluster_endpoint_private_access = "true"
   cluster_endpoint_public_access  = "true"
-
-
 
   # List of map_users
   map_users = [
@@ -236,7 +236,7 @@ module "eks_blueprints" {
 
   tags = {
     Terraform   = "true"
-    Createdby   = "sysrex"
+    Createdby   = "Terraform"
     Environment = "${local.environment}"
   }
 }
