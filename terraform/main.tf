@@ -274,7 +274,7 @@ module "eks_blueprints_kubernetes_addons" {
     kustomize-apps = {
       path     = "argocd-root"
       repo_url = "https://github.com/celestiaorg/testground-infra.git"
-      type     = "kustomize"
+      type     = "manifests"
     }
   }
 
