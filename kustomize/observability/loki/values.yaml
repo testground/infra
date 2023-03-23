@@ -1,0 +1,30 @@
+backend:
+  replicas: 0
+write:
+  replicas: 0
+read:
+  replicas: 0
+loki:
+  auth_enabled: false
+  limits_config:
+    split_queries_by_interval: 24h
+  query_scheduler:
+    max_outstanding_requests_per_tenant: 4096
+  commonConfig:
+    replication_factor: 1
+  storage:
+    type: 'filesystem'
+  rulerConfig:
+    storage:
+      type: local
+  query_range:
+    align_queries_with_step: true
+    split_queries_by_interval: 0 # 720h # 30d
+    parallelise_shardable_queries: false
+  querier:
+    max_concurrent: 2048
+  frontend:
+    max_outstanding_per_tenant: 4096
+    compress_responses: true
+global:
+  dnsService: "coredns"
