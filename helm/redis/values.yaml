@@ -1,4 +1,0 @@
-auth:
-  enabled: false
-master:
-  nodeSelector: 'testground.node.role.infra: "true"'
