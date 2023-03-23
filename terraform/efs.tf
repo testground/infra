@@ -1,7 +1,7 @@
 # EFS for Testground outputs
 locals {
-  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
-
+ // azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  azs = ["${local.region}a"]
   name = "${local.project_name}-${local.environment}"
 }
 

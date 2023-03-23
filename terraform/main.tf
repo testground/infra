@@ -23,11 +23,17 @@ module "vpc" {
   name = "${local.project_name}-${local.environment}"
   cidr = "${local.vpc_cidr}.0.0/16"
 
-  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  azs = ["${local.region}a"]
+  //azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
 
-  private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
-  intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20", "${local.vpc_cidr}.80.0/20"]
-  public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20", "${local.vpc_cidr}.128.0/20"]
+  //private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
+  //intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20", "${local.vpc_cidr}.80.0/20"]
+  //public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20", "${local.vpc_cidr}.128.0/20"]
+
+  // TODO: check this in future, could be the issue about networking :/
+  private_subnets = ["${local.vpc_cidr}.0.0/20"]
+  intra_subnets   = ["${local.vpc_cidr}.48.0/20"]
+  public_subnets  = ["${local.vpc_cidr}.96.0/20"]
 
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
@@ -257,7 +263,7 @@ module "eks_blueprints_kubernetes_addons" {
   enable_aws_load_balancer_controller = true
 
   enable_argocd         = true
-  argocd_manage_add_ons = true
+  argocd_manage_add_ons = false
   argocd_applications = {
     addons = {
       path               = "chart"
