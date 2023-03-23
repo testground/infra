@@ -1,9 +1,9 @@
 locals {
   region       = "eu-west-1"
-  project_name = "celestia-1"
+  project_name = "celestia-3"
   environment  = "tg"
   vpc_cidr     = "10.1"
-  azs = ["${local.region}a", "${local.region}b"]
+  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
 }
 
 //################################################################################
@@ -27,14 +27,18 @@ module "vpc" {
   //azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
   azs = "${local.azs}"
 
+  // TODO: check this in future, could be the issue about networking :/
+  private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
+  intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20", "${local.vpc_cidr}.80.0/20"]
+  public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20", "${local.vpc_cidr}.128.0/20"]
+
   //private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
   //intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20", "${local.vpc_cidr}.80.0/20"]
   //public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20", "${local.vpc_cidr}.128.0/20"]
 
-  // TODO: check this in future, could be the issue about networking :/
-  private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20"]
-  intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20"]
-  public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20"]
+  # private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20"]
+  # intra_subnets   = ["${local.vpc_cidr}.48.0/20", "${local.vpc_cidr}.64.0/20"]
+  # public_subnets  = ["${local.vpc_cidr}.96.0/20", "${local.vpc_cidr}.112.0/20"]
 
   enable_dns_hostnames   = true
   enable_nat_gateway     = true
@@ -66,7 +70,7 @@ module "vpc" {
 ################################################################################
 
 module "eks_blueprints" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.26.0"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.25.0"
 
   # EKS CLUSTER
   cluster_name       = "${local.project_name}-${local.environment}-eks"
