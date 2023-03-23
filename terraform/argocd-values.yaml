@@ -4,3 +4,6 @@
 redis-ha:
   # -- Enables the Redis HA subchart and disables the custom Redis single node deployment
   enabled: true
+configs:
+  cm:
+    kustomize.buildOptions: --enable-helm
