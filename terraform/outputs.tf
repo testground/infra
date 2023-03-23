@@ -102,6 +102,12 @@ output "public_subnets" {
   value       = module.vpc.public_subnets
 }
 
+// testing purpose
+output "public_subnets_first" {
+  description = "first public subnet id"
+  value = element(module.vpc.public_subnets, 0)
+}
+
 output "public_subnet_arns" {
   description = "List of ARNs of public subnets"
   value       = module.vpc.public_subnet_arns

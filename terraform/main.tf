@@ -1,6 +1,9 @@
+//################################################################################
+//# Locals
+//################################################################################
 locals {
   region       = "eu-west-1"
-  project_name = "celestia-3"
+  project_name = "devops-2"
   environment  = "tg"
   vpc_cidr     = "10.1"
   azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
@@ -17,7 +20,6 @@ locals {
 ################################################################################
 # VPC Module
 ################################################################################
-
 module "vpc" {
   source = "github.com/terraform-aws-modules/terraform-aws-vpc?ref=v3.19.0"
 
@@ -25,7 +27,7 @@ module "vpc" {
   cidr = "${local.vpc_cidr}.0.0/16"
 
   //azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
-  azs = "${local.azs}"
+  azs = local.azs
 
   // TODO: check this in future, could be the issue about networking :/
   private_subnets = ["${local.vpc_cidr}.0.0/20", "${local.vpc_cidr}.16.0/20", "${local.vpc_cidr}.32.0/20"]
@@ -44,7 +46,7 @@ module "vpc" {
   enable_nat_gateway     = true
   single_nat_gateway     = true
   one_nat_gateway_per_az = false
-
+  //one_nat_gateway_per_az = false
 
   tags = {
     Terraform   = "true"
@@ -58,6 +60,7 @@ module "vpc" {
 
   public_subnet_tags = {
     "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/${local.project_name}-${local.environment}" = "shared"
   }
 
   private_subnet_tags = {
@@ -68,7 +71,6 @@ module "vpc" {
 ################################################################################
 # EKS Cluster - Blueprints Module
 ################################################################################
-
 module "eks_blueprints" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints?ref=v4.25.0"
 
@@ -79,9 +81,46 @@ module "eks_blueprints" {
   public_subnet_ids  = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
 
+  cluster_endpoint_private_access = true
+  cluster_endpoint_public_access  = true
 
-  cluster_endpoint_private_access = "true"
-  cluster_endpoint_public_access  = "true"
+  // TODO: want to test
+  // enable_irsa                     = true
+
+
+  // https://github.com/aws-ia/terraform-aws-eks-blueprints/issues/619
+  node_security_group_additional_rules = {
+    # Extend node-to-node security group rules. Recommended and required for the Add-ons
+    ingress_self_all = {
+      description = "Node to node all ports/protocols"
+      protocol    = "-1"
+      from_port   = 0
+      to_port     = 0
+      type        = "ingress"
+      self        = true
+    }
+    # Recommended outbound traffic for Node groups
+    egress_all = {
+      description      = "Node all egress"
+      protocol         = "-1"
+      from_port        = 0
+      to_port          = 0
+      type             = "egress"
+      cidr_blocks      = ["0.0.0.0/0"]
+      ipv6_cidr_blocks = ["::/0"]
+    }
+    # Allows Control Plane Nodes to talk to Worker nodes on all ports. Added this to simplify the example and further avoid issues with Add-ons communication with Control plane.
+    # This can be restricted further to specific port based on the requirement for each Add-on e.g., metrics-server 4443, spark-operator 8080, karpenter 8443 etc.
+    # Change this according to your security requirements if needed
+    ingress_cluster_to_node_all_traffic = {
+      description              = "Cluster API to Nodegroup all traffic"
+      protocol                 = "-1"
+      from_port                = 0
+      to_port                  = 0
+      type                     = "ingress"
+      source_security_group_id = module.eks_blueprints.cluster_security_group_id
+    }
+  }
 
   # List of map_users
   map_users = [
@@ -112,6 +151,12 @@ module "eks_blueprints" {
     ng-1-infra = {
       node_group_name = "ng-1-infra"
       instance_types  = ["c5a.xlarge"]
+      // TODO: FIXME PLEASE!
+      // we are hardcoding the first element of the list in order to use ONLY
+      // the first az in the nodes
+      //subnet_ids      = split(",", module.vpc.public_subnets[0])
+      //subnets_id = element(module.vpc.public_subnets, 0)
+      //subnets_id = "subnet-0315baa5c81ff7d10"
       subnet_ids      = module.vpc.private_subnets
       capacity_type   = "ON_DEMAND"
       disk_size       = 30
@@ -168,6 +213,13 @@ module "eks_blueprints" {
     ng-2-plan = {
       node_group_name = "ng-2-plan"
       instance_types  = ["c5a.2xlarge"]
+      // TODO: FIXME PLEASE!
+      // we are hardcoding the first element of the list in order to use ONLY
+      // the first az in the nodes
+      //subnet_ids      = module.vpc.public_subnets[0].id
+      //subnets_id = element(module.vpc.public_subnets, 0)
+      //subnets_id = "subnet-0315baa5c81ff7d10"
+      //azs = slice(data.aws_availability_zones.available.names, 0, local.selected_azs)
       subnet_ids      = module.vpc.private_subnets
       capacity_type   = "ON_DEMAND"
       disk_size       = 30
@@ -245,6 +297,40 @@ module "eks_blueprints" {
   }
 }
 
+################################################################################
+# SG
+################################################################################
+ resource "aws_security_group_rule" "allow_node_sg_to_cluster_sg" {
+  description = "Self-Node Group to Cluster API/MNG all traffic"
+
+  source_security_group_id = module.eks_blueprints.worker_node_security_group_id
+  security_group_id        = module.eks_blueprints.cluster_primary_security_group_id
+  type                     = "ingress"
+  protocol                 = "-1"
+  from_port                = 0
+  to_port                  = 0
+
+  depends_on = [
+    module.eks_blueprints
+  ]
+}
+
+resource "aws_security_group_rule" "allow_node_sg_from_cluster_sg" {
+  description = "Cluster API/MNG to Self-Nodegroup all traffic"
+  source_security_group_id = module.eks_blueprints.cluster_primary_security_group_id
+  security_group_id        = module.eks_blueprints.worker_node_security_group_id
+  type                     = "ingress"
+  protocol                 = "-1"
+  from_port                = 0
+  to_port                  = 0
+
+  depends_on = [
+    module.eks_blueprints
+  ]
+}
+################################################################################
+# EKS Addons
+################################################################################
 module "eks_blueprints_kubernetes_addons" {
   source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.17.0"
 
@@ -254,9 +340,8 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
   # EKS Addons
-  enable_amazon_eks_vpc_cni = true
+  enable_amazon_eks_vpc_cni = false
   enable_amazon_eks_coredns = true
-  //enable_self_managed_coredns = true
   enable_amazon_eks_kube_proxy         = true
   enable_amazon_eks_aws_ebs_csi_driver = true
   enable_aws_efs_csi_driver            = true
@@ -266,8 +351,8 @@ module "eks_blueprints_kubernetes_addons" {
   enable_cluster_autoscaler           = true
   enable_aws_load_balancer_controller = true
 
-  enable_argocd         = true
   argocd_manage_add_ons = false
+  enable_argocd         = true
   argocd_applications = {
     addons = {
       path               = "chart"
@@ -287,6 +372,9 @@ module "eks_blueprints_kubernetes_addons" {
   }
 }
 
+################################################################################
+# S3
+################################################################################
 // https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/s3_bucket
 resource "aws_s3_bucket" "bucket" {
   bucket = "${local.project_name}-${local.environment}"

@@ -3,7 +3,7 @@ terraform {
 
   backend "s3" {
     bucket = "testground-terraform-state"
-    key    = "celestia-3-tg"
+    key    = "devops-2-tg"
     region = "eu-west-1"
   }
 }
