@@ -2,23 +2,25 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: observability
+  namespace: argocd
 spec:
   generators:
   - git:
       repoURL: https://github.com/celestiaorg/testground-infra.git
       revision: jose/hackground-k8s-tf
       directories:
-      - path: 'kustomize/observability/*'
-      - path: kustomize/observability/deactivated
+      - path: 'manifests/observability/*'
+      - path: manifests/observability/deactivated
         exclude: true
   template:
     metadata:
-      name: 'observability-{{path[1]}}'
+      name: 'observability-{{path[2]}}'
     spec:
       project: default
       source:
         repoURL: https://github.com/celestiaorg/testground-infra.git
-        path: 'kustomize/observability/{{path[1]}}'
+        path: 'manifests/observability/{{path[2]}}'
+        targetRevision: jose/hackground-k8s-tf
       destination:
         name: in-cluster
         namespace: default

@@ -1,11 +1,13 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: argocd
+
 resources:
 - aws-applicationset.yaml
-- kustomization.yaml
 - observability-applicationset.yaml
 - testground-applicationset.yaml
-- influxdb.yaml
 - networking-applicationset.yaml
-- telegraf-operator.yaml
+  #- telegraf-operator.yaml
+  #- kustomization.yaml
+  #- influxdb.yaml
