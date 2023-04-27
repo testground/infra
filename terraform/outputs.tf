@@ -105,7 +105,7 @@ output "public_subnets" {
 // testing purpose
 output "public_subnets_first" {
   description = "first public subnet id"
-  value = element(module.vpc.public_subnets, 0)
+  value       = element(module.vpc.public_subnets, 0)
 }
 
 output "public_subnet_arns" {

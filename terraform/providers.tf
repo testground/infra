@@ -1,11 +1,5 @@
 terraform {
   required_version = ">= 0.13.1"
-
-  backend "s3" {
-    bucket = "testground-terraform-state"
-    key    = "devops-2-tg"
-    region = "eu-west-1"
-  }
 }
 
 provider "aws" {

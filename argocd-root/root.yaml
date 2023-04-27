@@ -6,8 +6,8 @@ spec:
   project: default
   source:
     repoURL: https://github.com/celestiaorg/testground-infra.git
-    revision: jose/hackground-k8s-tf
     path: 'argocd'
+    targetRevision: jose/hackground-k8s-tf
   destination:
     name: in-cluster
     namespace: argocd
