@@ -1,3 +1,4 @@
+# We generate this ArgoCD application with Terraform, but we keep it here as a workaround
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -7,7 +8,6 @@ spec:
   source:
     repoURL: https://github.com/celestiaorg/testground-infra.git
     path: 'argocd'
-    targetRevision: jose/hackground-k8s-tf
   destination:
     name: in-cluster
     namespace: argocd
