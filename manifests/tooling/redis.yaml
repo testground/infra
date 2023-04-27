@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+helmCharts:
+- name: testground-infra-redis
+  releaseName: redtestground-infra-redisis
+  repo: https://charts.bitnami.com/bitnami
+  version: "17.10.1"
+  namespace: cert-manager
+  valuesInline:
+    global:
+      auth:
+        enabled: false
+      master:
+        nodeSelector:
+          'testground.node.role.infra="true"'
