@@ -6,7 +6,7 @@ locals {
   project_name = "devops-2"
   environment  = "tg"
   vpc_cidr     = "10.1"
-  azs = ["${local.region}a", "${local.region}b", "${local.region}c"]
+  azs          = ["${local.region}a", "${local.region}b", "${local.region}c"]
 }
 
 ################################################################################
@@ -43,7 +43,7 @@ module "vpc" {
   }
 
   public_subnet_tags = {
-    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/role/elb"                                           = "1"
     "kubernetes.io/cluster/${local.project_name}-${local.environment}" = "shared"
   }
 
@@ -140,9 +140,9 @@ module "eks_blueprints" {
       //subnet_ids      = split(",", module.vpc.public_subnets[0])
       //subnets_id = element(module.vpc.public_subnets, 0)
       //subnets_id = "subnet-0315baa5c81ff7d10"
-      subnet_ids      = module.vpc.private_subnets
-      capacity_type   = "ON_DEMAND"
-      disk_size       = 30
+      subnet_ids    = module.vpc.private_subnets
+      capacity_type = "ON_DEMAND"
+      disk_size     = 30
       k8s_labels = {
         "testground.node.role.infra" = "true"
       }
@@ -203,9 +203,9 @@ module "eks_blueprints" {
       //subnets_id = element(module.vpc.public_subnets, 0)
       //subnets_id = "subnet-0315baa5c81ff7d10"
       //azs = slice(data.aws_availability_zones.available.names, 0, local.selected_azs)
-      subnet_ids      = module.vpc.private_subnets
-      capacity_type   = "ON_DEMAND"
-      disk_size       = 30
+      subnet_ids    = module.vpc.private_subnets
+      capacity_type = "ON_DEMAND"
+      disk_size     = 30
       k8s_labels = {
         "testground.node.role.plan" = "true"
       }
@@ -283,7 +283,7 @@ module "eks_blueprints" {
 ################################################################################
 # SG
 ################################################################################
- resource "aws_security_group_rule" "allow_node_sg_to_cluster_sg" {
+resource "aws_security_group_rule" "allow_node_sg_to_cluster_sg" {
   description = "Self-Node Group to Cluster API/MNG all traffic"
 
   source_security_group_id = module.eks_blueprints.worker_node_security_group_id
@@ -299,7 +299,7 @@ module "eks_blueprints" {
 }
 
 resource "aws_security_group_rule" "allow_node_sg_from_cluster_sg" {
-  description = "Cluster API/MNG to Self-Nodegroup all traffic"
+  description              = "Cluster API/MNG to Self-Nodegroup all traffic"
   source_security_group_id = module.eks_blueprints.cluster_primary_security_group_id
   security_group_id        = module.eks_blueprints.worker_node_security_group_id
   type                     = "ingress"
@@ -315,7 +315,7 @@ resource "aws_security_group_rule" "allow_node_sg_from_cluster_sg" {
 # EKS Addons
 ################################################################################
 module "eks_blueprints_kubernetes_addons" {
-  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.17.0"
+  source = "github.com/aws-ia/terraform-aws-eks-blueprints//modules/kubernetes-addons?ref=v4.29.0"
 
   eks_cluster_id       = module.eks_blueprints.eks_cluster_id
   eks_cluster_endpoint = module.eks_blueprints.eks_cluster_endpoint
@@ -323,8 +323,8 @@ module "eks_blueprints_kubernetes_addons" {
   eks_cluster_version  = module.eks_blueprints.eks_cluster_version
 
   # EKS Addons
-  enable_amazon_eks_vpc_cni = true
-  enable_amazon_eks_coredns = true
+  enable_amazon_eks_vpc_cni            = true
+  enable_amazon_eks_coredns            = true
   enable_amazon_eks_kube_proxy         = true
   enable_amazon_eks_aws_ebs_csi_driver = true
   enable_aws_efs_csi_driver            = true
@@ -343,10 +343,12 @@ module "eks_blueprints_kubernetes_addons" {
       add_on_application = true # Indicates the root add-on application.
     }
 
-    kustomize_apps = {
-      path     = "argocd-root"
-      repo_url = "https://github.com/celestiaorg/testground-infra.git"
-      type     = "manifests"
+    // https://github.com/aws-ia/terraform-aws-eks-blueprints/blob/main/modules/kubernetes-addons/argocd/main.tf#L94-L114
+    kustomize-apps = {
+      path            = "argocd-root"
+      repo_url        = "https://github.com/celestiaorg/testground-infra.git"
+      target_revision = "jose/hackground-k8s-tf"
+      type            = "kustomize"
     }
   }
 
