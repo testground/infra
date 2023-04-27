@@ -8,6 +8,7 @@ resources:
 - observability-applicationset.yaml
 - testground-applicationset.yaml
 - networking-applicationset.yaml
-  #- telegraf-operator.yaml
-  #- kustomization.yaml
-  #- influxdb.yaml
+- testground-tools-applicationset.yaml
+#- telegraf-operator.yaml
+#- kustomization.yaml
+#- influxdb.yaml
