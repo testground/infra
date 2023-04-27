@@ -2,7 +2,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: testground-tools
-  namespace: default
+  namespace: argocd
 spec:
   generators:
   - git:
