@@ -9,7 +9,7 @@ spec:
       repoURL: https://github.com/celestiaorg/testground-infra.git
       revision: jose/hackground-k8s-tf
       directories:
-      - path: 'tooling/*'
+      - path: 'manifests/tooling/*'
   template:
     metadata:
       name: 'tooling-{{path[0]}}'
@@ -17,7 +17,7 @@ spec:
       project: default
       source:
         repoURL: https://github.com/celestiaorg/testground-infra.git
-        path: 'tooling/{{path[0]}}'
+        path: 'manifests/tooling/{{path[0]}}'
         targetRevision: jose/hackground-k8s-tf
       destination:
         name: in-cluster
