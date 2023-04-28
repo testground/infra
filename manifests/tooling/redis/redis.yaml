@@ -6,7 +6,6 @@ helmCharts:
   releaseName: redtestground-infra-redisis
   repo: https://charts.bitnami.com/bitnami
   version: "17.10.1"
-  namespace: default
   valuesInline:
     global:
       auth:
