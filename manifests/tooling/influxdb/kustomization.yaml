@@ -4,9 +4,9 @@ kind: Kustomization
 helmCharts:
 
 - name: influxdb
-  releaseName: influxdb
-  repo: https://charts.bitnami.com/bitnami
-  version: 2.2.13
+  releaseName: azure-marketplace
+  repo: https://marketplace.azurecr.io/helm/v1/repo
+  version: 2.6.1
   valuesFile: values.yaml
 
 
