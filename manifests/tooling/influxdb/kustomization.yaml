@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 helmCharts:
-- name: celestiaorg/influxdb
+- name: influxdb
   releaseName: influxdb
-  repo: ghcr.io
+  repo: https://charts.bitnami.com/bitnami
   version: "2.6.1"
   valuesFile: values.yaml
