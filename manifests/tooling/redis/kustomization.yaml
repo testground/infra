@@ -5,7 +5,7 @@ namespace: default
 
 helmCharts:
 - name: bitnami/redis
-  releaseName: testground-infra-redis
-  repo: oci://registry-1.docker.io/bitnamicharts/redis
+  releaseName: redis
+  repo: https://charts.bitnami.com/bitnami
   version: "17.7.3"
   valuesFile: values.yaml
