@@ -10,9 +10,11 @@ spec:
       revision: jose/hackground-k8s-tf
       directories:
       - path: 'manifests/tooling/*'
+      - path: manifests/tooling/deactivated
+        exclude: true
   template:
     metadata:
-      name: '{path[2]}}'
+      name: 'tg-tool-{path[2]}}'
     spec:
       project: default
       source:
