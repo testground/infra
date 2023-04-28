@@ -12,12 +12,12 @@ spec:
       - path: 'manifests/tooling/*'
   template:
     metadata:
-      name: '{path[0]}}'
+      name: '{path[2]}}'
     spec:
       project: default
       source:
         repoURL: https://github.com/celestiaorg/testground-infra.git
-        path: 'manifests/tooling/{{path[0]}}'
+        path: 'manifests/tooling/{{path[2]}}'
         targetRevision: jose/hackground-k8s-tf
       destination:
         name: in-cluster
