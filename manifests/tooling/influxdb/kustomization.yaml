@@ -5,5 +5,5 @@ helmCharts:
 - name: influxdb
   releaseName: influxdb
   repo: https://charts.bitnami.com/bitnami
-  version: "2.6.1"
+  version: "2.7.0"
   valuesFile: values.yaml
