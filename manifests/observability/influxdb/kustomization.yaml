@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: observability
 
 helmCharts:
-- name: celestiaorg/influxdb
-  releaseName: influxdb
-  repo: ghcr.io
-  version: "2.6.1"
+- name: influxdb
+  releaseName: azure-marketplace
+  repo: https://marketplace.azurecr.io/helm/v1/repo # https://bitnami.com/stack/influxdb/helm
+  version: 2.6.1
   valuesFile: values.yaml
