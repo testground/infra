@@ -3,7 +3,7 @@ kind: Kustomization
 
 helmCharts:
 - name: influxdb
-  chart: ghcr.io/celestiaorg/influxdb
+  repo: ghcr.io/celestiaorg/influxdb
   version: 2.6.1
   releaseName: influxdb
   valuesFile: values.yaml
