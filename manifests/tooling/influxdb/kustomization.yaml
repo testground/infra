@@ -5,13 +5,6 @@ helmCharts:
 
 - name: influxdb
   releaseName: azure-marketplace
-  repo: https://marketplace.azurecr.io/helm/v1/repo
+  repo: https://marketplace.azurecr.io/helm/v1/repo # https://bitnami.com/stack/influxdb/helm
   version: 2.6.1
   valuesFile: values.yaml
-
-
-#- name: influxdb
-#  repo: ghcr.io/celestiaorg/influxdb
-#  version: 2.6.1
-#  releaseName: influxdb
-#  valuesFile: values.yaml
