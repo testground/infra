@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: default
 
 helmCharts:
-- name: testground-infra-redis
-  releaseName: redis
-  repo: https://charts.bitnami.com/bitnami
-  version: "17.10.1"
+- name: celestiaorg/influxdb
+  releaseName: influxdb
+  repo: ghcr.io
+  version: "2.6.1"
   valuesFile: values.yaml
