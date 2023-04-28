@@ -6,6 +6,6 @@ namespace: default
 helmCharts:
 - name: bitnami/redis
   releaseName: redis
-  repo: https://charts.bitnami.com/bitnami
+  repo: oci://registry-1.docker.io/bitnamicharts/redis
   version: "17.7.3"
   valuesFile: values.yaml
