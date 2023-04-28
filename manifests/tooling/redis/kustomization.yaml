@@ -7,4 +7,5 @@ helmCharts:
 - name: testground-infra-redis
   releaseName: bitnami/redis
   repo: https://charts.bitnami.com/bitnami
+  version: 7.0.8
   valuesFile: values.yaml
