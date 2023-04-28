@@ -4,8 +4,8 @@ kind: Kustomization
 namespace: default
 
 helmCharts:
-- name: testground-infra-redis
-  releaseName: bitnami/redis
+- name: bitnami/redis
+  releaseName: testground-infra-redis
   repo: https://charts.bitnami.com/bitnami
-  version: 7.0.8
+  version: 17.7.3
   valuesFile: values.yaml
