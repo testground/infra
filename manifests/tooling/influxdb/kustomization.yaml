@@ -4,6 +4,6 @@ kind: Kustomization
 helmCharts:
 - name: celestiaorg/influxdb
   releaseName: influxdb
-  repo: ghcr.io
+  repo: ghcr
   version: 2.6.1
   valuesFile: values.yaml
