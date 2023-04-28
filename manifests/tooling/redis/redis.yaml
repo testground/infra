@@ -13,3 +13,6 @@ helmCharts:
       master:
         nodeSelector:
           'testground.node.role.infra="true"'
+
+resources:
+- redis.yaml
