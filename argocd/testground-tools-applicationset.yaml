@@ -14,7 +14,7 @@ spec:
         exclude: true
   template:
     metadata:
-      name: 'tg-tool-{path[2]}}'
+      name: 'testground-tools-{{path[2]}}'
     spec:
       project: default
       source:
