@@ -2,7 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 helmCharts:
-- name: celestiaorg/influxdb
-  releaseName: celestiaorg/influxdb
-  repo: ghcr.io
+- name: influxdb
+  releaseName: influxdb
+  repository: oci://ghcr.io/celestiaorg/influxdb
+  version: "2.6.1"
   valuesFile: values.yaml
