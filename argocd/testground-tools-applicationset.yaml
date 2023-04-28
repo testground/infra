@@ -12,7 +12,7 @@ spec:
       - path: 'manifests/tooling/*'
   template:
     metadata:
-      name: 'tooling-{{path[0]}}'
+      name: '{path[0]}}'
     spec:
       project: default
       source:
