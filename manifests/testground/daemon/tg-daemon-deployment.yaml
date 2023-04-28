@@ -78,7 +78,7 @@ spec:
             claimName: testground-daemon-datadir-pvc
         - name: dockersock
           hostPath:
-            path: /var/run/docker.sock
+            path: /run/containerd/containerd.sock
         - name: envtoml
           configMap:
             name: env-toml-cfg
