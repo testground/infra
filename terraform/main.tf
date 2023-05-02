@@ -60,7 +60,7 @@ module "eks_blueprints" {
 
   # EKS CLUSTER
   cluster_name       = "${local.project_name}-${local.environment}-eks"
-  cluster_version    = "1.25"
+  cluster_version    = "1.26"
   vpc_id             = module.vpc.vpc_id
   public_subnet_ids  = module.vpc.public_subnets
   private_subnet_ids = module.vpc.private_subnets
@@ -133,7 +133,13 @@ module "eks_blueprints" {
   managed_node_groups = {
     ng-1-infra = {
       node_group_name = "ng-1-infra"
-      instance_types  = ["c5a.xlarge"]
+      instance_types  = ["c5.4xlarge"]
+
+      //ami_id             = "ami-083694f0a1d262109"
+      //custom_ami_id      = "ami-083694f0a1d262109"
+      //create_launch_template = true              # false will use the default launch template
+      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
+
       // TODO: FIXME PLEASE!
       // we are hardcoding the first element of the list in order to use ONLY
       // the first az in the nodes
@@ -146,16 +152,35 @@ module "eks_blueprints" {
       k8s_labels = {
         "testground.node.role.infra" = "true"
       }
-      //remote_access = true
-      //ec2_ssh_key   = "sysrex"
 
       # Node Group scaling configuration
-      max_size     = 80
+      max_size     = 10
       min_size     = 3
       desired_size = 3
 
       create_launch_template = true
       kubelet_extra_args     = "--use-max-pods=false --max-pods=58"
+
+      //enable_bootstrap_user_data = true
+      //bootstrap_extra_args       = "--container-runtime dockerd"
+      //pre_bootstrap_user_data    = <<-EOT
+      //#!/bin/bash
+      //set -ex
+
+      //# https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html#determine-max-pods
+      //# https://github.com/awslabs/amazon-eks-ami/blob/master/files/bootstrap.sh
+      //cat <<-EOF > /etc/profile.d/bootstrap.sh
+      //  export DEFAULT_CONTAINER_RUNTIME="dockerd"
+      //  export CONTAINER_RUNTIME="dockerd"
+      //  export USE_MAX_PODS=false
+      //EOF
+      //# Source extra environment variables in bootstrap script
+      //sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+      //sed -i 's/KUBELET_EXTRA_ARGS=$2/KUBELET_EXTRA_ARGS="$2 $KUBELET_EXTRA_ARGS"/' /etc/eks/bootstrap.sh
+      //EOT
+
+      //bootstrap_extra_args   = ""
+      //bootstrap_extra_args   = "--use-max-pods=false --max-pods=58 --container-runtime docker"
       //bootstrap_extra_args   = ""
       //pre_userdata = <<-EOT
       //sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
@@ -195,7 +220,15 @@ module "eks_blueprints" {
     },
     ng-2-plan = {
       node_group_name = "ng-2-plan"
-      instance_types  = ["c5a.2xlarge"]
+      instance_types  = ["c5.4xlarge"]
+
+      //ami_id             = "ami-083694f0a1d262109"
+      //custom_ami_id      = "ami-083694f0a1d262109"
+      //create_launch_template = true              # false will use the default launch template
+      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
+      //custom_ami_id      = "ami-083694f0a1d262109"
+      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
+
       // TODO: FIXME PLEASE!
       // we are hardcoding the first element of the list in order to use ONLY
       // the first az in the nodes
@@ -214,13 +247,33 @@ module "eks_blueprints" {
       //ec2_ssh_key   = "sysrex"
 
       # Node Group scaling configuration
-      max_size     = 200
-      min_size     = 6
-      desired_size = 6
+      max_size     = 10
+      min_size     = 2
+      desired_size = 2
 
       create_launch_template = true
       kubelet_extra_args     = "--max-pods=234 --allowed-unsafe-sysctls=net.core.somaxconn --use-max-pods=false"
-      bootstrap_extra_args   = ""
+
+      //enable_bootstrap_user_data = true
+      //bootstrap_extra_args       = "--container-runtime containerd"
+      //bootstrap_extra_args    = "--container-runtime dockerd"
+      //pre_bootstrap_user_data = <<-EOT
+      //#!/bin/bash
+      //set -ex
+
+      //# https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html#determine-max-pods
+      //cat <<-EOF > /etc/profile.d/bootstrap.sh
+      //  export DEFAULT_CONTAINER_RUNTIME="dockerd"
+      //  export CONTAINER_RUNTIME="dockerd"
+      //  export USE_MAX_PODS=false
+      //EOF
+      //# Source extra environment variables in bootstrap script
+      //sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
+      //sed -i 's/KUBELET_EXTRA_ARGS=$2/KUBELET_EXTRA_ARGS="$2 $KUBELET_EXTRA_ARGS"/' /etc/eks/bootstrap.sh
+      //EOT
+
+      //bootstrap_extra_args   = ""
+      //bootstrap_extra_args     = "--use-max-pods=false --max-pods=58 --container-runtime docker"
 
       # pre_userdata can be used in both cases where you provide custom_ami_id or ami_type
       //pre_userdata = <<-EOT
@@ -251,15 +304,6 @@ module "eks_blueprints" {
       //LIMITS'
       //EOT
     }
-
-    //      iam:
-    // attachPolicyARNs:
-    // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
-    // - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-    // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-    // - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-    // - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
-
   }
 
   cluster_security_group_additional_rules = {
@@ -347,7 +391,7 @@ module "eks_blueprints_kubernetes_addons" {
     kustomize-apps = {
       path            = "argocd-root"
       repo_url        = "https://github.com/celestiaorg/testground-infra.git"
-      target_revision = "jose/hackground-k8s-tf"
+      target_revision = "jose/hackground-k8s-tf" // Remove this one, should use main
       type            = "kustomize"
     }
   }
