@@ -78,7 +78,9 @@ echo "Installing ArgoCD"
 kubectl create namespace argocd
 
 helm repo add argo https://argoproj.github.io/argo-helm
-helm install argocd argo/argo-cd --version 5.31.0 \
+helm install argocd argo/argo-cd \
+  --version 5.31.0 \
+  --namespace=argocd \
   --set redis-ha.enabled=true \
   --set controller.replicas=1 \
   --set server.autoscaling.enabled=true \
@@ -97,7 +99,6 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: root
-  namespace: argocd
 spec:
   project: default
   source:
