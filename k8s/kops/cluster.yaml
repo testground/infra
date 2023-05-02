@@ -87,7 +87,8 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: 1.18.10
+    #kubernetesVersion: 1.18.10
+  kubernetesVersion: 1.22.17
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 172.20.0.0/16
@@ -98,11 +99,13 @@ spec:
   sshAccess:
   - 0.0.0.0/0
   subnets:
-  - cidr: 172.20.32.0/19
+    #- cidr: 172.20.32.0/19
+  - cidr: 172.20.0.0/17
     name: ${ZONE_A}
     type: Public
     zone: ${ZONE_A}
-  - cidr: 172.20.64.0/19
+      #- cidr: 172.20.64.0/19
+  - cidr: 172.20.128.0/19
     name: ${ZONE_B}
     type: Public
     zone: ${ZONE_B}
@@ -143,7 +146,8 @@ spec:
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  image: 909427826938/testground_2020-10-30
+  #image: 909427826938/testground_2020-10-30
+  image: testground_2023-05-02
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 1
   minSize: 1
@@ -186,7 +190,8 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-  image: 909427826938/testground_2020-10-30
+  #image: 909427826938/testground_2020-10-30
+  image: testground_2023-05-02
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
   minSize: ${WORKER_NODES}
@@ -231,7 +236,8 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-  image: 909427826938/testground_2020-10-30
+      #image: 909427826938/testground_2020-10-30
+  image: testground_2023-05-02
   machineType: c5.2xlarge
   maxSize: 2
   minSize: 2
