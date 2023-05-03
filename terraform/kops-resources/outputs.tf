@@ -28,3 +28,7 @@ output "private_subnets_ids" {
 output "subnet_cidr_blocks" {
   value = [for i in data.aws_subnet.aws_subnet_ids : i.cidr_block]
 }
+
+output "efs" {
+  value = module.efs
+}

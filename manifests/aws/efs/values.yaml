@@ -9,7 +9,6 @@ sidecars:
   csiProvisioner:
     image:
       repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
-      #tag: v3.3.0-eks-1-25-latest
       tag: v3.4.1-eks-1-22-latest
       pullPolicy: IfNotPresent
     resources: {}

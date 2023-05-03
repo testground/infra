@@ -1,6 +1,8 @@
 # EFS for Testground outputs
 locals {
   name = local.project_name
+  namespace = "kube-system"
+  service_account_name = "efs-csi-role"
 }
 
 module "efs" {
@@ -34,8 +36,7 @@ resource "kubernetes_storage_class_v1" "efs" {
     name = "aws-efs"
   }
 
-  //storage_provisioner = "efs.csi.aws.com"
-  storage_provisioner = "storage.k8s.io"
+  storage_provisioner = "efs.csi.aws.com"
 
   parameters = {
     provisioningMode = "efs-ap" # Dynamic provisioning
@@ -46,4 +47,78 @@ resource "kubernetes_storage_class_v1" "efs" {
   mount_options = [
     "iam"
   ]
+}
+resource "aws_iam_policy" "efs_csi_driver" {
+  name        = "efs-csi-policy"
+  path        = "/"
+  description = "Policy for the EFS CSI driver"
+
+//  policy = data.aws_iam_policy_document.efs_csi_driver.json
+    policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticfilesystem:DescribeAccessPoints",
+        "elasticfilesystem:DescribeFileSystems",
+        "elasticfilesystem:DescribeMountTargets",
+        "ec2:DescribeAvailabilityZones"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticfilesystem:CreateAccessPoint"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "aws:RequestTag/efs.csi.aws.com/cluster": "true"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "elasticfilesystem:TagResource"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringLike": {
+          "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+        }
+      }
+    },
+    {
+      "Effect": "Allow",
+      "Action": "elasticfilesystem:DeleteAccessPoint",
+      "Resource": "*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/efs.csi.aws.com/cluster": "true"
+        }
+      }
+    }
+  ]
+}
+EOF
+}
+
+data "aws_iam_policy_document" "instance_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["*"]
+    }
+  }
+}
+resource "aws_iam_role" "example" {
+  name                = "efs-csi-role"
+  assume_role_policy = data.aws_iam_policy_document.instance_assume_role_policy.json
+  managed_policy_arns = [aws_iam_policy.efs_csi_driver.arn]
 }
