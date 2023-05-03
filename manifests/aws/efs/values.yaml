@@ -1,8 +1,19 @@
+# https://github.com/kubernetes-sigs/aws-efs-csi-driver/blob/master/charts/aws-efs-csi-driver/values.yaml
 replicaCount: 1
 
 image:
   repository: amazon/aws-efs-csi-driver
   tag: "v1.5.4"
+
+
+sidecars:
+  csiProvisioner:
+    image:
+      repository: public.ecr.aws/eks-distro/kubernetes-csi/external-provisioner
+      #tag: v3.3.0-eks-1-25-latest
+      tag: v3.4.1-eks-1-22-latest
+      pullPolicy: IfNotPresent
+    resources: {}
 
 ## Controller deployment variables
 controller:
