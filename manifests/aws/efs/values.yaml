@@ -1,0 +1,29 @@
+replicaCount: 1
+
+image:
+  repository: amazon/aws-efs-csi-driver
+  tag: "v1.5.4"
+
+## Controller deployment variables
+controller:
+  # Number for the log level verbosity
+  logLevel: 2
+  # Specifies whether a service account should be created
+  serviceAccount:
+    create: true
+    name: efs-csi-controller-sa
+    annotations:
+    ## Enable if EKS IAM for SA is used
+      eks.amazonaws.com/role-arn: arn:aws:iam::506657148836:role/efs-csi-role
+
+## Node daemonset variables
+node:
+  # Number for the log level verbosity
+  logLevel: 2
+  # Specifies whether a service account should be created
+  serviceAccount:
+    create: true
+    name: efs-csi-node-sa
+    annotations:
+    ## Enable if EKS IAM for SA is used
+      eks.amazonaws.com/role-arn: arn:aws:iam::506657148836:role/efs-csi-role
