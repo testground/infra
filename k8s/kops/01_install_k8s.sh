@@ -84,8 +84,8 @@ helm install argocd argo/argo-cd \
      --namespace=argocd \
      -f ./argocd/values.yaml
 
-#kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-sleep 30
+echo "Giving some seconds to ArgoCD to be operative..."
+sleep 20
 
 echo "Installing root app..."
 kubectl apply -f - <<EOF
