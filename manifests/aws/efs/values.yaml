@@ -5,7 +5,6 @@ image:
   repository: amazon/aws-efs-csi-driver
   tag: "v1.5.4"
 
-
 sidecars:
   csiProvisioner:
     image:
@@ -21,7 +20,7 @@ controller:
   logLevel: 2
   # Specifies whether a service account should be created
   serviceAccount:
-    create: true
+    create: false
     name: efs-csi-controller-sa
     annotations:
     ## Enable if EKS IAM for SA is used
