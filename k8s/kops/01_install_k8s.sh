@@ -53,6 +53,7 @@ fi
 
 kops create -f $CLUSTER_SPEC
 kops create secret --name $CLUSTER_NAME sshpublickey admin -i $PUBKEY
+# The following command updates the cluster and updates the kubeconfig
 kops update cluster $CLUSTER_NAME --admin --yes
 
 # Wait for worker nodes and master to be ready
@@ -79,15 +80,9 @@ kubectl create namespace argocd
 
 helm repo add argo https://argoproj.github.io/argo-helm
 helm install argocd argo/argo-cd \
-  --version 5.31.0 \
-  --namespace=argocd \
-  --set redis-ha.enabled=true \
-  --set controller.replicas=1 \
-  --set server.autoscaling.enabled=true \
-  --set server.autoscaling.minReplicas=2 \
-  --set repoServer.autoscaling.enabled=true \
-  --set repoServer.autoscaling.minReplicas=2 \
-  --set applicationSet.replicaCount=2
+     --version 5.31.0 \
+     --namespace=argocd \
+     -f ./argocd/values.yaml
 
 #kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 sleep 30
@@ -99,6 +94,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: root
+  namespace: argocd
 spec:
   project: default
   source:
