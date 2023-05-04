@@ -2,8 +2,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: efs
-    #annotations:
-    #  volume.beta.kubernetes.io/storage-class: "aws-efs"
 spec:
   accessModes:
     - ReadWriteOnce
