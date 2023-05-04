@@ -1,4 +1,8 @@
+global:
+  imageRegistry: docker.io
 image:
+  registry: docker.io
+  repository: bitnami/influxdb
   tag: 1.8.2
   debug: true
 releaseName: bitnami-full-index
