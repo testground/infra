@@ -21,9 +21,6 @@ controller:
   serviceAccount:
     create: false
     name: efs-csi-controller-sa
-    #annotations:
-    ## Enable if EKS IAM for SA is used
-    #  eks.amazonaws.com/role-arn: arn:aws:iam::506657148836:role/efs-csi-role
 
 ## Node daemonset variables
 node:
@@ -33,6 +30,3 @@ node:
   serviceAccount:
     create: true
     name: efs-csi-node-sa
-    #annotations:
-    ## Enable if EKS IAM for SA is used
-    #  eks.amazonaws.com/role-arn: arn:aws:iam::506657148836:role/efs-csi-role
