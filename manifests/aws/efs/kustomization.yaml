@@ -14,4 +14,4 @@ helmCharts:
 
 resources:
 - pvc.yaml
-#- rbac.yaml
+- rbac.yaml
