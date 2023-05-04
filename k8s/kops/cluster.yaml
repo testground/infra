@@ -26,6 +26,13 @@ spec:
               "ecr:*"
           ],
           "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "elasticfilesystem:*"
+          ],
+          "Resource": "*"
         }
       ]
   authorization:
@@ -88,7 +95,7 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-    #kubernetesVersion: 1.18.10
+  #kubernetesVersion: 1.18.10
   kubernetesVersion: 1.22.17
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
@@ -146,8 +153,7 @@ spec:
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  #image: 909427826938/testground_2020-10-30
-  image: testground_2023-05-02
+  image: testground_2023-05-04
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 3
   minSize: 1
@@ -189,8 +195,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-  #image: 909427826938/testground_2020-10-30
-  image: testground_2023-05-02
+  image: testground_2023-05-04
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
   minSize: ${WORKER_NODES}
@@ -234,8 +239,7 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-      #image: 909427826938/testground_2020-10-30
-  image: testground_2023-05-02
+  image: testground_2023-05-04
   machineType: c5.2xlarge
   maxSize: 2
   minSize: 2
