@@ -1,8 +1,30 @@
 #!/bin/bash
 
+# Description:
+# This script is used to spin up a new Kubernetes cluster using Kops.
+# Also, the tool creates an ArgoCD app to provision the cluster.
+#
+# The following variables are required to make it work
+# CLUSTER_NAME=
+# DEPLOYMENT_NAME=
+# WORKER_NODE_TYPE=
+# MASTER_NODE_TYPE=
+# WORKER_NODES=
+# TEAM=
+# PROJECT=
+# AWS_REGION=
+# KOPS_STATE_STORE=
+# ZONE_A=
+# ZONE_B=
+# PUBKEY=
+# AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
+# AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+
 set -o errexit
 set -o pipefail
 set -e
+
+TF_RESOURCES="../../terraform/kops-resources/"
 
 err_report() {
     echo "Error on line $1"
@@ -61,6 +83,17 @@ kops validate cluster --wait 20m
 
 echo "Cluster nodes are Ready"
 echo
+
+# =======================================================
+echo "Create EFS resources & storageclasses..."
+cd ${TF_RESOURCES}
+# we used the && to be sure that the previous command was executed properly
+terraform init &&\
+terraform plan &&\
+terraform apply -auto-approve &&\
+cd -
+pwd
+# =======================================================
 
 echo "Install default container limits"
 echo
