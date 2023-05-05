@@ -1,4 +1,14 @@
 ---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: olm
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: operators
+---
 kind: ServiceAccount
 apiVersion: v1
 metadata:
@@ -29,11 +39,6 @@ subjects:
   name: olm-operator-serviceaccount
   namespace: olm
 ---
-apiVersion: operators.coreos.com/v1
-kind: OLMConfig
-metadata:
-  name: cluster
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -53,17 +58,9 @@ spec:
       labels:
         app: olm-operator
     spec:
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
       serviceAccountName: olm-operator-serviceaccount
       containers:
         - name: olm-operator
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ "ALL" ]
           command:
           - /bin/olm
           args:
@@ -71,21 +68,21 @@ spec:
           - $(OPERATOR_NAMESPACE)
           - --writeStatusName
           - ""
-          image: quay.io/operator-framework/olm@sha256:3cfc40fa4b779fe1d9817dc454a6d70135e84feba1ffc468c4e434de75bb2ac5
+          image: quay.io/operator-framework/olm@sha256:e74b2ac57963c7f3ba19122a8c31c9f2a0deb3c0c5cac9e5323ccffd0ca198ed
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+            - containerPort: 8081
               name: metrics
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
               port: 8080
-              scheme: HTTP
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8080
-              scheme: HTTP
           terminationMessagePolicy: FallbackToLogsOnError
           env:
           - name: OPERATOR_NAMESPACE
@@ -120,41 +117,32 @@ spec:
       labels:
         app: catalog-operator
     spec:
-      securityContext:
-        runAsNonRoot: true
-        seccompProfile:
-          type: RuntimeDefault
       serviceAccountName: olm-operator-serviceaccount
       containers:
         - name: catalog-operator
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop: [ "ALL" ]
           command:
           - /bin/catalog
           args:
-          - '--namespace'
+          - '-namespace'
           - olm
-          - --configmapServerImage=quay.io/operator-framework/configmap-operator-registry:latest
-          - --util-image
-          -  quay.io/operator-framework/olm@sha256:3cfc40fa4b779fe1d9817dc454a6d70135e84feba1ffc468c4e434de75bb2ac5
-          - --set-workload-user-id=true
-          image: quay.io/operator-framework/olm@sha256:3cfc40fa4b779fe1d9817dc454a6d70135e84feba1ffc468c4e434de75bb2ac5
+          - -configmapServerImage=quay.io/operator-framework/configmap-operator-registry:latest
+          - -util-image
+          -  quay.io/operator-framework/olm@sha256:e74b2ac57963c7f3ba19122a8c31c9f2a0deb3c0c5cac9e5323ccffd0ca198ed
+          image: quay.io/operator-framework/olm@sha256:e74b2ac57963c7f3ba19122a8c31c9f2a0deb3c0c5cac9e5323ccffd0ca198ed
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080
+            - containerPort: 8081
               name: metrics
+              protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
               port: 8080
-              scheme: HTTP
           readinessProbe:
             httpGet:
               path: /healthz
               port: 8080
-              scheme: HTTP
           terminationMessagePolicy: FallbackToLogsOnError
           resources:
             requests:
@@ -215,7 +203,7 @@ metadata:
   name: packageserver
   namespace: olm
   labels:
-    olm.version: v0.23.1
+    olm.version: 0.18.3
 spec:
   displayName: Package Server
   description: Represents an Operator package that is available from a given CatalogSource which will resolve to a ClusterServiceVersion.
@@ -291,19 +279,11 @@ spec:
               labels:
                 app: packageserver
             spec:
-              securityContext:
-                runAsNonRoot: true
-                seccompProfile:
-                  type: RuntimeDefault
               serviceAccountName: olm-operator-serviceaccount
               nodeSelector:
                 kubernetes.io/os: linux
               containers:
               - name: packageserver
-                securityContext:
-                  allowPrivilegeEscalation: false
-                  capabilities:
-                    drop: [ "ALL" ]
                 command:
                 - /bin/package-server
                 - -v=4
@@ -311,7 +291,7 @@ spec:
                 - "5443"
                 - --global-namespace
                 - olm
-                image: quay.io/operator-framework/olm@sha256:3cfc40fa4b779fe1d9817dc454a6d70135e84feba1ffc468c4e434de75bb2ac5
+                image: quay.io/operator-framework/olm@sha256:e74b2ac57963c7f3ba19122a8c31c9f2a0deb3c0c5cac9e5323ccffd0ca198ed
                 imagePullPolicy: Always
                 ports:
                 - containerPort: 5443
@@ -330,6 +310,8 @@ spec:
                   requests:
                     cpu: 10m
                     memory: 50Mi
+                securityContext:
+                  runAsUser: 1000
                 volumeMounts:
                 - name: tmpfs
                   mountPath: /tmp
@@ -337,7 +319,7 @@ spec:
               - name: tmpfs
                 emptyDir: {}
   maturity: alpha
-  version: v0.23.1
+  version: 0.18.3
   apiservicedefinitions:
     owned:
     - group: packages.operators.coreos.com
@@ -359,8 +341,6 @@ spec:
   image: quay.io/operatorhubio/catalog:latest
   displayName: Community Operators
   publisher: OperatorHub.io
-  grpcPodConfig:
-    securityContextConfig: restricted
   updateStrategy:
     registryPoll:
       interval: 60m
