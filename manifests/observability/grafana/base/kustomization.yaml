@@ -8,13 +8,13 @@ resources:
 - grafana.yaml
 - prometheus_datasource.yaml
 - loki_datasource.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-config.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-dashboardDatasources.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-dashboardSources.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-deployment.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-networkPolicy.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-prometheusRule.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-serviceAccount.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-serviceMonitor.yaml
-- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-service.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-config.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-dashboardDatasources.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-dashboardSources.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-deployment.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-networkPolicy.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-prometheusRule.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-serviceAccount.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-serviceMonitor.yaml
+  #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-service.yaml
 #- https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/v0.12.0/manifests/grafana-dashboardDefinitions.yaml
