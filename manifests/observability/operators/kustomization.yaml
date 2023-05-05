@@ -6,5 +6,4 @@ namespace: observability
 resources:
 - operatorgroup.yaml
 - subscription.yaml
-- ns_olm.yaml
 - ns_operators.yaml
