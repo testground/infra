@@ -1,0 +1,12 @@
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: ${name}
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: ${name}
+    key: ${file}

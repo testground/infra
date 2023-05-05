@@ -1,0 +1,301 @@
+
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-alertmanager-overview
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-alertmanager-overview
+    key: alertmanager-overview.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-apiserver
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-apiserver
+    key: apiserver.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-cluster-total
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-cluster-total
+    key: cluster-total.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-controller-manager
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-controller-manager
+    key: controller-manager.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-grafana-overview
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-grafana-overview
+    key: grafana-overview.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-cluster
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-cluster
+    key: k8s-resources-cluster.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-namespace
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-namespace
+    key: k8s-resources-namespace.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-node
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-node
+    key: k8s-resources-node.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-pod
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-pod
+    key: k8s-resources-pod.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-workload
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-workload
+    key: k8s-resources-workload.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-k8s-resources-workloads-namespace
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-k8s-resources-workloads-namespace
+    key: k8s-resources-workloads-namespace.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-kubelet
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-kubelet
+    key: kubelet.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-namespace-by-pod
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-namespace-by-pod
+    key: namespace-by-pod.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-namespace-by-workload
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-namespace-by-workload
+    key: namespace-by-workload.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-node-cluster-rsrc-use
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-node-cluster-rsrc-use
+    key: node-cluster-rsrc-use.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-node-rsrc-use
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-node-rsrc-use
+    key: node-rsrc-use.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-nodes-darwin
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-nodes-darwin
+    key: nodes-darwin.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-nodes
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-nodes
+    key: nodes.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-persistentvolumesusage
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-persistentvolumesusage
+    key: persistentvolumesusage.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-pod-total
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-pod-total
+    key: pod-total.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-prometheus-remote-write
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-prometheus-remote-write
+    key: prometheus-remote-write.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-prometheus
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-prometheus
+    key: prometheus.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-proxy
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-proxy
+    key: proxy.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-scheduler
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-scheduler
+    key: scheduler.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: grafana-dashboard-workload-total
+  labels:
+    app: grafana
+spec:
+  customFolderName: default
+  configMapRef:
+    name: grafana-dashboard-workload-total
+    key: workload-total.json

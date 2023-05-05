@@ -1,0 +1,24 @@
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: testground-base-monitoring
+  labels:
+    app: grafana
+spec:
+  customFolderName: TestGround
+  configMapRef:
+    name: testground
+    key: testground-base-monitoring.json
+---
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: testground-base
+  labels:
+    app: grafana
+spec:
+  customFolderName: TestGround
+  configMapRef:
+    name: testground
+    key: testground-base.json

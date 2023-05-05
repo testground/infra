@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
 #- influxdb # do we need it here as well or only in the tg-tooling?
+- grafana
 - loki
 - otel
 - prometheus
