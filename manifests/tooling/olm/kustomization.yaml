@@ -4,4 +4,3 @@ kind: Kustomization
 resources:
 - crds.yaml
 - olm.yaml
-#- ns_olm.yaml
