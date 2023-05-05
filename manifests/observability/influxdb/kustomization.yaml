@@ -7,3 +7,4 @@ helmCharts:
   repo: https://marketplace.azurecr.io/helm/v1/repo # https://bitnami.com/stack/influxdb/helm
   version: 2.6.1
   valuesFile: values.yaml
+  namespace: observability
