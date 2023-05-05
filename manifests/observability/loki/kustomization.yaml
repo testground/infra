@@ -1,10 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: observability
+
 helmCharts:
 - name: loki
   releaseName: grafana-loki
   repo: https://grafana.github.io/helm-charts
   version: "4.8.0"
   valuesFile: values.yaml
-  namespace: observability

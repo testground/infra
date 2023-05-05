@@ -1,10 +1,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
+namespace: observability
+
 helmCharts:
 - name: influxdb
   releaseName: influxdb
   repo: https://marketplace.azurecr.io/helm/v1/repo # https://bitnami.com/stack/influxdb/helm
   version: 2.6.1
   valuesFile: values.yaml
-  namespace: observability
