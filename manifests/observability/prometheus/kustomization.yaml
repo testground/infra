@@ -3,36 +3,45 @@ kind: Kustomization
 
 namespace: observability
 
-resources:
-- https://github.com/prometheus-operator/kube-prometheus?v0.12.0
+# https://github.com/kubernetes-sigs/aws-efs-csi-driver
+helmCharts:
+- name: prometheus-community
+  releaseName: tg-monitoring
+  repo: https://prometheus-community.github.io/helm-charts
+  version: 45.26.0
+  #valuesFile: values.yaml
+  #namespace: kube-system
 
-patchesStrategicMerge:
-# Namespace specific roles fail as we change the namespace to observability
-- |-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: RoleBinding
-  metadata:
-    name: prometheus-k8s
-    namespace: default
-  $patch: delete
-- |-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: Role
-  metadata:
-    name: prometheus-k8s
-    namespace: default
-  $patch: delete
-- |-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: RoleBinding
-  metadata:
-    name: prometheus-k8s
-    namespace: kube-system
-  $patch: delete
-- |-
-  apiVersion: rbac.authorization.k8s.io/v1
-  kind: Role
-  metadata:
-    name: prometheus-k8s
-    namespace: kube-system
-  $patch: delete
+# resources:
+# - https://github.com/prometheus-operator/kube-prometheus?v0.12.0
+
+# patchesStrategicMerge:
+# # Namespace specific roles fail as we change the namespace to observability
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: RoleBinding
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: default
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: Role
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: default
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: RoleBinding
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: kube-system
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: Role
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: kube-system
+#   $patch: delete
