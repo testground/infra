@@ -46,7 +46,8 @@ spec:
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
-          value: "testground-infra-redis-master.default.svc.cluster.local"
+          # value: "testground-infra-redis-master.default.svc.cluster.local"
+          value: "redis-master.default.svc.cluster.local"
         securityContext:
           privileged: true
         ports:
