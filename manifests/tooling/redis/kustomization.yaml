@@ -9,4 +9,3 @@ helmCharts:
   repo: https://marketplace.azurecr.io/helm/v1/repo
   version: 17.4.2
   valuesFile: values.yaml
-  namespace: default
