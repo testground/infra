@@ -3,10 +3,9 @@ kind: Kustomization
 
 namespace: observability
 
-# https://github.com/kubernetes-sigs/aws-efs-csi-driver
 helmCharts:
 - name: prometheus-community
-  releaseName: prometheus-community
+  releaseName: prometheus-community/kube-prometheus-stack
   repo: https://prometheus-community.github.io/helm-charts
   #valuesFile: values.yaml
   #namespace: kube-system
