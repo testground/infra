@@ -3,9 +3,10 @@ kind: Kustomization
 
 namespace: default
 
+# https://bitnami.com/stack/influxdb/helm
 helmCharts:
 - name: influxdb
   releaseName: influxdb
-  repo: https://marketplace.azurecr.io/helm/v1/repo # https://bitnami.com/stack/influxdb/helm
+  repo: https://marketplace.azurecr.io/helm/v1/repo
   version: 2.6.1
   valuesFile: values.yaml
