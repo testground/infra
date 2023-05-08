@@ -4,8 +4,9 @@ kind: Kustomization
 namespace: default
 
 helmCharts:
-- name: bitnami/redis
+- name: redis
   releaseName: redis
   repo: https://charts.bitnami.com/bitnami
-  version: 17.10.1
+  version: 14.8.11
   valuesFile: values.yaml
+  namespace: default
