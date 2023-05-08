@@ -6,7 +6,7 @@ namespace: observability
 # https://github.com/kubernetes-sigs/aws-efs-csi-driver
 helmCharts:
 - name: prometheus-community
-  releaseName: tg-monitoring
+  releaseName: prometheus-community
   repo: https://prometheus-community.github.io/helm-charts
   #valuesFile: values.yaml
   #namespace: kube-system
