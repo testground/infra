@@ -145,15 +145,6 @@ spec:
     syncOptions:
     - ApplyOutOfSyncOnly=true
     - CreateNamespace=true
-  clusterResourceWhitelist:
-  - group: ''
-    kind: 'Namespace'
-  - group: 'rbac.authorization.k8s.io'
-    kind: 'ClusterRole'
-  - group: 'rbac.authorization.k8s.io'
-    kind: 'ClusterRoleBinding'
-  - group: 'apiextensions.k8s.io'
-    kind: 'CustomResourceDefinition'
 EOF
 
 #echo "Installing Prometheus"
