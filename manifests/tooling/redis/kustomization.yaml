@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: default
 
 helmCharts:
-- name: redis
+- name: bitnami/redis
   releaseName: redis
   repo: https://charts.bitnami.com/bitnami
   version: 17.10.1
