@@ -7,5 +7,6 @@ resources:
 - loki
 - otel
 - prometheus
+- prometheus-crds
 - promtail
 - telegraf-operator
