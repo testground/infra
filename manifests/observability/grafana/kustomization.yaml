@@ -5,7 +5,6 @@ namespace: observability
 
 resources:
   - ./base
-  - namespace.yaml
   - dashboards.yaml
 
 configMapGenerator:
