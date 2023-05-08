@@ -3,6 +3,7 @@ kind: Kustomization
 
 namespace: default
 
+# https://github.com/bitnami/azure-marketplace-charts
 helmCharts:
 - name: bitnami-azure
   releaseName: redis
