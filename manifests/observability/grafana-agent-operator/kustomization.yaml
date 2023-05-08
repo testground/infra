@@ -8,3 +8,6 @@ helmCharts:
   releaseName: grafana-agent-operator
   repo: https://grafana.github.io/helm-charts
   version: "0.2.12"
+
+resources:
+  - https://raw.githubusercontent.com/grafana-operator/grafana-operator/master/deploy/kustomize/base/crds.yaml
