@@ -3,6 +3,7 @@ kind: Kustomization
 
 namespace: operators
 
+# https://github.com/grafana-operator/grafana-operator
 helmCharts:
 - name: grafana-agent-operator
   releaseName: grafana-agent-operator

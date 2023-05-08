@@ -28,3 +28,8 @@ loki:
     compress_responses: true
 global:
   dnsService: "coredns"
+  # Configuration for the backend pod(s)
+  backend:
+    persistence:
+      # -- Size of persistent disk
+      size: 30Gi

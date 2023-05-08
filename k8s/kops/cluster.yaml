@@ -126,8 +126,9 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  #kubernetesVersion: 1.18.10
-  kubernetesVersion: 1.22.17
+  # kubernetesVersion: 1.18.10
+  # kubernetesVersion: 1.22.17
+  kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 172.20.0.0/16
