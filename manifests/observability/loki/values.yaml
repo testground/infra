@@ -31,5 +31,6 @@ global:
   # Configuration for the backend pod(s)
   backend:
     persistence:
+      storageClass: gp2
       # -- Size of persistent disk
       size: 30Gi
