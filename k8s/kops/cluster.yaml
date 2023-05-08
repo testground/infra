@@ -17,7 +17,7 @@ spec:
       type: Public
   kubeDNS:
     provider: CoreDNS
-  additionalPolicies:
+  additionalPolicies: # https://kops.sigs.k8s.io/iam_roles/#adding-additional-policies
     node: |
       [
         {
@@ -31,6 +31,37 @@ spec:
           "Effect": "Allow",
           "Action": [
               "elasticfilesystem:*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "elasticloadbalancing:*"
+          ],
+          "Resource": "*"
+        }
+      ]
+    master: |
+      [
+        {
+          "Effect": "Allow",
+          "Action": [
+              "ecr:*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "elasticfilesystem:*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "elasticloadbalancing:*"
           ],
           "Resource": "*"
         }
