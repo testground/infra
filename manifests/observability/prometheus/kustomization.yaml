@@ -8,7 +8,6 @@ helmCharts:
 - name: prometheus-community
   releaseName: tg-monitoring
   repo: https://prometheus-community.github.io/helm-charts
-  version: 0.65.1
   #valuesFile: values.yaml
   #namespace: kube-system
 
