@@ -41,13 +41,12 @@ spec:
             memory: 1000Mi
             cpu: 700m
       - name: testground-daemon
-        image: public.ecr.aws/n6b0k8i7/testground-daemon:80c5aca36114de067c33c8718cca95ef16db4c06
-        #image: ghcr.io/celestiaorg/testground:39661ea
+        #image: public.ecr.aws/n6b0k8i7/testground-daemon:80c5aca36114de067c33c8718cca95ef16db4c06
+        image: ghcr.io/celestiaorg/testground:39661ea
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
           # value: "testground-infra-redis-master.default.svc.cluster.local"
-          #value: "redis-master.default.svc.cluster.local"
           value: "redis-master"
         securityContext:
           privileged: true
