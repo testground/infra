@@ -3,11 +3,10 @@ kind: Kustomization
 
 namespace: default
 
-# https://github.com/bitnami/azure-marketplace-charts
 helmCharts:
-- name: bitnami-azure
+- name: redis
   releaseName: redis
-  repo: https://marketplace.azurecr.io/helm/v1/repo
-  version: 17.4.2
+  repo: https://charts.bitnami.com/bitnami
+  version: 17.10.2
   valuesFile: values.yaml
   namespace: default
