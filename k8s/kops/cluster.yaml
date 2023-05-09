@@ -30,6 +30,13 @@ spec:
         {
           "Effect": "Allow",
           "Action": [
+              "ec2:*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
               "elasticfilesystem:*"
           ],
           "Resource": "*"
@@ -48,6 +55,13 @@ spec:
           "Effect": "Allow",
           "Action": [
               "ecr:*"
+          ],
+          "Resource": "*"
+        },
+        {
+          "Effect": "Allow",
+          "Action": [
+              "ec2:*"
           ],
           "Resource": "*"
         },
@@ -140,8 +154,7 @@ spec:
   masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 172.20.0.0/16
   networking:
-    flannel:
-      backend: vxlan
+    amazonvpc: {} # https://kops.sigs.k8s.io/networking/aws-vpc/
   nonMasqueradeCIDR: 100.64.0.0/10
   sshAccess:
   - 0.0.0.0/0
