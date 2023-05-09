@@ -10,4 +10,3 @@ resources:
 - prometheus
 - prometheus-crds
 - promtail
-#- telegraf-operator
