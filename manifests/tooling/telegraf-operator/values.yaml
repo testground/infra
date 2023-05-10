@@ -1,8 +1,4 @@
 replicaCount: 2
-image:
-  repository: quay.io/influxdb/telegraf-operator
-  pullPolicy: IfNotPresent
-  sidecarImage: "docker.io/library/telegraf:1.22"
 
 classes:
   data:
@@ -11,24 +7,6 @@ classes:
         urls = ["http://influxdb:8086"]
         database = "testground"
 
-certManager:
-  enable: false
-
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
-serviceAccount:
-  # Annotations to add to the service account
-  annotations: {}
-podSecurityContext: {}
-  # fsGroup: 2000
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
 resources:
   limits:
     cpu: 400m
@@ -36,11 +14,4 @@ resources:
   requests:
     cpu: 50m
     memory: 64Mi
-nodeSelector: {}
-tolerations: []
-affinity: {}
-requireAnnotationsForSecret: false
-# allow hot reload ; disabled by default to support versions of telegraf
-# that do not support hot-reload and --watch-config flag
 hotReload: true
-
