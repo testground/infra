@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: tooling-telegraf-operator
+  name: testground-tools-telegraf-operator
   namespace: argocd
 spec:
   project: default
