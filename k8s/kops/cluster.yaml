@@ -23,27 +23,10 @@ spec:
         {
           "Effect": "Allow",
           "Action": [
-              "ecr:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-              "ec2:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-              "elasticfilesystem:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
+              "ecr:*",
+              "ec2:*",
+              "autoscaling:*",
+              "elasticfilesystem:*",
               "elasticloadbalancing:*"
           ],
           "Resource": "*"
@@ -54,27 +37,10 @@ spec:
         {
           "Effect": "Allow",
           "Action": [
-              "ecr:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-              "ec2:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
-              "elasticfilesystem:*"
-          ],
-          "Resource": "*"
-        },
-        {
-          "Effect": "Allow",
-          "Action": [
+              "ecr:*",
+              "ec2:*",
+              "autoscaling:*",
+              "elasticfilesystem:*",
               "elasticloadbalancing:*"
           ],
           "Resource": "*"
@@ -337,7 +303,6 @@ spec:
   role: Node
   subnets:
   - ${ZONE_A}
-  - ${ZONE_B}
 
 ---
 apiVersion: kops.k8s.io/v1alpha2
@@ -374,11 +339,10 @@ spec:
   image: testground_2023-05-04
   machineType: c5.2xlarge
   maxSize: 80
-  minSize: 30
+  minSize: 5
   nodeLabels:
     kops.k8s.io/instancegroup: tginfra
     testground.node.role.infra: "true"
   role: Node
   subnets:
   - ${ZONE_A}
-  - ${ZONE_B}
