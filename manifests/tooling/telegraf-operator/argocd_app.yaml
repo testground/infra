@@ -1,0 +1,73 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tooling-telegraf-operator
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: telegraf-operator
+    repoURL: https://helm.influxdata.com/
+    targetRevision: 1.3.11
+    helm:
+      releaseName: telegraf-operator
+      #valueFiles:
+      #- values.yaml
+      values: |
+        replicaCount: 2
+        image:
+          repository: quay.io/influxdb/telegraf-operator
+          pullPolicy: IfNotPresent
+          sidecarImage: "docker.io/library/telegraf:1.22"
+
+        classes:
+          data:
+            default: |
+              [[outputs.influxdb]]
+                urls = ["http://influxdb:8086"]
+                database = "testground"
+
+        certManager:
+          enable: false
+
+        imagePullSecrets: []
+        nameOverride: ""
+        fullnameOverride: ""
+        serviceAccount:
+          # Annotations to add to the service account
+          annotations: {}
+        podSecurityContext: {}
+          # fsGroup: 2000
+        securityContext: {}
+          # capabilities:
+          #   drop:
+          #   - ALL
+          # readOnlyRootFilesystem: true
+          # runAsNonRoot: true
+          # runAsUser: 1000
+        resources:
+          limits:
+            cpu: 400m
+            memory: 256Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+        nodeSelector: {}
+        tolerations: []
+        affinity: {}
+        requireAnnotationsForSecret: false
+        # allow hot reload ; disabled by default to support versions of telegraf
+        # that do not support hot-reload and --watch-config flag
+        hotReload: true
+  destination:
+    namespace: default
+    name: in-cluster
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: true
+    syncOptions:
+      - ApplyOutOfSyncOnly=true
+      - CreateNamespace=true
+      - ServerSideApply=true
