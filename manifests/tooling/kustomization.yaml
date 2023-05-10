@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
 - redis
 - influxdb
-- telegraf-operator
+# - telegraf-operator
