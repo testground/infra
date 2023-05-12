@@ -1,5 +1,7 @@
 replicaCount: 2
 
+namespace: default
+
 classes:
   data:
     default: |
