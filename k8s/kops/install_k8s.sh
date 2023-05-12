@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# =======================================================
 # Description:
 # This script is used to spin up a new Kubernetes cluster using Kops.
 # Also, the tool creates an ArgoCD app to provision the cluster.
@@ -19,24 +20,26 @@
 # PUBKEY=
 # AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id)
 # AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key)
+# =======================================================
 
 set -o errexit
 set -o pipefail
 set -e
 
+# =======================================================
 TF_RESOURCES="../../terraform/kops-resources/"
-
+ARGOCD_VERSION="5.31.0"
+# =======================================================
 err_report() {
     echo "Error on line $1"
 }
-
+# =======================================================
 trap 'err_report $LINENO' ERR
-
+# =======================================================
 START_TIME=`date +%s`
-
+# =======================================================
 echo "Creating cluster for Testground..."
 echo
-
 CLUSTER_SPEC_TEMPLATE=$1
 
 my_dir="$(dirname "$0")"
@@ -59,28 +62,26 @@ echo
 CLUSTER_SPEC=$(mktemp)
 envsubst <$CLUSTER_SPEC_TEMPLATE >$CLUSTER_SPEC
 
+# =======================================================
 # Verify with the user before continuing.
 echo
 echo "The cluster will be built based on the params above."
 echo -n "Do they look right to you? [y/n]: "
 read response
-
 if [ "$response" != "y" ]
 then
   echo "Canceling ."
   exit 2
 fi
 
+# =======================================================
 # The remainder of this script creates the cluster using the generated template
-
 kops create -f $CLUSTER_SPEC
 kops create secret --name $CLUSTER_NAME sshpublickey admin -i $PUBKEY
 # The following command updates the cluster and updates the kubeconfig
 kops update cluster $CLUSTER_NAME --admin --yes
-
 # Wait for worker nodes and master to be ready
 kops validate cluster --wait 20m
-
 echo "Cluster nodes are Ready"
 echo
 
@@ -93,33 +94,21 @@ terraform plan &&\
 terraform apply -auto-approve &&\
 cd -
 pwd
+
 # =======================================================
-
-echo "Install default container limits"
-echo
-# kubectl apply -f ./limit-range/limit-range.yaml
-
-echo "Install Weave, CNI-Genie, Sidecar Daemonset..."
-echo
-
-kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml
-# -f ./sidecar.yaml
-#./kops-weave/weave.yml \
-# -f ./kops-weave/genie-plugin.yaml \
-# -f ./kops-weave/dummy.yml \
-
 echo "Installing ArgoCD"
 kubectl create namespace argocd
 
 helm repo add argo https://argoproj.github.io/argo-helm
 helm install argocd argo/argo-cd \
-     --version 5.31.0 \
+     --version ${ARGOCD_VERSION} \
      --namespace=argocd \
      -f ./argocd/values.yaml
 
 echo "Giving some seconds to ArgoCD to be operative..."
 sleep 20
 
+# =======================================================
 echo "Installing root app..."
 kubectl apply -f - <<EOF
 # We generate this ArgoCD application with Terraform, but we keep it here as a workaround
@@ -147,19 +136,7 @@ spec:
     - CreateNamespace=true
 EOF
 
-#echo "Install Weave service monitor..."
-#echo
-#
-#kubectl apply -f ./kops-weave/weave-metrics-service.yml \
-#              -f ./kops-weave/weave-service-monitor.yml
-
-# echo "Wait for Sidecar to be Ready..."
-# echo
-# RUNNING_SIDECARS=0
-# while [ "$RUNNING_SIDECARS" -ne "$WORKER_NODES" ]; do RUNNING_SIDECARS=$(kubectl get pods | grep testground-sidecar | grep Running | wc -l || true); echo "Got $RUNNING_SIDECARS running sidecar pods"; sleep 5; done;#
-
-# echo "Testground cluster is installed"
-# echo
-
+# =======================================================
 END_TIME=`date +%s`
 echo "Execution time was `expr $END_TIME - $START_TIME` seconds"
+# =======================================================
