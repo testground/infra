@@ -269,7 +269,7 @@ spec:
 # Notes:
 # multus and weave were 'fighting' over eth0; happening because multus writes the weave config inside 00-multus.conf, instead of the primary CNI config. errors like:
 # could not create veth pair vethwepl7524981-vethwepg7524981: file exists
-# Initially solved by restarting the 'kube-multus-ds' in '-n kube-system', but later introduced a custom configmap and editing the multus daemonset ("cniVersion": "0.3.1") 
+# Initially solved by restarting the 'kube-multus-ds' in '-n kube-system', but later introduced a custom configmap and editing the multus daemonset ("cniVersion": "0.3.1")
 # so it always includes the primary CNI config (AWS VPC CNI instead of weave)
 # Issue referenced here:
 # https://github.com/testground/testground/issues/1459
