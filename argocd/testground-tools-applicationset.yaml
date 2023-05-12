@@ -14,8 +14,6 @@ spec:
       - path: 'manifests/tooling/*'
       - path: manifests/tooling/deactivated
         exclude: true
-      - path: manifests/tooling/telegraf-operator
-        exclude: true
   template:
     metadata:
       name: 'testground-tools-{{path[2]}}'
