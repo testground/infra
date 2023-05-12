@@ -8,8 +8,6 @@ spec:
   - git:
       repoURL: https://github.com/celestiaorg/testground-infra.git
       revision: jose/hackground-k8s-tf
-      files:
-      - path: 'manifests/tooling/telegraf-operator/argocd_app.yaml'
       directories:
       - path: 'manifests/tooling/*'
       - path: manifests/tooling/deactivated
