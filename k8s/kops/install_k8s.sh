@@ -136,6 +136,11 @@ spec:
     - CreateNamespace=true
 EOF
 
+echo "Installing AutoScaler"
+helm repo add autoscaler https://kubernetes.github.io/autoscaler
+helm install autoscaler autoscaler/cluster-autoscaler \
+    --set autoDiscovery.clusterName=$CLUSTER_NAME
+
 # =======================================================
 END_TIME=`date +%s`
 echo "Execution time was `expr $END_TIME - $START_TIME` seconds"

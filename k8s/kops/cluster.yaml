@@ -130,7 +130,7 @@ spec:
     name: ${ZONE_A}
     type: Public
     zone: ${ZONE_A}
-      #- cidr: 172.20.64.0/19
+    #- cidr: 172.20.64.0/19
   - cidr: 172.20.128.0/19
     name: ${ZONE_B}
     type: Public
@@ -175,6 +175,9 @@ spec:
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 3
   minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/enabled: "1"
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}0
   role: Master
@@ -215,6 +218,9 @@ spec:
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 3
   minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/enabled: "1"
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}1
   role: Master
@@ -255,6 +261,9 @@ spec:
   machineType: ${MASTER_NODE_TYPE}
   maxSize: 3
   minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/enabled: "1"
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}2
   role: Master
@@ -293,6 +302,8 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
+    k8s.io/cluster-autoscaler/enabled: "1"
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   image: testground_2023-05-04
   machineType: ${WORKER_NODE_TYPE}
   maxSize: ${WORKER_NODES}
@@ -336,10 +347,12 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
+    k8s.io/cluster-autoscaler/enabled: "1"
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   image: testground_2023-05-04
   machineType: c5.2xlarge
-  maxSize: 80
-  minSize: 5
+  maxSize: 100
+  minSize: 80
   nodeLabels:
     kops.k8s.io/instancegroup: tginfra
     testground.node.role.infra: "true"
