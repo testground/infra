@@ -123,7 +123,10 @@ spec:
   kubernetesApiAccess:
   - 0.0.0.0/0
   # kubernetesVersion: 1.22.17
+  # the latest version we can use atm is this one, due to the Docker CRI
   kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
+  #kubernetesVersion: v1.24.0
+  # kubernetesVersion: v1.25.4
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 172.20.0.0/16
@@ -368,8 +371,10 @@ spec:
     testground.node.role.infra: "true"
   image: testground_2023-05-04
   machineType: c5.2xlarge
-  maxSize: 100
-  minSize: 35
+    #maxSize: 100
+    #minSize: 75
+  maxSize: 20
+  minSize: 5
   cloudLabels:
     k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
     k8s.io/cluster-autoscaler/enabled: ""
