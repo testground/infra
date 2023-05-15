@@ -17,6 +17,14 @@ spec:
       type: Public
   kubeDNS:
     provider: CoreDNS
+  # https://kops.sigs.k8s.io/addons/#metrics-server
+  certManager:
+    enabled: true
+  metricsServer:
+    enabled: true
+    insecure: false
+  clusterAutoscaler:
+    enabled: true
   additionalPolicies: # https://kops.sigs.k8s.io/iam_roles/#adding-additional-policies
     node: |
       [
@@ -176,10 +184,13 @@ spec:
   maxSize: 3
   minSize: 1
   cloudLabels:
-    k8s.io/cluster-autoscaler/enabled: "1"
-    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}0
+      #k8s.io/cluster-autoscaler/enabled: 1
+      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
@@ -219,10 +230,13 @@ spec:
   maxSize: 3
   minSize: 1
   cloudLabels:
-    k8s.io/cluster-autoscaler/enabled: "1"
-    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}1
+      #k8s.io/cluster-autoscaler/enabled: 1
+      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
@@ -262,10 +276,13 @@ spec:
   maxSize: 3
   minSize: 1
   cloudLabels:
-    k8s.io/cluster-autoscaler/enabled: "1"
-    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}2
+      #k8s.io/cluster-autoscaler/enabled: 1
+      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
@@ -302,12 +319,14 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.plan: "true"
-    k8s.io/cluster-autoscaler/enabled: "1"
-    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   image: testground_2023-05-04
   machineType: ${WORKER_NODE_TYPE}
-  maxSize: ${WORKER_NODES}
-  minSize: ${WORKER_NODES}
+  maxSize: ${MAX_WORKER_NODES}
+  minSize: ${MIN_WORKER_NODES}
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: nodes
     testground.node.role.plan: "true"
@@ -347,12 +366,14 @@ spec:
       EOT
   cloudLabels:
     testground.node.role.infra: "true"
-    k8s.io/cluster-autoscaler/enabled: "1"
-    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: ""
   image: testground_2023-05-04
   machineType: c5.2xlarge
   maxSize: 100
-  minSize: 80
+  minSize: 35
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: tginfra
     testground.node.role.infra: "true"

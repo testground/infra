@@ -55,7 +55,8 @@ echo "AWS availability zone B (ZONE_B): $ZONE_B"
 echo "AWS region (AWS_REGION): $AWS_REGION"
 echo "AWS worker node type (WORKER_NODE_TYPE): $WORKER_NODE_TYPE"
 echo "AWS master node type (MASTER_NODE_TYPE): $MASTER_NODE_TYPE"
-echo "Worker nodes (WORKER_NODES): $WORKER_NODES"
+echo "Min number of Worker nodes (MIN_WORKER_NODES): $MIN_WORKER_NODES"
+echo "Max number of Worker nodes (MAX_WORKER_NODES): $MAX_WORKER_NODES"
 echo "Public key (PUBKEY): $PUBKEY"
 echo
 
@@ -135,11 +136,6 @@ spec:
     - ApplyOutOfSyncOnly=true
     - CreateNamespace=true
 EOF
-
-echo "Installing AutoScaler"
-helm repo add autoscaler https://kubernetes.github.io/autoscaler
-helm install autoscaler autoscaler/cluster-autoscaler \
-    --set autoDiscovery.clusterName=$CLUSTER_NAME
 
 # =======================================================
 END_TIME=`date +%s`
