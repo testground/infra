@@ -9,6 +9,3 @@ resources:
 - testground-applicationset.yaml
 - networking-applicationset.yaml
 - testground-tools-applicationset.yaml
-#- telegraf-operator.yaml
-#- kustomization.yaml
-#- influxdb.yaml
