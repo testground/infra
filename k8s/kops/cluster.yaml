@@ -192,8 +192,6 @@ spec:
     k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}0
-      #k8s.io/cluster-autoscaler/enabled: 1
-      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
@@ -238,8 +236,6 @@ spec:
     k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}1
-      #k8s.io/cluster-autoscaler/enabled: 1
-      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
@@ -284,8 +280,6 @@ spec:
     k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: master-${ZONE_A}2
-      #k8s.io/cluster-autoscaler/enabled: 1
-      #k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
   role: Master
   subnets:
   - ${ZONE_A}
