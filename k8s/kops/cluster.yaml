@@ -125,7 +125,7 @@ spec:
   # kubernetesVersion: 1.22.17
   # the latest version we can use atm is this one, due to the Docker CRI
   kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
-  #kubernetesVersion: v1.24.0
+  #kubernetesVersion: v1.24.5
   # kubernetesVersion: v1.25.4
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
