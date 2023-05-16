@@ -178,8 +178,8 @@ spec:
         name: kube-multus
         resources:
           limits:
-            cpu: 100m
-            memory: 50Mi
+            cpu: 250m
+            memory: 350Mi
           requests:
             cpu: 100m
             memory: 50Mi
