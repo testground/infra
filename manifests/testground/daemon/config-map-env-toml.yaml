@@ -8,7 +8,7 @@ data:
     ["aws"]
     region = "eu-west-1" # FIXME: this wont have to be hardcoded
     [runners."cluster:k8s"]
-    run_timeout_min             = 15
+    run_timeout_min             = 30
     testplan_pod_cpu            = "100m"
     testplan_pod_memory         = "100Mi"
     collect_outputs_pod_cpu     = "1000m"
@@ -24,7 +24,7 @@ data:
     influxdb_endpoint = "http://influxdb:8086"
     [daemon.scheduler]
     workers = 2
-    task_timeout_min  = 20
+    task_timeout_min  = 25
     task_repo_type    = "disk"
     [client]
     endpoint = "localhost:8080"
