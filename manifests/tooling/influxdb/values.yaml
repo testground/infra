@@ -9,7 +9,6 @@ releaseName: bitnami-full-index
 auth:
   enabled: false
 influxdb:
-  replicaCount: 3
   nodeSelector:
     testground.node.role.infra: "true"
   service:
