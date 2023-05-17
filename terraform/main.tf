@@ -3,7 +3,7 @@
 //################################################################################
 locals {
   region       = "eu-west-1"
-  project_name = "devops-2"
+  project_name = "testground"
   environment  = "tg"
   vpc_cidr     = "10.1"
   azs          = ["${local.region}a", "${local.region}b", "${local.region}c"]
@@ -106,25 +106,19 @@ module "eks_blueprints" {
   }
 
   # List of map_users
+  # define your list of users here
+  # Example:
+  # map_users = [
+  #   {
+  #     userarn  = "arn:aws:iam::<your-account-id>:user/<user-id>"
+  #     username = "<username>"
+  #     groups   = ["system:masters"]
+  #   }
+  # ]
   map_users = [
     {
-      userarn  = "arn:aws:iam::506657148836:user/samuel@celestia.org"
-      username = "samuel@celestia.org"
-      groups   = ["system:masters"]
-    },
-    {
-      userarn  = "arn:aws:iam::506657148836:user/viet@celestia.org"
-      username = "viet@celestia.org"
-      groups   = ["system:masters"]
-    },
-    {
-      userarn  = "arn:aws:iam::506657148836:user/alexk@celestia.org"
-      username = "alexk@celestia.org"
-      groups   = ["system:masters"]
-    },
-    {
-      userarn  = "arn:aws:iam::506657148836:user/jose@celestia.org"
-      username = "jose@celestia.org"
+      userarn  = "arn:aws:iam::*:user/*"
+      username = "*"
       groups   = ["system:masters"]
     }
   ]
@@ -135,17 +129,6 @@ module "eks_blueprints" {
       node_group_name = "ng-1-infra"
       instance_types  = ["c5.4xlarge"]
 
-      //ami_id             = "ami-083694f0a1d262109"
-      //custom_ami_id      = "ami-083694f0a1d262109"
-      //create_launch_template = true              # false will use the default launch template
-      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
-
-      // TODO: FIXME PLEASE!
-      // we are hardcoding the first element of the list in order to use ONLY
-      // the first az in the nodes
-      //subnet_ids      = split(",", module.vpc.public_subnets[0])
-      //subnets_id = element(module.vpc.public_subnets, 0)
-      //subnets_id = "subnet-0315baa5c81ff7d10"
       subnet_ids    = module.vpc.private_subnets
       capacity_type = "ON_DEMAND"
       disk_size     = 30
@@ -160,91 +143,46 @@ module "eks_blueprints" {
 
       create_launch_template = true
       kubelet_extra_args     = "--use-max-pods=false --max-pods=58"
-
-      //enable_bootstrap_user_data = true
-      //bootstrap_extra_args       = "--container-runtime dockerd"
-      //pre_bootstrap_user_data    = <<-EOT
-      //#!/bin/bash
-      //set -ex
-
-      //# https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html#determine-max-pods
-      //# https://github.com/awslabs/amazon-eks-ami/blob/master/files/bootstrap.sh
-      //cat <<-EOF > /etc/profile.d/bootstrap.sh
-      //  export DEFAULT_CONTAINER_RUNTIME="dockerd"
-      //  export CONTAINER_RUNTIME="dockerd"
-      //  export USE_MAX_PODS=false
-      //EOF
-      //# Source extra environment variables in bootstrap script
-      //sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
-      //sed -i 's/KUBELET_EXTRA_ARGS=$2/KUBELET_EXTRA_ARGS="$2 $KUBELET_EXTRA_ARGS"/' /etc/eks/bootstrap.sh
-      //EOT
-
-      //bootstrap_extra_args   = ""
-      //bootstrap_extra_args   = "--use-max-pods=false --max-pods=58 --container-runtime docker"
-      //bootstrap_extra_args   = ""
-      //pre_userdata = <<-EOT
-      //sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
-      //fs.file-max = 3178504
-      //net.core.somaxconn = 131072
-      //net.netfilter.nf_conntrack_max = 1048576
-      //net.core.netdev_max_backlog = 524288
-      //net.core.rmem_max = 16777216
-      //net.core.wmem_max = 16777216
-      //net.ipv4.tcp_rmem = 16384 131072 16777216
-      //net.ipv4.tcp_wmem = 16384 131072 16777216
-      //net.ipv4.tcp_mem = 262144 524288 1572864
-      //net.ipv4.tcp_max_syn_backlog = 131072
-      //net.ipv4.ip_local_port_range = 10000 65535
-      //net.ipv4.tcp_tw_reuse = 1
-      //net.ipv4.ip_forward = 1
-      //net.ipv4.conf.all.rp_filter = 0
-      //net.ipv4.neigh.default.gc_thresh2 = 4096
-      //net.ipv4.neigh.default.gc_thresh3 = 32768
-      //SYSCTL'
-      //sudo sysctl -p /etc/sysctl.d/999-testground.conf
-      //sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
-      //* soft nproc 131072
-      //* hard nproc 262144
-      //* soft nofile 131072
-      //* hard nofile 262144
-      //LIMITS'
-      //EOT
-
-      //      iam:
-      // attachPolicyARNs:
-      // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess
-      // - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
-      // - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
-      // - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
-      // - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+      bootstrap_extra_args   = "--use-max-pods=false --max-pods=58 --container-runtime docker"
+      bootstrap_extra_args   = ""
+      pre_userdata = <<-EOT
+      sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
+      fs.file-max = 3178504
+      net.core.somaxconn = 131072
+      net.netfilter.nf_conntrack_max = 1048576
+      net.core.netdev_max_backlog = 524288
+      net.core.rmem_max = 16777216
+      net.core.wmem_max = 16777216
+      net.ipv4.tcp_rmem = 16384 131072 16777216
+      net.ipv4.tcp_wmem = 16384 131072 16777216
+      net.ipv4.tcp_mem = 262144 524288 1572864
+      net.ipv4.tcp_max_syn_backlog = 131072
+      net.ipv4.ip_local_port_range = 10000 65535
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.ip_forward = 1
+      net.ipv4.conf.all.rp_filter = 0
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 32768
+      SYSCTL'
+      sudo sysctl -p /etc/sysctl.d/999-testground.conf
+      sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+      * soft nproc 131072
+      * hard nproc 262144
+      * soft nofile 131072
+      * hard nofile 262144
+      LIMITS'
+      EOT
     },
     ng-2-plan = {
       node_group_name = "ng-2-plan"
       instance_types  = ["c5.4xlarge"]
 
-      //ami_id             = "ami-083694f0a1d262109"
-      //custom_ami_id      = "ami-083694f0a1d262109"
-      //create_launch_template = true              # false will use the default launch template
-      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
-      //custom_ami_id      = "ami-083694f0a1d262109"
-      //launch_template_os = "amazonlinux2eks" # amazonlinux2eks/bottlerocket # Used to identify the launch template
-
-      // TODO: FIXME PLEASE!
-      // we are hardcoding the first element of the list in order to use ONLY
-      // the first az in the nodes
-      //subnet_ids      = module.vpc.public_subnets[0].id
-      //subnets_id = element(module.vpc.public_subnets, 0)
-      //subnets_id = "subnet-0315baa5c81ff7d10"
-      //azs = slice(data.aws_availability_zones.available.names, 0, local.selected_azs)
       subnet_ids    = module.vpc.private_subnets
       capacity_type = "ON_DEMAND"
       disk_size     = 30
       k8s_labels = {
         "testground.node.role.plan" = "true"
       }
-
-      //remote_access = true
-      //ec2_ssh_key   = "sysrex"
 
       # Node Group scaling configuration
       max_size     = 10
@@ -253,56 +191,35 @@ module "eks_blueprints" {
 
       create_launch_template = true
       kubelet_extra_args     = "--max-pods=234 --allowed-unsafe-sysctls=net.core.somaxconn --use-max-pods=false"
+      bootstrap_extra_args     = "--use-max-pods=false --max-pods=58 --container-runtime docker"
 
-      //enable_bootstrap_user_data = true
-      //bootstrap_extra_args       = "--container-runtime containerd"
-      //bootstrap_extra_args    = "--container-runtime dockerd"
-      //pre_bootstrap_user_data = <<-EOT
-      //#!/bin/bash
-      //set -ex
-
-      //# https://docs.aws.amazon.com/eks/latest/userguide/choosing-instance-type.html#determine-max-pods
-      //cat <<-EOF > /etc/profile.d/bootstrap.sh
-      //  export DEFAULT_CONTAINER_RUNTIME="dockerd"
-      //  export CONTAINER_RUNTIME="dockerd"
-      //  export USE_MAX_PODS=false
-      //EOF
-      //# Source extra environment variables in bootstrap script
-      //sed -i '/^set -o errexit/a\\nsource /etc/profile.d/bootstrap.sh' /etc/eks/bootstrap.sh
-      //sed -i 's/KUBELET_EXTRA_ARGS=$2/KUBELET_EXTRA_ARGS="$2 $KUBELET_EXTRA_ARGS"/' /etc/eks/bootstrap.sh
-      //EOT
-
-      //bootstrap_extra_args   = ""
-      //bootstrap_extra_args     = "--use-max-pods=false --max-pods=58 --container-runtime docker"
-
-      # pre_userdata can be used in both cases where you provide custom_ami_id or ami_type
-      //pre_userdata = <<-EOT
-      //sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
-      //fs.file-max = 3178504
-      //net.core.somaxconn = 131072
-      //net.netfilter.nf_conntrack_max = 1048576
-      //net.core.netdev_max_backlog = 524288
-      //net.core.rmem_max = 16777216
-      //net.core.wmem_max = 16777216
-      //net.ipv4.tcp_rmem = 16384 131072 16777216
-      //net.ipv4.tcp_wmem = 16384 131072 16777216
-      //net.ipv4.tcp_mem = 262144 524288 1572864
-      //net.ipv4.tcp_max_syn_backlog = 131072
-      //net.ipv4.ip_local_port_range = 10000 65535
-      //net.ipv4.tcp_tw_reuse = 1
-      //net.ipv4.ip_forward = 1
-      //net.ipv4.conf.all.rp_filter = 0
-      //net.ipv4.neigh.default.gc_thresh2 = 4096
-      //net.ipv4.neigh.default.gc_thresh3 = 32768
-      //SYSCTL'
-      //sudo sysctl -p /etc/sysctl.d/999-testground.conf"
-      //sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
-      //* soft nproc 131072
-      //* hard nproc 262144
-      //* soft nofile 131072
-      //* hard nofile 262144
-      //LIMITS'
-      //EOT
+      pre_userdata = <<-EOT
+      sudo bash -c 'cat <<SYSCTL > /etc/sysctl.d/999-testground.conf
+      fs.file-max = 3178504
+      net.core.somaxconn = 131072
+      net.netfilter.nf_conntrack_max = 1048576
+      net.core.netdev_max_backlog = 524288
+      net.core.rmem_max = 16777216
+      net.core.wmem_max = 16777216
+      net.ipv4.tcp_rmem = 16384 131072 16777216
+      net.ipv4.tcp_wmem = 16384 131072 16777216
+      net.ipv4.tcp_mem = 262144 524288 1572864
+      net.ipv4.tcp_max_syn_backlog = 131072
+      net.ipv4.ip_local_port_range = 10000 65535
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.ip_forward = 1
+      net.ipv4.conf.all.rp_filter = 0
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 32768
+      SYSCTL'
+      sudo sysctl -p /etc/sysctl.d/999-testground.conf"
+      sudo bash -c 'cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+      * soft nproc 131072
+      * hard nproc 262144
+      * soft nofile 131072
+      * hard nofile 262144
+      LIMITS'
+      EOT
     }
   }
 
