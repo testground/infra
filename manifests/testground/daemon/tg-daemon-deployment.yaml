@@ -41,7 +41,7 @@ spec:
             memory: 1000Mi
             cpu: 700m
       - name: testground-daemon
-        image: ghcr.io/celestiaorg/testground:39661ea
+        image: ghcr.io/celestiaorg/testground:900c23e
         imagePullPolicy: Always
         env:
         - name: REDIS_HOST
