@@ -464,10 +464,8 @@ spec:
     #  onDemandAboveBase: 0
     #  onDemandBase: 0
     #  spotAllocationStrategy: capacity-optimized
-  minSize: 50
   minSize: 10
-    #maxSize: 25
-    #minSize: 12
+  maxSize: 15
   cloudLabels:
     k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
     k8s.io/cluster-autoscaler/enabled: ""
