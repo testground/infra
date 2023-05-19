@@ -17,7 +17,7 @@ spec:
           data:
             default: |
               [[outputs.influxdb]]
-                urls = ["http://influxdb:8086"]
+                urls = ["http://influxdb.default.svc:8086"]
                 database = "testground"
         resources:
           limits:
