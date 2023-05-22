@@ -17,7 +17,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: testground-sync-service
-          image: ghcr.io/celestiaorg/sync-service:e38a411
+          image: ghcr.io/celestiaorg/sync-service:5c9eba6
           command: ["/service"]
           ports:
             - name: syncservicehttp
