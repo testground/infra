@@ -461,14 +461,15 @@ spec:
   cloudLabels:
     testground.node.role.infra: "true"
   image: testground_2023-05-04
-  machineType: c5.4xlarge
+    #machineType: c5.4xlarge
+  machineType: c5.9xlarge
     #mixedInstancesPolicy:
     #  instances:
     #  - c5.9xlarge
     #  onDemandAboveBase: 0
     #  onDemandBase: 0
     #  spotAllocationStrategy: capacity-optimized
-  minSize: 30
+  minSize: 40
   maxSize: 50
   cloudLabels:
     k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
