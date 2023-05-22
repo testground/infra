@@ -14,6 +14,7 @@ data:
     collect_outputs_pod_cpu     = "1000m"
     collect_outputs_pod_memory  = "1000Mi"
     provider                    = "aws"
+    autoscaler_enabled = true
     sysctls = [
       "net.core.somaxconn=10000",
     ]
