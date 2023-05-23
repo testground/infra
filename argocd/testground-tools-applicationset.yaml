@@ -26,10 +26,10 @@ spec:
         namespace: default
       syncPolicy:
         automated:
-          prune: false
+          prune: true
           allowEmpty: true
-          selfHeal: false
+          selfHeal: true
         syncOptions:
-        - ApplyOutOfSyncOnly=false
+        - ApplyOutOfSyncOnly=true
         - CreateNamespace=true
         - ServerSideApply=true
