@@ -3,7 +3,6 @@ kind: Kustomization
 
 # https://github.com/grafana/agent/tree/main/production/operator/crds
 resources:
-- ns.yaml
 - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_grafanaagents.yaml
 - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_podlogs.yaml
 - https://raw.githubusercontent.com/grafana/agent/main/production/operator/crds/monitoring.grafana.com_logsinstances.yaml

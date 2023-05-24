@@ -8,7 +8,7 @@ spec:
   - name: Loki
     type: loki
     access: proxy
-    url: http://loki-headless.observability.svc.cluster.local:3100
+    url: http://loki-headless.default.svc.cluster.local:3100
     isDefault: false
     version: 1
     editable: true
