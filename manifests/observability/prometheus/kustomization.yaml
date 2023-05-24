@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: observability
+namespace: default
 
 helmCharts:
 - name: kube-prometheus-stack
   releaseName: tg-monitoring
   repo: https://prometheus-community.github.io/helm-charts
   version: 43.2.1
-  namespace: observability
+  namespace: default
   valuesFile: values.yaml
 
 # resources:

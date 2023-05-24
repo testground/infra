@@ -7,4 +7,4 @@ helmCharts:
   repo: https://grafana.github.io/helm-charts
   version: "6.9.3"
   valuesFile: values.yaml
-  namespace: observability
+  namespace: default

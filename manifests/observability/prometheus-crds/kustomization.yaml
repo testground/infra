@@ -1,14 +1,14 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: observability
+namespace: default
 
 helmCharts:
 - name: prometheus-operator-crds
   releaseName: tg-monitoring
   repo: https://prometheus-community.github.io/helm-charts
   version: 3.0.0
-  namespace: observability
+  namespace: default
 
 # resources:
 # - https://raw.githubusercontent.com/prometheus-operator/prometheus-operator/v0.63.0/example/prometheus-operator-crd/monitoring.coreos.com_alertmanagerconfigs.yaml

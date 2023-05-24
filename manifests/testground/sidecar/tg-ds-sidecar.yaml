@@ -31,7 +31,8 @@ spec:
         - name: LOG_LEVEL
           value: "DEBUG"
         - name: REDIS_HOST
-          value: "testground-infra-redis"
+          #value: "testground-infra-redis"
+          value: "testground-infra-redis-master"
         - name: INFLUXDB_HOST
           value: "influxdb"
         - name: INFLUXDB_URL
