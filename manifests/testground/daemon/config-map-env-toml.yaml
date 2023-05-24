@@ -1,0 +1,31 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: env-toml-cfg
+  namespace: default
+data:
+  .env.toml: |
+    ["aws"]
+    region = "eu-west-1" # FIXME: this wont have to be hardcoded
+    [runners."cluster:k8s"]
+    run_timeout_min             = 30
+    testplan_pod_cpu            = "100m"
+    testplan_pod_memory         = "100Mi"
+    collect_outputs_pod_cpu     = "1000m"
+    collect_outputs_pod_memory  = "1000Mi"
+    provider                    = "aws"
+    autoscaler_enabled = true
+    sysctls = [
+      "net.core.somaxconn=10000",
+    ]
+    [daemon]
+    listen = "0.0.0.0:8042"
+    slack_webhook_url = ""
+    github_repo_status_token = ""
+    influxdb_endpoint = "http://influxdb:8086"
+    [daemon.scheduler]
+    workers = 2
+    task_timeout_min  = 25
+    task_repo_type    = "disk"
+    [client]
+    endpoint = "localhost:8080"

@@ -2,6 +2,12 @@
 
 sudo apt update
 sudo apt install -y docker.io
+# Required to have NFS client available
+sudo apt-get update -y
+sudo apt-get install -y libnfsidmap2
+sudo apt-get install -y rpcbind
+sudo apt-get install -y libkeyutils1
+sudo apt-get install -y nfs-common
 
 sudo docker pull bitnami/redis:5.0.8-debian-10-r39
 sudo docker pull bitnami/redis-exporter:1.5.2-debian-10-r27

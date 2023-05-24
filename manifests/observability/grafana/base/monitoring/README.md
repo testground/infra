@@ -1,0 +1,1 @@
+The `dashboard.sh` script creates `GrafanaDashboard` resources from [kube-prometheus](https://raw.githubusercontent.com/prometheus-operator/kube-prometheus/main/manifests/grafana-dashboardDefinitions.yaml) default dashboards.

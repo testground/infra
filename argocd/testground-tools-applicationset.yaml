@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: testground-tools
+  namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/celestiaorg/testground-infra.git
+      revision: jose/hackground-k8s-tf
+      directories:
+      - path: 'manifests/tooling/*'
+      - path: manifests/tooling/deactivated
+        exclude: true
+  template:
+    metadata:
+      name: 'testground-tools-{{path[2]}}'
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/celestiaorg/testground-infra.git
+        path: 'manifests/tooling/{{path[2]}}'
+        targetRevision: jose/hackground-k8s-tf
+      destination:
+        name: in-cluster
+        namespace: default
+      syncPolicy:
+        automated:
+          prune: true
+          allowEmpty: true
+          selfHeal: true
+        syncOptions:
+        - ApplyOutOfSyncOnly=true
+        - CreateNamespace=true
+        - ServerSideApply=true

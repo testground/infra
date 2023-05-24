@@ -19,12 +19,12 @@ data:
         org: default
         bucket: testground
         metrics_schema: telegraf-prometheus-v1
-    
+
         sending_queue:
           enabled: true
           num_consumers: 3
           queue_size: 10
-    
+
         retry_on_failure:
           enabled: true
           initial_interval: 1s

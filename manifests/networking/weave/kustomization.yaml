@@ -1,0 +1,11 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- weave.yaml
+- drop-weave-cm.yaml
+- drop-weave-ds.yaml
+- networkattachmentdefinition.yaml
+- clusterrolebinding.yaml
+#- multi-weave.yaml
+#- https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml

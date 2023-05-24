@@ -1,0 +1,46 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: default
+
+helmCharts:
+- name: kube-prometheus-stack
+  releaseName: tg-monitoring
+  repo: https://prometheus-community.github.io/helm-charts
+  version: 43.2.1
+  namespace: default
+  valuesFile: values.yaml
+
+# resources:
+# - https://github.com/prometheus-operator/kube-prometheus?v0.12.0
+
+# patchesStrategicMerge:
+# # Namespace specific roles fail as we change the namespace to observability
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: RoleBinding
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: default
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: Role
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: default
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: RoleBinding
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: kube-system
+#   $patch: delete
+# - |-
+#   apiVersion: rbac.authorization.k8s.io/v1
+#   kind: Role
+#   metadata:
+#     name: prometheus-k8s
+#     namespace: kube-system
+#   $patch: delete

@@ -1,0 +1,11 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: efs
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: aws-efs
+  resources:
+    requests:
+      storage: 1000Mi

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testground-sync-service
+spec:
+  selector:
+    matchLabels:
+      name: testground-sync-service
+  template:
+    metadata:
+      labels:
+        name: testground-sync-service
+    spec:
+      terminationGracePeriodSeconds: 10
+      hostPID: true
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: testground-sync-service
+          image: ghcr.io/celestiaorg/sync-service:5c9eba6
+          command: ["/service"]
+          ports:
+            - name: syncservicehttp
+              containerPort: 5050
+          env:
+            - name: DEBUG
+              value: "true"
+          resources:
+            limits:
+              cpu: 800m
+              memory: 1000Mi
+            requests:
+              cpu: 120m
+              memory: 130Mi
+      nodeSelector:
+        testground.node.role.plan: "true"
+
+# Notes:
+# testground (storm) tests failing when using more than 40 instances/pods; sync-service showed an OOMkilled error
+# The solution was to increase requests for the sync service pod from 20cpu/20MB RAM to 120cpu/130MB, and also increase the limits as well just as a buffer for larger deployments
+# Also, with these values we are able to reach the hardware limits of the c5.4xlarge nodes, so there is no point in increasing them further.
+# Issue referenced here:
+# https://github.com/testground/testground/issues/1453
