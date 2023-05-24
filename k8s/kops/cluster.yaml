@@ -1,3 +1,4 @@
+---
 apiVersion: kops.k8s.io/v1alpha2
 kind: Cluster
 metadata:
@@ -16,13 +17,39 @@ spec:
       type: Public
   kubeDNS:
     provider: CoreDNS
-  additionalPolicies:
+  # https://kops.sigs.k8s.io/addons/#metrics-server
+  certManager:
+    enabled: true
+  metricsServer:
+    enabled: true
+    insecure: false
+  clusterAutoscaler:
+    enabled: true
+  additionalPolicies: # https://kops.sigs.k8s.io/iam_roles/#adding-additional-policies
     node: |
       [
         {
           "Effect": "Allow",
           "Action": [
-              "ecr:*"
+              "ecr:*",
+              "ec2:*",
+              "autoscaling:*",
+              "elasticfilesystem:*",
+              "elasticloadbalancing:*"
+          ],
+          "Resource": "*"
+        }
+      ]
+    master: |
+      [
+        {
+          "Effect": "Allow",
+          "Action": [
+              "ecr:*",
+              "ec2:*",
+              "autoscaling:*",
+              "elasticfilesystem:*",
+              "elasticloadbalancing:*"
           ],
           "Resource": "*"
         }
@@ -38,14 +65,22 @@ spec:
   etcdClusters:
   - cpuRequest: 200m
     etcdMembers:
-    - instanceGroup: master-${ZONE}
+    - instanceGroup: master-${ZONE}0
       name: a
+    - instanceGroup: master-${ZONE}1
+      name: b
+    - instanceGroup: master-${ZONE}2
+      name: c
     memoryRequest: 100Mi
     name: main
   - cpuRequest: 100m
     etcdMembers:
-    - instanceGroup: master-${ZONE}
+    - instanceGroup: master-${ZONE}0
       name: a
+    - instanceGroup: master-${ZONE}1
+      name: b
+    - instanceGroup: master-${ZONE}2
+      name: c
     memoryRequest: 100Mi
     name: events
   hooks:
@@ -61,7 +96,7 @@ spec:
     legacy: false
   kubelet:
     anonymousAuth: false
-    maxPods: 200
+    maxPods: 200 # 234 is the max number of pods for c5.4xlarge
     allowedUnsafeSysctls:
       - net.netfilter.nf_conntrack_max
       - net.core.somaxconn
@@ -87,22 +122,27 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: 1.18.10
+  # the latest version we can use atm is this one, due to the Docker CRI
+  kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
+  # kubernetesVersion: 1.22.17
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
-  networkCIDR: 172.20.0.0/16
+  networkCIDR: 192.168.0.0/16
   networking:
-    flannel:
-      backend: vxlan
-  nonMasqueradeCIDR: 100.64.0.0/10
+    #amazonvpc: {} # https://kops.sigs.k8s.io/networking/aws-vpc/
+    amazonvpc:
+      env:
+      - name: AWS_VPC_K8S_CNI_LOGLEVEL
+        value: debug
+  #nonMasqueradeCIDR: 100.64.0.0/10
   sshAccess:
   - 0.0.0.0/0
   subnets:
-  - cidr: 172.20.32.0/19
+  - cidr: 192.168.0.0/17 # hosts: 32,768
     name: ${ZONE_A}
     type: Public
     zone: ${ZONE_A}
-  - cidr: 172.20.64.0/19
+  - cidr: 192.168.128.0/17 # hosts: 32,768
     name: ${ZONE_B}
     type: Public
     zone: ${ZONE_B}
@@ -113,14 +153,13 @@ spec:
     nodes: public
 
 ---
-
 apiVersion: kops.k8s.io/v1alpha2
 kind: InstanceGroup
 metadata:
   creationTimestamp: null
   labels:
     kops.k8s.io/cluster: ${CLUSTER_NAME}
-  name: master-${ZONE}
+  name: master-${ZONE}0
 spec:
   additionalUserData:
   - name: myscript.sh
@@ -128,33 +167,148 @@ spec:
     content: |
       #!/bin/sh
       cat <<EOT >> /etc/sysctl.d/999-testground.conf
+      fs.file-max = 3178504
       net.core.somaxconn = 131072
       net.netfilter.nf_conntrack_max = 1048576
-      net.ipv4.tcp_max_syn_backlog = 131072
       net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 10000 65535
-      net.ipv4.tcp_tw_recycle = 1
-      net.ipv4.tcp_tw_reuse = 1
-      net.core.rmem_max = 4194304
-      net.core.wmem_max = 4194304
+      net.core.rmem_max = 16777216
+      net.core.wmem_max = 16777216
+      net.ipv4.tcp_rmem = 16384 131072 16777216
+      net.ipv4.tcp_wmem = 16384 131072 16777216
       net.ipv4.tcp_mem = 262144 524288 1572864
-      net.ipv4.tcp_rmem = 16384 131072 4194304
-      net.ipv4.tcp_wmem = 16384 131072 4194304
+      net.ipv4.tcp_max_syn_backlog = 131072
+      net.ipv4.ip_local_port_range = 10000 65535
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.ip_forward = 1
+      net.ipv4.conf.all.rp_filter = 0
       net.ipv4.neigh.default.gc_thresh2 = 4096
       net.ipv4.neigh.default.gc_thresh3 = 32768
       EOT
-  image: 909427826938/testground_2020-10-30
+      cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+       *  soft  nproc  131072
+       *  hard  nproc  262144
+       *  soft  nofile 131072
+       *  hard  nofile 262144
+      LIMITS
+  image: testground_2023-05-04
   machineType: ${MASTER_NODE_TYPE}
-  maxSize: 1
+  maxSize: 3
   minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
-    kops.k8s.io/instancegroup: master-${ZONE_A}
+    kops.k8s.io/instancegroup: master-${ZONE_A}0
   role: Master
   subnets:
   - ${ZONE_A}
 
 ---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: ${CLUSTER_NAME}
+  name: master-${ZONE}1
+spec:
+  additionalUserData:
+  - name: myscript.sh
+    type: text/x-shellscript
+    content: |
+      #!/bin/sh
+      cat <<EOT >> /etc/sysctl.d/999-testground.conf
+      fs.file-max = 3178504
+      net.core.somaxconn = 131072
+      net.netfilter.nf_conntrack_max = 1048576
+      net.core.netdev_max_backlog = 524288
+      net.core.rmem_max = 16777216
+      net.core.wmem_max = 16777216
+      net.ipv4.tcp_rmem = 16384 131072 16777216
+      net.ipv4.tcp_wmem = 16384 131072 16777216
+      net.ipv4.tcp_mem = 262144 524288 1572864
+      net.ipv4.tcp_max_syn_backlog = 131072
+      net.ipv4.ip_local_port_range = 10000 65535
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.ip_forward = 1
+      net.ipv4.conf.all.rp_filter = 0
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 32768
+      EOT
+      cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+       *  soft  nproc  131072
+       *  hard  nproc  262144
+       *  soft  nofile 131072
+       *  hard  nofile 262144
+      LIMITS
+  image: testground_2023-05-04
+  machineType: ${MASTER_NODE_TYPE}
+  maxSize: 3
+  minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-${ZONE_A}1
+  role: Master
+  subnets:
+  - ${ZONE_A}
 
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  creationTimestamp: null
+  labels:
+    kops.k8s.io/cluster: ${CLUSTER_NAME}
+  name: master-${ZONE}2
+spec:
+  additionalUserData:
+  - name: myscript.sh
+    type: text/x-shellscript
+    content: |
+      #!/bin/sh
+      cat <<EOT >> /etc/sysctl.d/999-testground.conf
+      fs.file-max = 3178504
+      net.core.somaxconn = 131072
+      net.netfilter.nf_conntrack_max = 1048576
+      net.core.netdev_max_backlog = 524288
+      net.core.rmem_max = 16777216
+      net.core.wmem_max = 16777216
+      net.ipv4.tcp_rmem = 16384 131072 16777216
+      net.ipv4.tcp_wmem = 16384 131072 16777216
+      net.ipv4.tcp_mem = 262144 524288 1572864
+      net.ipv4.tcp_max_syn_backlog = 131072
+      net.ipv4.ip_local_port_range = 10000 65535
+      net.ipv4.tcp_tw_reuse = 1
+      net.ipv4.ip_forward = 1
+      net.ipv4.conf.all.rp_filter = 0
+      net.ipv4.neigh.default.gc_thresh2 = 4096
+      net.ipv4.neigh.default.gc_thresh3 = 32768
+      EOT
+      cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+       *  soft  nproc  131072
+       *  hard  nproc  262144
+       *  soft  nofile 131072
+       *  hard  nofile 262144
+      LIMITS
+  image: testground_2023-05-04
+  machineType: ${MASTER_NODE_TYPE}
+  maxSize: 3
+  minSize: 1
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
+  nodeLabels:
+    kops.k8s.io/instancegroup: master-${ZONE_A}2
+  role: Master
+  subnets:
+  - ${ZONE_A}
+
+---
 apiVersion: kops.k8s.io/v1alpha2
 kind: InstanceGroup
 metadata:
@@ -163,43 +317,80 @@ metadata:
     kops.k8s.io/cluster: ${CLUSTER_NAME}
   name: nodes
 spec:
+  kubelet:
+    maxPods: 117 # as we reduced the resources to the half
+    allowed-unsafe-sysctls: net.core.somaxconn
+    use-max-pods: false
+  sysctlParameters:
+  - fs.file-max = 3178504
+  - net.core.somaxconn = 131072
+  - net.netfilter.nf_conntrack_max = 1048576
+  - net.core.netdev_max_backlog = 524288
+  - net.core.rmem_max = 16777216
+  - net.core.wmem_max = 16777216
+  - net.ipv4.tcp_rmem = 16384 131072 16777216
+  - net.ipv4.tcp_wmem = 16384 131072 16777216
+  - net.ipv4.tcp_mem = 262144 524288 1572864
+  - net.ipv4.tcp_max_syn_backlog = 131072
+  - net.ipv4.ip_local_port_range = 10000 65535
+  - net.ipv4.tcp_tw_reuse = 1
+  - net.ipv4.ip_forward = 1
+  - net.ipv4.conf.all.rp_filter = 0
+  - net.ipv4.neigh.default.gc_thresh2 = 4096
+  - net.ipv4.neigh.default.gc_thresh3 = 32768
   additionalUserData:
   - name: myscript.sh
     type: text/x-shellscript
     content: |
       #!/bin/sh
-      cat <<EOT >> /etc/sysctl.d/999-testground.conf
-      net.core.somaxconn = 131072
-      net.netfilter.nf_conntrack_max = 1048576
-      net.ipv4.tcp_max_syn_backlog = 131072
-      net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 10000 65535
-      net.ipv4.tcp_tw_recycle = 1
-      net.ipv4.tcp_tw_reuse = 1
-      net.core.rmem_max = 4194304
-      net.core.wmem_max = 4194304
-      net.ipv4.tcp_mem = 262144 524288 1572864
-      net.ipv4.tcp_rmem = 16384 131072 4194304
-      net.ipv4.tcp_wmem = 16384 131072 4194304
-      net.ipv4.neigh.default.gc_thresh2 = 4096
-      net.ipv4.neigh.default.gc_thresh3 = 32768
-      EOT
+      #cat <<EOT >> /etc/sysctl.d/999-testground.conf
+      #fs.file-max = 3178504
+      #net.core.somaxconn = 131072
+      #net.netfilter.nf_conntrack_max = 1048576
+      #net.core.netdev_max_backlog = 524288
+      #net.core.rmem_max = 16777216
+      #net.core.wmem_max = 16777216
+      #net.ipv4.tcp_rmem = 16384 131072 16777216
+      #net.ipv4.tcp_wmem = 16384 131072 16777216
+      #net.ipv4.tcp_mem = 262144 524288 1572864
+      #net.ipv4.tcp_max_syn_backlog = 131072
+      #net.ipv4.ip_local_port_range = 10000 65535
+      #net.ipv4.tcp_tw_reuse = 1
+      #net.ipv4.ip_forward = 1
+      #net.ipv4.conf.all.rp_filter = 0
+      #net.ipv4.neigh.default.gc_thresh2 = 4096
+      #net.ipv4.neigh.default.gc_thresh3 = 32768
+      #EOT
+      cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+       *  soft  nproc  131072
+       *  hard  nproc  262144
+       *  soft  nofile 131072
+       *  hard  nofile 262144
+      LIMITS
   cloudLabels:
     testground.node.role.plan: "true"
-  image: 909427826938/testground_2020-10-30
+  image: testground_2023-05-04
   machineType: ${WORKER_NODE_TYPE}
-  maxSize: ${WORKER_NODES}
-  minSize: ${WORKER_NODES}
+  ##mixedInstancesPolicy:
+  ##  instances:
+  ##  - c5.9xlarge
+  ##  onDemandAboveBase: 0
+  ##  onDemandBase: 0
+  ##  spotAllocationStrategy: capacity-optimized
+  maxSize: ${MAX_WORKER_NODES}
+  minSize: ${MIN_WORKER_NODES}
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: nodes
     testground.node.role.plan: "true"
   role: Node
   subnets:
   - ${ZONE_A}
-  - ${ZONE_B}
 
 ---
-
 apiVersion: kops.k8s.io/v1alpha2
 kind: InstanceGroup
 metadata:
@@ -208,37 +399,75 @@ metadata:
     kops.k8s.io/cluster: ${CLUSTER_NAME}
   name: tginfra
 spec:
+  kubelet:
+    maxPods: 58
+    use-max-pods: false
+  sysctlParameters:
+  - fs.file-max = 3178504
+  - net.core.somaxconn = 131072
+  - net.netfilter.nf_conntrack_max = 1048576
+  - net.core.netdev_max_backlog = 524288
+  - net.core.rmem_max = 16777216
+  - net.core.wmem_max = 16777216
+  - net.ipv4.tcp_rmem = 16384 131072 16777216
+  - net.ipv4.tcp_wmem = 16384 131072 16777216
+  - net.ipv4.tcp_mem = 262144 524288 1572864
+  - net.ipv4.tcp_max_syn_backlog = 131072
+  - net.ipv4.ip_local_port_range = 10000 65535
+  - net.ipv4.tcp_tw_reuse = 1
+  - net.ipv4.ip_forward = 1
+  - net.ipv4.conf.all.rp_filter = 0
+  - net.ipv4.neigh.default.gc_thresh2 = 4096
+  - net.ipv4.neigh.default.gc_thresh3 = 32768
   additionalUserData:
   - name: myscript.sh
     type: text/x-shellscript
     content: |
       #!/bin/sh
-      cat <<EOT >> /etc/sysctl.d/999-testground.conf
-      net.core.somaxconn = 131072
-      net.netfilter.nf_conntrack_max = 1048576
-      net.ipv4.tcp_max_syn_backlog = 131072
-      net.core.netdev_max_backlog = 524288
-      net.ipv4.ip_local_port_range = 10000 65535
-      net.ipv4.tcp_tw_recycle = 1
-      net.ipv4.tcp_tw_reuse = 1
-      net.core.rmem_max = 4194304
-      net.core.wmem_max = 4194304
-      net.ipv4.tcp_mem = 262144 524288 1572864
-      net.ipv4.tcp_rmem = 16384 131072 4194304
-      net.ipv4.tcp_wmem = 16384 131072 4194304
-      net.ipv4.neigh.default.gc_thresh2 = 4096
-      net.ipv4.neigh.default.gc_thresh3 = 32768
-      EOT
+      #cat <<EOT >> /etc/sysctl.d/999-testground.conf
+      #fs.file-max = 3178504
+      #net.core.somaxconn = 131072
+      #net.netfilter.nf_conntrack_max = 1048576
+      #net.core.netdev_max_backlog = 524288
+      #net.core.rmem_max = 16777216
+      #net.core.wmem_max = 16777216
+      #net.ipv4.tcp_rmem = 16384 131072 16777216
+      #net.ipv4.tcp_wmem = 16384 131072 16777216
+      #net.ipv4.tcp_mem = 262144 524288 1572864
+      #net.ipv4.tcp_max_syn_backlog = 131072
+      #net.ipv4.ip_local_port_range = 10000 65535
+      #net.ipv4.tcp_tw_reuse = 1
+      #net.ipv4.ip_forward = 1
+      #net.ipv4.conf.all.rp_filter = 0
+      #net.ipv4.neigh.default.gc_thresh2 = 4096
+      #net.ipv4.neigh.default.gc_thresh3 = 32768
+      #EOT
+      cat <<LIMITS > /etc/security/limits.d/999-limits.conf
+       *  soft  nproc  131072
+       *  hard  nproc  262144
+       *  soft  nofile 131072
+       *  hard  nofile 262144
+      LIMITS
   cloudLabels:
     testground.node.role.infra: "true"
-  image: 909427826938/testground_2020-10-30
-  machineType: c5.2xlarge
-  maxSize: 2
+  image: testground_2023-05-04
+    #machineType: c5.4xlarge
+  machineType: c5.9xlarge
+  #mixedInstancesPolicy:
+  #  instances:
+  #  - c5.9xlarge
+  #  onDemandAboveBase: 0
+  #  onDemandBase: 0
+  #  spotAllocationStrategy: capacity-optimized
   minSize: 2
+  maxSize: 10
+  cloudLabels:
+    k8s.io/cluster-autoscaler/${CLUSTER_NAME}: "owned"
+    k8s.io/cluster-autoscaler/enabled: ""
+    k8s.io/cluster-autoscaler/node-template/label: ""
   nodeLabels:
     kops.k8s.io/instancegroup: tginfra
     testground.node.role.infra: "true"
   role: Node
   subnets:
   - ${ZONE_A}
-  - ${ZONE_B}

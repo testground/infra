@@ -1,0 +1,22 @@
+# We generate this ArgoCD application with Terraform, but we keep it here as a workaround
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/testground/infra.git
+    path: 'argocd'
+    targetRevision: v0.7.0
+  destination:
+    name: in-cluster
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      allowEmpty: true
+      selfHeal: true
+    syncOptions:
+    - ApplyOutOfSyncOnly=true
+    - CreateNamespace=true

@@ -54,9 +54,14 @@ then
   echo -e "Environment variable MASTER_NODE_TYPE must be set."
   exit 2
 fi
-if [ -z "$WORKER_NODES" ]
+if [ -z "$MAX_WORKER_NODES" ]
 then
-  echo -e "Environment variable WORKER_NODES must be set."
+  echo -e "Environment variable MAX_WORKER_NODES must be set."
+  exit 2
+fi
+if [ -z "$MIN_WORKER_NODES" ]
+then
+  echo -e "Environment variable MIN_WORKER_NODES must be set."
   exit 2
 fi
 if [ -z "$PUBKEY" ]

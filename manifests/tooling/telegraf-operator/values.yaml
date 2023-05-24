@@ -1,0 +1,19 @@
+replicaCount: 2
+
+namespace: default
+
+classes:
+  data:
+    default: |
+      [[outputs.influxdb]]
+        urls = ["http://influxdb:8086"]
+        database = "testground"
+
+resources:
+  limits:
+    cpu: 400m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+hotReload: true
