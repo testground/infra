@@ -122,11 +122,9 @@ spec:
     kubeAPIBurst: 40
   kubernetesApiAccess:
   - 0.0.0.0/0
-  kubernetesVersion: 1.22.17
   # the latest version we can use atm is this one, due to the Docker CRI
-  #kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
-  #kubernetesVersion: v1.24.5
-  # kubernetesVersion: v1.25.4
+  kubernetesVersion: 1.23.4 # https://sysdig.com/blog/kubernetes-1-23-whats-new/ needed -> persistentVolumeClaimRetentionPolicy
+  # kubernetesVersion: 1.22.17
   masterInternalName: api.internal.${CLUSTER_NAME}
   masterPublicName: api.${CLUSTER_NAME}
   networkCIDR: 192.168.0.0/16
@@ -140,18 +138,10 @@ spec:
   sshAccess:
   - 0.0.0.0/0
   subnets:
-    #- cidr: 172.20.32.0/19
-    #- cidr: 172.20.0.0/17
-    #- cidr: 192.168.0.0/19
-    #- cidr: 192.168.0.0/18
   - cidr: 192.168.0.0/17 # hosts: 32,768
     name: ${ZONE_A}
     type: Public
     zone: ${ZONE_A}
-    #- cidr: 172.20.64.0/19
-    #- cidr: 172.20.128.0/19
-    #  - cidr: 192.168.128.0/19
-    #- cidr: 192.168.64.0/18
   - cidr: 192.168.128.0/17 # hosts: 32,768
     name: ${ZONE_B}
     type: Public
@@ -381,12 +371,12 @@ spec:
     testground.node.role.plan: "true"
   image: testground_2023-05-04
   machineType: ${WORKER_NODE_TYPE}
-    ###mixedInstancesPolicy:
-    ###  instances:
-    ###  - c5.9xlarge
-    ###  onDemandAboveBase: 0
-    ###  onDemandBase: 0
-    ###  spotAllocationStrategy: capacity-optimized
+  ##mixedInstancesPolicy:
+  ##  instances:
+  ##  - c5.9xlarge
+  ##  onDemandAboveBase: 0
+  ##  onDemandBase: 0
+  ##  spotAllocationStrategy: capacity-optimized
   maxSize: ${MAX_WORKER_NODES}
   minSize: ${MIN_WORKER_NODES}
   cloudLabels:
@@ -463,12 +453,12 @@ spec:
   image: testground_2023-05-04
     #machineType: c5.4xlarge
   machineType: c5.9xlarge
-    #mixedInstancesPolicy:
-    #  instances:
-    #  - c5.9xlarge
-    #  onDemandAboveBase: 0
-    #  onDemandBase: 0
-    #  spotAllocationStrategy: capacity-optimized
+  #mixedInstancesPolicy:
+  #  instances:
+  #  - c5.9xlarge
+  #  onDemandAboveBase: 0
+  #  onDemandBase: 0
+  #  spotAllocationStrategy: capacity-optimized
   minSize: 40
   maxSize: 50
   cloudLabels:
