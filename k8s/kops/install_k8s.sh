@@ -122,9 +122,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/celestiaorg/testground-infra.git
+    repoURL: https://github.com/testground/infra.git
     path: 'argocd'
-    targetRevision: jose/hackground-k8s-tf
+    targetRevision: v0.7.0
   destination:
     name: in-cluster
     namespace: argocd

@@ -307,8 +307,8 @@ module "eks_blueprints_kubernetes_addons" {
     // https://github.com/aws-ia/terraform-aws-eks-blueprints/blob/main/modules/kubernetes-addons/argocd/main.tf#L94-L114
     kustomize-apps = {
       path            = "argocd-root"
-      repo_url        = "https://github.com/celestiaorg/testground-infra.git"
-      target_revision = "jose/hackground-k8s-tf" // Remove this one, should use main
+      repo_url        = "https://github.com/testground/infra.git"
+      target_revision = "v0.7.0"
       type            = "kustomize"
     }
   }

@@ -6,8 +6,8 @@ metadata:
 spec:
   generators:
   - git:
-      repoURL: https://github.com/celestiaorg/testground-infra.git
-      revision: jose/hackground-k8s-tf
+      repoURL: https://github.com/testground/infra.git
+      revision: v0.7.0
       directories:
       - path: 'manifests/aws/*'
       - path: manifests/aws/deactivated
@@ -18,9 +18,9 @@ spec:
     spec:
       project: default
       source:
-        repoURL: https://github.com/celestiaorg/testground-infra.git
+        repoURL: https://github.com/testground/infra.git
         path: 'manifests/aws/{{path[2]}}'
-        targetRevision: jose/hackground-k8s-tf
+        targetRevision: v0.7.0
       destination:
         name: in-cluster
         namespace: default
