@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket = "testground-terraform-state"
-    key    = "jose.k8s.local-tf-state-devops-tg"
+    key    = "testground.k8s.local"
     region = "eu-west-1"
   }
 }

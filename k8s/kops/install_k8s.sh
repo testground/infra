@@ -39,6 +39,16 @@ trap 'err_report $LINENO' ERR
 # =======================================================
 START_TIME=`date +%s`
 # =======================================================
+
+# Load values form the file
+if [ -f ./values.sh ];then
+    source ./values.sh
+else
+    echo "[ERROR] Please, you need to fill the values in the script [values.sh]"
+    exit 1
+fi
+
+# =======================================================
 echo "Creating cluster for Testground..."
 echo
 CLUSTER_SPEC_TEMPLATE=$1
