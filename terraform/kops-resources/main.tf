@@ -3,8 +3,7 @@
 //################################################################################
 locals {
   region       = "eu-west-1"
-  //project_name = "testground-devops-k8s-local"
-  project_name = "tgdevops-k8s-local"
+  project_name = "testground-k8s-local"
 
   azs                         = ["${local.region}a", "${local.region}b"]
   vpc_id                      = data.aws_vpc.selected.id
